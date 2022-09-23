@@ -30,9 +30,8 @@ Right now [@PeterSterne](https://github.com/petersterne) (Peter Sterne) and [@fi
 
 The project is still in the planning stages (again, contributors are welcome), but we hope to move quickly to getting some sort of MVP available. If another solution becomes available in the interim that usurps our needs, we'll obviously be happy to link to that.
 
-Project planning and contributions will take place here on GitHub, but we'll be happy to talk to people on Slack/Twitter/other channels.
+[Join our Discord server](https://discord.gg/rcKtzTsA) to discuss the project's planning and development.
 
 ## License
 
-Any code that we distribute will be open sourced and follow the license terms of any of the projects that we are using. Whisper is MIT licensed, but some of its dependencies (ffmpeg) are licensed under different terms. We will be sure to adhere to any/all licensing terms and in the event that we cannot bundle ffmpeg with Stage Whisper, we will make it as easy to obtain as possible for the end-user. Any Stage Whsiper-specific code will be licensed under the MIT license.
-
+Any code that we distribute will be open sourced and follow the license terms of any of the projects that we are using. Whisper is MIT licensed, but some of its dependencies (FFmpeg) are licensed under different terms. We will be sure to adhere to any/all licensing terms and in the event that we cannot bundle ffmpeg with Stage Whisper, we will make it as easy to obtain as possible for the end-user. Any Stage Whsiper-specific code will be licensed under the MIT license.
