@@ -621,7 +621,7 @@ dev = ["pytest"]
 type = "git"
 url = "https://github.com/openai/whisper.git"
 reference = "main"
-resolved_reference = "f296bcd3fac41525f1c5ab467062776f8e13e4d0"
+resolved_reference = "8cf36f3508c9acd341a45eb2364239a3d81458b9"
 
 [[package]]
 name = "wxpython"

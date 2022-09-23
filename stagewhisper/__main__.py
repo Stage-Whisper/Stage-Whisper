@@ -1,4 +1,5 @@
 from gooey import Gooey, GooeyParser
+import wx
 
 # Imports copied from https://github.com/openai/whisper/blob/c85eaaa/whisper/transcribe.py
 import argparse
@@ -11,7 +12,22 @@ from whisper.utils import exact_div, format_timestamp, optional_int, optional_fl
 
 from whisper.transcribe import transcribe
 
-@Gooey
+
+IS_DARK = wx.SystemSettings.GetAppearance().IsUsingDarkBackground()
+APPEARANCE_LIGHT = {
+    'body_bg_color': '#F5F5F5',
+}
+APPEARANCE_DARK = {
+    'body_bg_color': '#222',
+    'terminal_panel_color': '#222',
+    'terminal_font_color': '#FFF',
+}
+
+
+@Gooey(
+    program_name="Stage Whisper",
+    **APPEARANCE_DARK if IS_DARK else APPEARANCE_LIGHT,
+)
 def cli():
     """
     This function is copied and modified from the original whisper CLI
