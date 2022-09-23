@@ -7,7 +7,7 @@ The main repo for Stage Whisper, our easy to use AI transcriber, powered by Open
 
 As Dan Nguyen [noted on Twitter](https://twitter.com/dancow/status/1572749731704573957), this could be a "godsend for newsrooms."
 
-The only problem, as [@PeterSterne](https://github.com/petersterne) pointed out is that not all journalists (or others who could benefit from this type of transcription tool) are comfortable with the command line and installing the dependecies requried to run Whisper.
+The only problem, as [@PeterSterne](https://github.com/petersterne) pointed out, is that not all journalists (or others who could benefit from this type of transcription tool) are comfortable with the command line and installing the dependecies requried to run Whisper.
 
 Our goal is to package Whisper in an easier to use way so that less technical users can take advantage of this neural net.
 
