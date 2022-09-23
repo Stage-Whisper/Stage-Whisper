@@ -1,6 +1,15 @@
 # Stage-Whisper
 The main repo for Stage Whisper, our easy to use AI transcriber, powered by OpenAI's Whisper
 
+## Quickstart
+
+Install [Poetry](https://python-poetry.org/). Then, from inside this repository:
+
+```sh
+poetry install  # Required for first run only
+poetry run stagewhisper
+```
+
 ## Goal
 
 [OpenAI](https://openai.com/blog/whisper/) recently released [Whisper](https://github.com/openai/whisper), its automatic speech recognition (ASR) system that is trained on "680,000 hours of multilingual and multitask supervised data collected from the web." You can learn more by [reading the paper](https://cdn.openai.com/papers/whisper.pdf) [PDF] or looking at the [examples](https://openai.com/blog/whisper/) on OpenAI's website.
