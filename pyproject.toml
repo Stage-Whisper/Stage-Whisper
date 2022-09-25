@@ -5,7 +5,7 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9"
 Gooey = "^1.0.8"
 whisper = {git = "https://github.com/openai/whisper.git", rev = "8cf36f3508c9acd341a45eb2364239a3d81458b9"}
 
