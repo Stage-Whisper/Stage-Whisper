@@ -61,7 +61,7 @@ def cli():
     parser.add_argument("--temperature_increment_on_fallback", type=optional_float, default=0.2, help="temperature to increase when falling back when the decoding fails to meet either of the thresholds below")
     parser.add_argument("--compression_ratio_threshold", type=optional_float, default=2.4, help="if the gzip compression ratio is higher than this value, treat the decoding as failed")
     parser.add_argument("--logprob_threshold", type=optional_float, default=-1.0, help="if the average log probability is lower than this value, treat the decoding as failed")
-    parser.add_argument("--no_caption_threshold", type=optional_float, default=0.6, help="if the probability of the <|nocaptions|> token is higher than this value AND the decoding has failed due to `logprob_threshold`, consider the segment as silence")
+    parser.add_argument("--no_speech_threshold", type=optional_float, default=0.6, help="if the probability of the <|nospeech|> token is higher than this value AND the decoding has failed due to `logprob_threshold`, consider the segment as silence")
 
     args = parser.parse_args().__dict__
     model_name: str = args.pop("model")
@@ -73,30 +73,18 @@ def cli():
         warnings.warn(f"{model_name} is an English-only model but receipted '{args['language']}'; using English instead.")
         args["language"] = "en"
 
-    temperature_increment_on_fallback = args.pop("temperature_increment_on_fallback")
-    compression_ratio_threshold = args.pop("compression_ratio_threshold")
-    logprob_threshold = args.pop("logprob_threshold")
-    no_caption_threshold = args.pop("no_caption_threshold")
-
     temperature = args.pop("temperature")
+    temperature_increment_on_fallback = args.pop("temperature_increment_on_fallback")
     if temperature_increment_on_fallback is not None:
         temperature = tuple(np.arange(temperature, 1.0 + 1e-6, temperature_increment_on_fallback))
     else:
         temperature = [temperature]
 
     from whisper import load_model
-    model = load_model(model_name).to(device)
+    model = load_model(model_name, device=device)
 
     for audio_path in args.pop("audio"):
-        result = transcribe(
-            model,
-            audio_path,
-            temperature=temperature,
-            compression_ratio_threshold=compression_ratio_threshold,
-            logprob_threshold=logprob_threshold,
-            no_captions_threshold=no_caption_threshold,
-            **args,
-        )
+        result = transcribe(model, audio_path, temperature=temperature, **args)
 
         audio_basename = os.path.basename(audio_path)
 
