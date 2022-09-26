@@ -37,6 +37,33 @@ To build in **single-file mode**:
 poetry run pyinstaller --onefile --windowed stagewhisper.spec
 ```
 
+A useful shortcut while making changes to `stagewhisper.spec` is this command to build and run:
+
+```sh
+poetry run pyinstaller stagewhisper.spec --noconfirm && ./dist/stagewhisper/stagewhisper
+```
+
+#### Bundling for Mac
+
+Unfortunately bundling with either method for Mac appears to be extremely wonky. After reading [this thread](https://github.com/chriskiehl/Gooey/issues/259), I've come up with the following process that works:
+
+```sh
+poetry run pyinstaller stagewhisper.spec
+mkdir dist/stagewhisper/Contents
+```
+
+From there you can run the executable (no, I have no idea why creating an empty `Contents` folder makes it work):
+
+```sh
+./dist/stagewhisper/stagewhisper
+```
+
+or rename the directory to turn it into a bundled application:
+
+```sh
+mv dist/stagewhisper dist/stagewhisper.app
+```
+
 ## About the Project
 
 ### Goal

@@ -1,4 +1,21 @@
 # -*- mode: python ; coding: utf-8 -*-
+import platform
+
+from PyInstaller.utils.hooks import collect_data_files
+from PyInstaller.utils.hooks import copy_metadata
+from PyInstaller.building.build_main import Analysis
+from PyInstaller.building.api import EXE, PYZ, COLLECT
+from PyInstaller.building.osx import BUNDLE
+
+datas = []
+datas += collect_data_files('whisper')
+datas += copy_metadata('tqdm')
+datas += copy_metadata('regex')
+datas += copy_metadata('requests')
+datas += copy_metadata('packaging')
+datas += copy_metadata('filelock')
+datas += copy_metadata('numpy')
+datas += copy_metadata('tokenizers')
 
 
 block_cipher = None
@@ -6,9 +23,9 @@ block_cipher = None
 
 a = Analysis(
     ['stagewhisper/__main__.py'],
-    pathex=[],
+    pathex=['stagewhisper/__main__.py'],
     binaries=[],
-    datas=[],
+    datas=datas,
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -38,6 +55,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
+
 coll = COLLECT(
     exe,
     a.binaries,
