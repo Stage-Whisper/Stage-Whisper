@@ -24,11 +24,11 @@ Peter came up with the project name, Stage Whisper.
 
 ## Who is involved
 
-Right now [@PeterSterne](https://github.com/petersterne) (Peter Sterne) and [@filmgirl](https://github.com/filmgirl) (Christina Warren) are involved but we'd love to collaborate with anyone who has ideas about how we could more easily package Whisper and make it easy to use for non-technical users.
+[@PeterSterne](https://github.com/petersterne) and [@filmgirl](https://github.com/filmgirl) (Christina Warren) created the project, and [@HarrisLapiroff](https://github.com/harrislapiroff) and [@Crazy4Pi314](https://github.com/crazy4pi314) (Sarah Kaiser) are leading the development. We'd love to collaborate with anyone who has ideas about how we could more easily package Whisper and make it easy to use for non-technical users.
 
 ## Project Status
 
-The project is still in the planning stages (again, contributors are welcome), but we hope to move quickly to getting some sort of MVP available. If another solution becomes available in the interim that usurps our needs, we'll obviously be happy to link to that.
+The project is still in the planning stages (again, contributors are welcome), but we hope to move quickly to getting some sort of MVP available. For the first version of Stage Whisper, we are working to create a simple GUI interface with [Gooey](https://github.com/chriskiehl/Gooey/) and then package it into binaries that can be downloaded on Windows and MacOS. For subsequent versions of Stage Whisper, though, we are considering alternatives to Gooey, including an Electron app.     
 
 [Join our Discord server](https://discord.gg/rcKtzTsA) to discuss the project's planning and development.
 
