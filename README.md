@@ -30,8 +30,11 @@ Peter came up with the project name, Stage Whisper.
 
 The project is still in the planning stages (again, contributors are welcome), but we hope to move quickly to getting some sort of MVP available. For the first version of Stage Whisper, we are working to create a simple GUI interface with [Gooey](https://github.com/chriskiehl/Gooey/) and then package it into binaries that can be downloaded on Windows and MacOS. For subsequent versions of Stage Whisper, though, we are considering alternatives to Gooey, including an Electron app.     
 
-[Join our Discord server](https://discord.gg/rcKtzTsA) to discuss the project's planning and development.
+- [Request features or ask questions](https://github.com/Stage-Whisper/Stage-Whisper/discussions) on the project discussions on GitHub.
+- Find a bug? [Open an issue](https://github.com/Stage-Whisper/Stage-Whisper/issues/choose) so that we can see how we can fix it.
+- Want to contribute? Check out our good first issues and check out our [contributing guide](https://github.com/Stage-Whisper/Stage-Whisper/contribute).
+- [Join our Discord server](https://discord.gg/rcKtzTsA) to discuss the project's planning and development.
 
 ## License
 
-Any code that we distribute will be open sourced and follow the license terms of any of the projects that we are using. Whisper is MIT licensed, but some of its dependencies (FFmpeg) are licensed under different terms. We will be sure to adhere to any/all licensing terms and in the event that we cannot bundle ffmpeg with Stage Whisper, we will make it as easy to obtain as possible for the end-user. Any Stage Whsiper-specific code will be licensed under the MIT license.
+Any code that we distribute will be open sourced and follow the license terms of any of the projects that we are using. Whisper is MIT licensed, but some of its dependencies (FFmpeg) are licensed under different terms. We will be sure to adhere to any/all licensing terms and in the event that we cannot bundle ffmpeg with Stage Whisper, we will make it as easy to obtain as possible for the end-user. Any Stage Whisper-specific code will be licensed under the MIT license.
