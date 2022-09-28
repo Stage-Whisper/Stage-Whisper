@@ -12,18 +12,21 @@ import {
   MantineProvider,
   MediaQuery,
   Navbar,
+  NavLink,
   Text,
   Title,
   useMantineTheme
 } from '@mantine/core';
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 
-import { IconMoonStars, IconSun } from '@tabler/icons';
+import { IconHome, IconLanguage, IconMicrophone2, IconMoonStars, IconSun } from '@tabler/icons';
+import strings from './localization';
 
 // React Components
 
 function App() {
+  const location = useLocation();
   // eslint-disable-next-line no-console
   console.debug(window.ipcRenderer);
 
@@ -54,26 +57,47 @@ function App() {
           navbarOffsetBreakpoint="sm"
           asideOffsetBreakpoint="sm"
           navbar={
-            <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 150, lg: 300 }}>
-              <Text>Application </Text>
+            <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
+              <NavLink
+                label={strings.dashboard.title}
+                icon={<IconHome size={18} />}
+                active={location.pathname === '/'}
+                component={Link}
+                to="/"
+              />
+
+              <NavLink
+                label={strings.transcribe.title}
+                icon={<IconLanguage size={18} />}
+                active={location.pathname === '/transcribe'}
+                component={Link}
+                to="/transcribe"
+              />
+              <NavLink
+                label={strings.interview.title}
+                component={Link}
+                to="/interview"
+                icon={<IconMicrophone2 size={18} />}
+                active={location.pathname === '/interview'}
+              />
             </Navbar>
           }
           aside={
             <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
               <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
-                <Text>Processing jobs</Text>
+                <Text>{strings.sidebar.title}</Text>
               </Aside>
             </MediaQuery>
           }
           footer={
             <Footer height={60} p="md">
               <Group position="apart">
-                <Text>About</Text>
+                <Text>{strings.about.title}</Text>
                 <ActionIcon
                   variant="outline"
                   color={colorScheme === 'dark' ? 'yellow' : 'blue'}
                   onClick={() => toggleColorScheme()}
-                  title="Toggle color scheme"
+                  title={strings.settings.toggle_dark_mode}
                 >
                   {colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoonStars size={18} />}
                 </ActionIcon>
