@@ -5,34 +5,39 @@ import { IconUpload } from '@tabler/icons';
 import strings from '../../localization';
 
 export interface AudioFile {
-  name: string;
-  type: string;
-  file?: File;
+  name: string | undefined;
+  type: string | undefined;
+  path: string | undefined;
+  file: File | undefined;
 }
 
 interface Props {
-  setSelectedAudio: Dispatch<SetStateAction<AudioFile[]>>;
-  // selectedAudio: AudioFile[];
+  setSelectedAudio: Dispatch<SetStateAction<AudioFile>>;
+
+  showWarning: {
+    audio: boolean;
+    directory: boolean;
+  };
 }
 
-function Audio({ setSelectedAudio }: Props) {
+function Audio({ setSelectedAudio, showWarning }: Props) {
   return (
     <Card shadow="xs" p="md" withBorder title="Audio">
       <Stack>
         <Title order={4}>{strings.transcribe?.audio.title}</Title>
         <FileInput
+          error={showWarning.audio}
           placeholder={strings.transcribe?.audio.placeholder}
           label={strings.transcribe?.audio.prompt}
           accept="audio/*"
-          multiple
-          onChange={(files) => {
-            if (files) {
-              setSelectedAudio(
-                files.map((file) => ({
-                  name: file.name,
-                  type: file.type
-                }))
-              );
+          onChange={(file) => {
+            if (file) {
+              setSelectedAudio({
+                name: file.name,
+                path: file.path,
+                type: file.type,
+                file
+              });
             }
           }}
           icon={<IconUpload size={14} />}
