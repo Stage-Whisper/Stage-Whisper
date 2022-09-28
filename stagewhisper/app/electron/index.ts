@@ -1,10 +1,15 @@
 // Native
 import { join } from 'path';
 
+// Python-Shell
+import { PythonShell } from 'python-shell';
+
 // Packages
 import { BrowserWindow, app, ipcMain, IpcMainEvent, dialog } from 'electron';
 import isDev from 'electron-is-dev';
+import { whisperArgs } from './preload';
 
+// Electron Defaults
 const height = 600;
 const width = 800;
 
@@ -93,4 +98,35 @@ ipcMain.handle('open-directory-dialog', async () => {
   });
 
   return directory.canceled ? null : directory.filePaths[0];
+});
+
+ipcMain.on('run-whisper', (event: IpcMainEvent, args: whisperArgs) => {
+  // eslint-disable-next-line no-console
+  console.log(args);
+
+  // Format model name
+  const model = args.language === 'english' ? `${args.model}.en` : args.model || 'base';
+
+  const options = {
+    scriptPath: join(__dirname, '../src/python'),
+    args: [
+      args.file,
+      `--model ${model}`,
+      args.language || 'en',
+      args.translate ? '--task translate' : '',
+      args.output_dir ? `--output_dir ${args.output_dir}` : ''
+    ]
+    // TODO: Add this option to the frontend to allow for automatic language detection
+    // args.detect_language
+  };
+
+  console.debug(options);
+
+  PythonShell.run('whisper.py', options, (err, results) => {
+    if (err) throw err;
+    // results is an array consisting of messages collected during execution
+    // eslint-disable-next-line no-console
+    console.log('results: %j', results);
+    event.reply('whisper-complete', results);
+  });
 });
