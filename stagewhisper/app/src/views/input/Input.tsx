@@ -16,8 +16,7 @@ function Input() {
   const [selectedAudio, setSelectedAudio] = useState<AudioFile>({
     name: undefined,
     type: undefined,
-    path: undefined,
-    file: undefined
+    path: undefined
   });
   const [showWarning, setShowWarning] = useState({
     audio: false,
@@ -53,13 +52,20 @@ function Input() {
                 audio: false,
                 directory: false
               });
-              window.Main.runWhisper({
-                file: selectedAudio.path,
-                model: selectedModel,
-                language: selectedLanguage,
-                output_dir: selectedDirectory,
-                translate: selectedLanguage !== 'english'
-              });
+              if (window.Main) {
+                window.Main.runWhisper({
+                  file: selectedAudio.path,
+                  model: selectedModel,
+                  language: selectedLanguage,
+                  output_dir: selectedDirectory,
+                  translate: selectedLanguage !== 'english'
+                });
+              } else {
+                // eslint-disable-next-line no-alert
+                alert(
+                  'window.Main is undefined, app in dev mode, please view in electron to select an output directory'
+                );
+              }
             } else {
               setShowWarning({
                 audio: selectedAudio.path === undefined,
