@@ -5,6 +5,8 @@ import Language from '../../components/language/Language';
 import Model from '../../components/model/Model';
 import Audio, { AudioFile } from '../../components/audio/Audio';
 
+import strings from '../../localization';
+
 function Input() {
   // Selections for the user
   const [selectedModel, setSelectedModel] = useState<string>('Base');
@@ -37,7 +39,7 @@ function Input() {
             });
           }}
         >
-          Start
+          {strings.transcribe.submit_button}
         </Button>
       </Center>
     </>
