@@ -134,7 +134,7 @@ export const strings = new LocalizedStrings({
       title: 'Recent Transcriptions'
     }
   },
-  // Turkish translation
+  // Turkish translation -- Ai
   tr: {
     transcribe: {
       title: 'Transkribe',
