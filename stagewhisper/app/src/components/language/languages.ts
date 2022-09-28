@@ -1,5 +1,5 @@
 export const languages = [
-  'none',
+  'auto-detect', // FIXME: How to handle translating this string for all languages?
   'english',
   'chinese',
   'german',

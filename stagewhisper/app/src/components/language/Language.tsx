@@ -2,6 +2,8 @@ import { Text, Card, Select, Stack, Title } from '@mantine/core';
 import React from 'react';
 import { languages } from './languages';
 
+import strings from '../../localization';
+
 interface Props {
   selectedLanguage: string;
   setSelectedLanguage: (value: string) => void;
@@ -11,14 +13,12 @@ function Language({ selectedLanguage, setSelectedLanguage }: Props) {
   return (
     <Card shadow="xs" p="md" withBorder title="Language">
       <Stack>
-        <Title order={4}>Language</Title>
+        <Title order={4}>{strings.transcribe.language.title}</Title>
         <Select
           withinPortal
-          label="Language spoken in the audio, specify none to perform automatic language detection"
-          placeholder="none"
-          defaultValue="none"
+          label={strings.transcribe.language.prompt}
+          placeholder={strings.transcribe.language.placeholder}
           searchable
-          nothingFound="No options"
           data={languages}
           onChange={(value) => {
             if (value) {
@@ -28,7 +28,7 @@ function Language({ selectedLanguage, setSelectedLanguage }: Props) {
         />
         {selectedLanguage !== 'english' && (
           <Text color="dimmed" italic size="sm">
-            Note: Languages other than english may have an increased error rate
+            {strings.transcribe.language.non_english_warning}
           </Text>
         )}
       </Stack>

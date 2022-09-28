@@ -1,47 +1,47 @@
-import { Text, Card, FileInput, Stack, Title } from '@mantine/core';
+import { Text, Card, Input, Stack, Title } from '@mantine/core';
 import React, { Dispatch, SetStateAction } from 'react';
+
+import strings from '../../localization';
+
 // import { ipcRenderer } from 'electron';
 // const { ipcRenderer } = window.require('electron');
 
 interface Props {
-  setSelectedDirectory: Dispatch<SetStateAction<string>>;
+  setSelectedDirectory: Dispatch<SetStateAction<string | undefined>>;
+  selectedDirectory: string | undefined;
 }
 
 // const handleDirectory = () => {
 //   ipcRenderer.send('open-directory-dialog');
 // };
 
-function Directory({ setSelectedDirectory }: Props) {
+function Directory({ setSelectedDirectory, selectedDirectory }: Props) {
   return (
     <Card shadow="xs" p="md" withBorder title="Output">
       <Stack>
-        <Title order={4}>Output Location</Title>
-        <FileInput
-          placeholder="Select a directory"
-          label="Select a directory to save the output"
-          disabled
-          onChange={(file) => {
-            if (file) {
-              setSelectedDirectory(file.path);
-            }
-          }}
-
-          //   console.log('clicked');
-          //   if (window.Main) {
-          //     console.log('clicked and window.Main exists');
-          //     handleDirectory();
-          //   } else {
-          //     const devDirectory = prompt(
-          //       'window.Main is undefined, app in dev mode, please enter a directory manually'
-          //     );
-          //     if (devDirectory) {
-          //       setSelectedDirectory(devDirectory);
-          //     }
-          //   }
-          // }}
-        />
+        <Title order={4}>{strings.transcribe.directory.title}</Title>
+        <Input.Wrapper label={strings.transcribe.directory.prompt}>
+          <Input
+            placeholder={strings.transcribe.directory.placeholder}
+            component="button"
+            onClick={() => {
+              if (window.Main) {
+                window.Main.openDirectoryDialog().then((result: string) => {
+                  setSelectedDirectory(result);
+                });
+              } else {
+                // eslint-disable-next-line no-alert
+                alert(
+                  'window.Main is undefined, app in dev mode, please view in electron to select an output directory'
+                );
+              }
+            }}
+          >
+            {selectedDirectory || strings.transcribe.directory.placeholder}
+          </Input>
+        </Input.Wrapper>
         <Text italic size="xs" color="dimmed" align="center">
-          Not functional yet, will just save to desktop
+          {strings.transcribe.directory.not_functional}
         </Text>
       </Stack>
     </Card>
