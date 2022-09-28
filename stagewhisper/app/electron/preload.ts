@@ -1,4 +1,5 @@
 import { ipcRenderer, contextBridge } from 'electron';
+// import { languages } from '../src/components/language/languages';
 
 declare global {
   interface Window {
@@ -7,9 +8,20 @@ declare global {
   }
 }
 
+// Arguments to be passed to the Whisper AI python script
+export interface whisperArgs {
+  file: string;
+  model: 'tiny' | 'base' | 'small' | 'medium' | 'large';
+  language: string;
+  translate: boolean;
+  output_dir: string;
+  // detect_language: boolean;
+  // output_format: string;
+}
+
 const api = {
-  runWhisper: (args: string[]) => {
-    ipcRenderer.send('run-whisper', args);
+  runWhisper: (args: whisperArgs) => {
+    ipcRenderer.invoke('run-whisper', args);
   },
 
   openDirectoryDialog: async () => {
@@ -21,18 +33,6 @@ const api = {
     ipcRenderer.send('message', message);
   },
 
-  /**
-    Here function for AppBar
-   */
-  // Minimize: () => {
-  //   ipcRenderer.send('minimize');
-  // },
-  // Maximize: () => {
-  //   ipcRenderer.send('maximize');
-  // },
-  // Close: () => {
-  //   ipcRenderer.send('close');
-  // },
   /**
    * Provide an easier way to listen to events
    */

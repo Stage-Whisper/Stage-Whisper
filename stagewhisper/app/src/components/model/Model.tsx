@@ -4,35 +4,35 @@ import React from 'react';
 import strings from '../../localization';
 
 interface Props {
-  selectedModel: string;
-  setSelectedModel: (value: string) => void;
+  selectedModel: 'tiny' | 'base' | 'small' | 'medium' | 'large';
+  setSelectedModel: (value: 'tiny' | 'base' | 'small' | 'medium' | 'large') => void;
 }
 
 function model({ selectedModel, setSelectedModel }: Props) {
   const options = [
     {
       label: strings.transcribe.models.options.tiny.title,
-      value: 'Tiny',
+      value: 'tiny',
       description: strings.transcribe.models.options.tiny.description
     },
     {
       label: strings.transcribe.models.options.base.title,
-      value: 'Base',
+      value: 'base',
       description: strings.transcribe.models.options.base.description
     },
     {
       label: strings.transcribe.models.options.small.title,
-      value: 'Small',
+      value: 'small',
       description: strings.transcribe.models.options.small.description
     },
     {
       label: strings.transcribe.models.options.medium.title,
-      value: 'Medium',
+      value: 'medium',
       description: strings.transcribe.models.options.medium.description
     },
     {
       label: strings.transcribe.models.options.large.title,
-      value: 'Large',
+      value: 'large',
       description: strings.transcribe.models.options.large.description
     }
   ];
@@ -43,7 +43,9 @@ function model({ selectedModel, setSelectedModel }: Props) {
         <Title order={4}>{strings.transcribe.models.title}</Title>
         <SegmentedControl
           value={selectedModel}
-          onChange={(value) => setSelectedModel(value)}
+          onChange={(value) => {
+            setSelectedModel(value as 'tiny' | 'base' | 'small' | 'medium' | 'large');
+          }}
           data={options.map((option) => ({
             label: option.label,
             value: option.value

@@ -16,7 +16,7 @@ export const strings = new LocalizedStrings({
       directory: {
         title: 'Output Directory',
         prompt: 'Select a directory to save the output',
-        placeholder: 'Select a directory',
+        placeholder: 'Select an output directory',
         not_functional: 'Not functional yet, will just save to desktop'
       },
       language: {
