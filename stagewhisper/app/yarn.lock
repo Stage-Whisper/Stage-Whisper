@@ -4480,6 +4480,11 @@ verror@^1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
+vite-plugin-electron-renderer@^0.9.3:
+  version "0.9.3"
+  resolved "https://registry.yarnpkg.com/vite-plugin-electron-renderer/-/vite-plugin-electron-renderer-0.9.3.tgz#f9d50a810306ce62886b6dec54d3989ce71f9193"
+  integrity sha512-RSZBK2+IIVY/7pluyAB6Uavf/e9tXck7tJzSvS/XMDrbwmphXmr0IPCbDd9uqDlq3GqP/sxx+tdJgWs72F40Tg==
+
 vite@^2.8.6:
   version "2.8.6"
   resolved "https://registry.yarnpkg.com/vite/-/vite-2.8.6.tgz#32d50e23c99ca31b26b8ccdc78b1d72d4d7323d3"

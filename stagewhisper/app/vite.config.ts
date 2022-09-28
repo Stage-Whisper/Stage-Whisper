@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react';
 import { UserConfig, ConfigEnv } from 'vite';
 import { join } from 'path';
+import renderer from 'vite-plugin-electron-renderer';
 
 const srcRoot = join(__dirname, 'src');
 
@@ -10,7 +11,7 @@ export default ({ command }: ConfigEnv): UserConfig => {
     return {
       root: srcRoot,
       base: '/',
-      plugins: [react()],
+      plugins: [react(), renderer()],
       resolve: {
         alias: {
           '/@': srcRoot
@@ -33,7 +34,7 @@ export default ({ command }: ConfigEnv): UserConfig => {
   return {
     root: srcRoot,
     base: './',
-    plugins: [react()],
+    plugins: [react(), renderer()],
     resolve: {
       alias: {
         '/@': srcRoot

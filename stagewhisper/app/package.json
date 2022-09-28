@@ -49,7 +49,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-router-dom": "^6.4.1",
-    "vite": "^2.8.6"
+    "vite": "^2.8.6",
+    "vite-plugin-electron-renderer": "^0.9.3"
   },
   "devDependencies": {
     "@types/eslint": "8.4.6",
