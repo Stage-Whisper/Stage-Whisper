@@ -8,7 +8,7 @@ export interface AudioFile {
   name: string | undefined;
   type: string | undefined;
   path: string | undefined;
-  file: File | undefined;
+  file?: File;
 }
 
 interface Props {
