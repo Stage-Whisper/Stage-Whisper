@@ -30,20 +30,9 @@ function App() {
   // eslint-disable-next-line no-console
   console.debug(window.ipcRenderer);
 
-  // const sendMessageToElectron = () => {
-  //   if (window.Main) {
-  //     window.Main.sendMessage("Hello I'm from React World");
-  //   } else {
-  //     setFromMain(
-  //       "You are in a Browser, so no Electron functions are available"
-  //     );
-  //   }
-  //   setSent(true);
-  // };
-
   // Theming
   const theme = useMantineTheme();
-  const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
+  const [colorScheme, setColorScheme] = useState<ColorScheme>('dark');
   const toggleColorScheme = (value?: ColorScheme) =>
     setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
 
@@ -76,6 +65,7 @@ function App() {
               <NavLink
                 label={strings.interview.title}
                 component={Link}
+                disabled
                 to="/interview"
                 icon={<IconMicrophone2 size={18} />}
                 active={location.pathname === '/interview'}
