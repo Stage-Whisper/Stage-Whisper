@@ -2,11 +2,18 @@
 import { join } from 'path';
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent } from 'electron';
+import { BrowserWindow, app, ipcMain, IpcMainEvent, dialog } from 'electron';
 import isDev from 'electron-is-dev';
 
 const height = 600;
 const width = 800;
+
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    api: any;
+  }
+}
 
 function createWindow() {
   // Create the browser window.
@@ -32,7 +39,7 @@ function createWindow() {
   }
 
   // eslint-disable-next-line no-unused-expressions
-  isDev && window?.webContents.openDevTools();
+  isDev && window?.webContents.openDevTools({ mode: 'detach' });
 
   // For AppBar
   ipcMain.on('minimize', () => {
@@ -77,4 +84,13 @@ ipcMain.on('message', (event: IpcMainEvent, message: unknown) => {
   // eslint-disable-next-line no-console
   console.log(message);
   setTimeout(() => event.sender.send('message', 'hi from electron'), 500);
+});
+
+ipcMain.handle('open-directory-dialog', async () => {
+  // Trigger electron directory picker and return the selected directory
+  const directory = await dialog.showOpenDialog({
+    properties: ['openDirectory']
+  });
+
+  return directory.canceled ? null : directory.filePaths[0];
 });
