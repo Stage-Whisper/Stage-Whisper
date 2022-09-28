@@ -1,5 +1,5 @@
 import { ipcRenderer, contextBridge } from 'electron';
-import { languages } from '../src/components/language/languages';
+// import { languages } from '../src/components/language/languages';
 
 declare global {
   interface Window {
@@ -12,7 +12,7 @@ declare global {
 export interface whisperArgs {
   file: string;
   model: 'tiny' | 'base' | 'small' | 'medium' | 'large';
-  language: typeof languages[number];
+  language: string;
   translate: boolean;
   output_dir: string;
   // detect_language: boolean;
@@ -21,7 +21,7 @@ export interface whisperArgs {
 
 const api = {
   runWhisper: (args: whisperArgs) => {
-    ipcRenderer.send('run-whisper', args);
+    ipcRenderer.invoke('run-whisper', args);
   },
 
   openDirectoryDialog: async () => {
