@@ -9,13 +9,17 @@ import strings from '../../localization';
 interface Props {
   setSelectedDirectory: Dispatch<SetStateAction<string | undefined>>;
   selectedDirectory: string | undefined;
+  showWarning: {
+    audio: boolean;
+    directory: boolean;
+  };
 }
 
 // const handleDirectory = () => {
 //   ipcRenderer.send('open-directory-dialog');
 // };
 
-function Directory({ setSelectedDirectory, selectedDirectory }: Props) {
+function Directory({ setSelectedDirectory, selectedDirectory, showWarning }: Props) {
   return (
     <Card shadow="xs" p="md" withBorder title="Output">
       <Stack>
@@ -23,6 +27,7 @@ function Directory({ setSelectedDirectory, selectedDirectory }: Props) {
         <Input.Wrapper label={strings.transcribe.directory.prompt}>
           <Input
             placeholder={strings.transcribe.directory.placeholder}
+            invalid={showWarning.directory}
             component="button"
             onClick={() => {
               if (window.Main) {
