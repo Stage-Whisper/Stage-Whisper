@@ -3705,6 +3705,11 @@ pupa@^2.1.1:
   dependencies:
     escape-goat "^2.0.0"
 
+python-shell@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/python-shell/-/python-shell-3.0.1.tgz#c3d3b11536e6ebdb8d6a2602482f7180d940bb13"
+  integrity sha512-TWeotuxe1auhXa5bGRScxnc2J+0r41NBntSa6RYZtMBLtAEsvCboKrEbW6DvASosWQepVkhZZlT3B5Ei766G+Q==
+
 queue-microtask@^1.2.2:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/queue-microtask/-/queue-microtask-1.2.3.tgz#4929228bbc724dfac43e0efb058caf7b6cfb6243"
