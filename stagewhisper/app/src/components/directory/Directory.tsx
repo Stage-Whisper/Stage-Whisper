@@ -3,9 +3,6 @@ import React, { Dispatch, SetStateAction } from 'react';
 
 import strings from '../../localization';
 
-// import { ipcRenderer } from 'electron';
-// const { ipcRenderer } = window.require('electron');
-
 interface Props {
   setSelectedDirectory: Dispatch<SetStateAction<string | undefined>>;
   selectedDirectory: string | undefined;
@@ -14,10 +11,6 @@ interface Props {
     directory: boolean;
   };
 }
-
-// const handleDirectory = () => {
-//   ipcRenderer.send('open-directory-dialog');
-// };
 
 function Directory({ setSelectedDirectory, selectedDirectory, showWarning }: Props) {
   return (
