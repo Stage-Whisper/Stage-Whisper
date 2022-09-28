@@ -5,8 +5,8 @@ import { languages } from './languages';
 import strings from '../../localization';
 
 interface Props {
-  selectedLanguage: string;
-  setSelectedLanguage: (value: string) => void;
+  selectedLanguage: typeof languages[number];
+  setSelectedLanguage: (value: typeof languages[number]) => void;
 }
 
 function Language({ selectedLanguage, setSelectedLanguage }: Props) {
@@ -19,10 +19,11 @@ function Language({ selectedLanguage, setSelectedLanguage }: Props) {
           label={strings.transcribe.language.prompt}
           placeholder={strings.transcribe.language.placeholder}
           searchable
-          data={languages}
+          data={Object.values(languages)}
+          value={selectedLanguage}
           onChange={(value) => {
             if (value) {
-              setSelectedLanguage(value);
+              setSelectedLanguage(value as typeof languages[number]);
             }
           }}
         />

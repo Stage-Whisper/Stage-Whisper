@@ -1,5 +1,4 @@
 export const languages = [
-  'auto-detect', // FIXME: How to handle translating this string for all languages?
   'english',
   'chinese',
   'german',
@@ -110,7 +109,7 @@ export const languages = [
   'moldovan',
   'sinhalese',
   'castilian'
-];
+] as const;
 
 export const checkValidLanguage = (language: string): boolean => {
   if (language in languages) {
