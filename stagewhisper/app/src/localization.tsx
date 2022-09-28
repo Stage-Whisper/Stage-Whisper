@@ -135,6 +135,7 @@ export const strings = new LocalizedStrings({
     }
   },
   // Turkish translation -- Ai
+  // FIXME: This is a placeholder translation
   tr: {
     transcribe: {
       title: 'Transkribe',
