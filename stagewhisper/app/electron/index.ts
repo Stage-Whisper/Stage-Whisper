@@ -5,7 +5,7 @@ import { join } from 'path';
 import { PythonShell } from 'python-shell';
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent, dialog } from 'electron';
+import { BrowserWindow, app, ipcMain, IpcMainEvent, dialog, IpcMainInvokeEvent } from 'electron';
 import isDev from 'electron-is-dev';
 import { whisperArgs } from './preload';
 
@@ -100,9 +100,8 @@ ipcMain.handle('open-directory-dialog', async () => {
   return directory.canceled ? null : directory.filePaths[0];
 });
 
-ipcMain.on('run-whisper', (event: IpcMainEvent, args: whisperArgs) => {
+ipcMain.handle('run-whisper', (event: IpcMainInvokeEvent, args: whisperArgs) => {
   // eslint-disable-next-line no-console
-  console.log(args);
 
   // Format model name
   const model = args.language === 'english' ? `${args.model}.en` : args.model || 'base';
@@ -120,13 +119,13 @@ ipcMain.on('run-whisper', (event: IpcMainEvent, args: whisperArgs) => {
     // args.detect_language
   };
 
-  console.debug(options);
-
+  // eslint-disable-next-line no-console
+  console.log('Running python script with options: ', options);
   PythonShell.run('whisper.py', options, (err, results) => {
     if (err) throw err;
     // results is an array consisting of messages collected during execution
     // eslint-disable-next-line no-console
     console.log('results: %j', results);
-    event.reply('whisper-complete', results);
+    event.sender.send('whisper-complete', results);
   });
 });
