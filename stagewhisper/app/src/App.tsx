@@ -4,8 +4,6 @@ import {
   Aside,
   // Aside,
   Burger,
-  Button,
-  Center,
   ColorScheme,
   ColorSchemeProvider,
   Footer,
@@ -14,18 +12,14 @@ import {
   MantineProvider,
   MediaQuery,
   Navbar,
-  SimpleGrid,
   Text,
   Title,
   useMantineTheme
 } from '@mantine/core';
 import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 
 import { IconMoonStars, IconSun } from '@tabler/icons';
-import Audio, { AudioFile } from './components/audio/Audio';
-import Language from './components/language/Language';
-import Model from './components/model/Model';
-import Directory from './components/directory/Directory';
 
 // React Components
 
@@ -52,19 +46,6 @@ function App() {
 
   // States
   const [opened, setOpened] = useState(false);
-
-  // Selections for the user
-  const [selectedModel, setSelectedModel] = useState<string>('Base');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('english');
-  const [selectedAudio, setSelectedAudio] = useState<AudioFile[]>([
-    {
-      name: '',
-      type: ''
-    }
-  ]);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-  const [selectedDirectory, setSelectedDirectory] = useState<string>('');
 
   return (
     <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
@@ -117,26 +98,7 @@ function App() {
             </Header>
           }
         >
-          <SimpleGrid cols={2} breakpoints={[{ maxWidth: 900, cols: 1, spacing: 'sm' }]}>
-            <Audio setSelectedAudio={setSelectedAudio} />
-            <Language selectedLanguage={selectedLanguage} setSelectedLanguage={setSelectedLanguage} />
-            <Model selectedModel={selectedModel} setSelectedModel={setSelectedModel} />
-            <Directory setSelectedDirectory={setSelectedDirectory} />
-          </SimpleGrid>
-
-          <Center my="lg">
-            <Button
-              onClick={() => {
-                window.ipcRenderer.send('start', {
-                  model: selectedModel,
-                  language: selectedLanguage,
-                  audio: selectedAudio
-                });
-              }}
-            >
-              Start
-            </Button>
-          </Center>
+          <Outlet />
         </AppShell>
       </MantineProvider>
     </ColorSchemeProvider>
