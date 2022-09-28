@@ -2,6 +2,8 @@ import { Card, FileInput, Stack, Title } from '@mantine/core';
 import React, { Dispatch, SetStateAction } from 'react';
 import { IconUpload } from '@tabler/icons';
 
+import strings from '../../localization';
+
 export interface AudioFile {
   name: string;
   type: string;
@@ -17,10 +19,10 @@ function Audio({ setSelectedAudio }: Props) {
   return (
     <Card shadow="xs" p="md" withBorder title="Audio">
       <Stack>
-        <Title order={4}>Audio</Title>
+        <Title order={4}>{strings.transcribe?.audio.title}</Title>
         <FileInput
-          placeholder="Interview.mp3"
-          label="Select audio file or drag and drop it here"
+          placeholder={strings.transcribe?.audio.placeholder}
+          label={strings.transcribe?.audio.prompt}
           accept="audio/*"
           multiple
           onChange={(files) => {
