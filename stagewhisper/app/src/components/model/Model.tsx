@@ -1,6 +1,8 @@
 import { Card, Stack, Title, SegmentedControl, Alert } from '@mantine/core';
 import React from 'react';
 
+import strings from '../../localization';
+
 interface Props {
   selectedModel: string;
   setSelectedModel: (value: string) => void;
@@ -9,40 +11,37 @@ interface Props {
 function model({ selectedModel, setSelectedModel }: Props) {
   const options = [
     {
-      label: 'Tiny',
+      label: strings.transcribe.models.options.tiny.title,
       value: 'Tiny',
-      description: 'This is the smallest model, it is the fastest but struggles with non english languages'
+      description: strings.transcribe.models.options.tiny.description
     },
     {
-      label: 'Base',
+      label: strings.transcribe.models.options.base.title,
       value: 'Base',
-      description: 'This is the default model, it is a good balance of speed and accuracy'
+      description: strings.transcribe.models.options.base.description
     },
     {
-      label: 'Small',
+      label: strings.transcribe.models.options.small.title,
       value: 'Small',
-      description: 'This is a larger model that is suitable for non-english language transcription and translation'
+      description: strings.transcribe.models.options.small.description
     },
     {
-      label: 'Medium',
+      label: strings.transcribe.models.options.medium.title,
       value: 'Medium',
-      description:
-        'This is a large model that can be used with any language, if using english this will likely be the best model for most people'
+      description: strings.transcribe.models.options.medium.description
     },
     {
-      label: 'Large',
+      label: strings.transcribe.models.options.large.title,
       value: 'Large',
-      description:
-        'This is the largest model, it is the most accurate but also the slowest. It requires a lot of memory to run'
+      description: strings.transcribe.models.options.large.description
     }
   ];
 
   return (
     <Card shadow="xs" p="md" withBorder title="Model">
       <Stack>
-        <Title order={4}>AI Model</Title>
+        <Title order={4}>{strings.transcribe.models.title}</Title>
         <SegmentedControl
-          placeholder="Pick one"
           value={selectedModel}
           onChange={(value) => setSelectedModel(value)}
           data={options.map((option) => ({
