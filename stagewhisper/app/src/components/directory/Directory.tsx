@@ -1,5 +1,8 @@
 import { Text, Card, FileInput, Stack, Title } from '@mantine/core';
 import React, { Dispatch, SetStateAction } from 'react';
+
+import strings from '../../localization';
+
 // import { ipcRenderer } from 'electron';
 // const { ipcRenderer } = window.require('electron');
 
@@ -15,10 +18,10 @@ function Directory({ setSelectedDirectory }: Props) {
   return (
     <Card shadow="xs" p="md" withBorder title="Output">
       <Stack>
-        <Title order={4}>Output Location</Title>
+        <Title order={4}>{strings.transcribe.directory.title}</Title>
         <FileInput
-          placeholder="Select a directory"
-          label="Select a directory to save the output"
+          placeholder={strings.transcribe.directory.placeholder}
+          label={strings.transcribe.directory.prompt}
           disabled
           onChange={(file) => {
             if (file) {
@@ -41,7 +44,7 @@ function Directory({ setSelectedDirectory }: Props) {
           // }}
         />
         <Text italic size="xs" color="dimmed" align="center">
-          Not functional yet, will just save to desktop
+          {strings.transcribe.directory.not_functional}
         </Text>
       </Stack>
     </Card>
