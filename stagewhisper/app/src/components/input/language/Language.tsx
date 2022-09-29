@@ -3,7 +3,12 @@ import React from 'react';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { selectLanguage, setLanguage, setLanguageValid, selectHighlightInvalid } from '../../../views/input/inputSlice';
+import {
+  selectLanguage,
+  setLanguage,
+  setLanguageValid,
+  selectHighlightInvalid
+} from '../../../features/input/inputSlice';
 
 // Localization
 import strings from '../../../localization';

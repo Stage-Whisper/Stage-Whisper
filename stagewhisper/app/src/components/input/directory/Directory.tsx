@@ -3,7 +3,7 @@ import React from 'react';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../../views/input/inputSlice';
+import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../../features/input/inputSlice';
 
 // Localization
 import strings from '../../../localization';

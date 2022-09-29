@@ -1,4 +1,4 @@
-import { DescriptionType } from './../../components/input/description/Description';
+import { DescriptionType } from '../../components/input/description/Description';
 import { createSlice } from '@reduxjs/toolkit';
 import { AudioType } from '../../components/input/audio/Audio';
 import { RootState } from '../../redux/store';

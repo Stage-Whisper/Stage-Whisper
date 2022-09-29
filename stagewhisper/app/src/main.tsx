@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 
 // Views
 import Dashboard from './views/dashboard/Dashboard';
-import Input from './views/input/Input';
+import Input from './features/input/Input';
 
 // React Router
 import { HashRouter, Route, Routes } from 'react-router-dom';

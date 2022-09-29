@@ -1,7 +1,7 @@
 import { combineReducers, configureStore, PreloadedState } from '@reduxjs/toolkit';
 
 // Redux reducers
-import inputReducer from '../views/input/inputSlice';
+import inputReducer from '../features/input/inputSlice';
 import settingsReducer from '../views/settings/settingsSlice';
 import appReducer from '../appSlice';
 

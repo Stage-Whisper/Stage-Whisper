@@ -4,7 +4,7 @@ import React from 'react';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { selectAudio, selectHighlightInvalid, setAudio, setAudioValid } from '../../../views/input/inputSlice';
+import { selectAudio, selectHighlightInvalid, setAudio, setAudioValid } from '../../../features/input/inputSlice';
 
 // Localization
 import strings from '../../../localization';
