@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { WhisperLanguages } from './components/input/language/languages';
 import { RootState } from './redux/store';
 
 // App Slice
@@ -19,14 +20,14 @@ enum AppView {
 export interface appState {
   currentView: AppView;
   darkMode: boolean;
-  displayLanguage: string;
+  displayLanguage: keyof typeof WhisperLanguages;
   burgerOpen: boolean;
 }
 
 const initialState: appState = {
   currentView: AppView.DASHBOARD,
   darkMode: false,
-  displayLanguage: 'english',
+  displayLanguage: 'en', // TODO: Change to user's language
   burgerOpen: false
 };
 
