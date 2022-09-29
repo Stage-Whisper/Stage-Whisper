@@ -11,6 +11,7 @@ export interface settingsState {
   theme: string;
   displayLanguage: keyof typeof WhisperLanguages;
   burgerOpen: boolean;
+  allowLargeModels: boolean;
 }
 
 const initialState: settingsState = {
@@ -19,7 +20,8 @@ const initialState: settingsState = {
 
   darkMode: false,
   displayLanguage: 'en', // TODO: Change to user's language
-  burgerOpen: false
+  burgerOpen: false,
+  allowLargeModels: false
 };
 
 export const settingsSlice = createSlice({
@@ -32,9 +34,11 @@ export const settingsSlice = createSlice({
     setDisplayLanguage: (state, action) => {
       state.displayLanguage = action.payload;
     },
-
     setTheme: (state, action) => {
       state.theme = action.payload;
+    },
+    setAllowLargeModel: (state, action) => {
+      state.allowLargeModels = action.payload;
     }
   }
 });
@@ -43,12 +47,14 @@ export const {
   //  setCurrentView,
   setTheme,
   toggleDarkMode,
-  setDisplayLanguage
+  setDisplayLanguage,
+  setAllowLargeModel
 } = settingsSlice.actions;
 
 // export const selectCurrentView = (state: RootState) => state.settings.currentView;
 export const selectTheme = (state: RootState) => state.settings.theme;
 export const selectDarkMode = (state: RootState) => state.settings.darkMode;
 export const selectDisplayLanguage = (state: RootState) => state.settings.displayLanguage;
+export const selectAllowLargeModels = (state: RootState) => state.settings.allowLargeModels;
 
 export default settingsSlice.reducer;

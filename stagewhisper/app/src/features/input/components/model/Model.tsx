@@ -7,11 +7,13 @@ import { selectModel, setModel } from '../../inputSlice';
 
 // Localization
 import strings from '../../../../localization';
+import { selectAllowLargeModels } from '../../../settings/settingsSlice';
 
 function model() {
   // Redux
   const dispatch = useAppDispatch();
   const { model } = useAppSelector(selectModel);
+  const allowLargeModels = useAppSelector(selectAllowLargeModels);
 
   const options = [
     {
@@ -37,7 +39,8 @@ function model() {
     {
       label: strings.transcribe?.models.options.large.title,
       value: 'large',
-      description: strings.transcribe?.models.options.large.description
+      description: strings.transcribe?.models.options.large.description,
+      disabled: !allowLargeModels // FIXME: This is not working
     }
   ];
 
@@ -47,8 +50,14 @@ function model() {
         <Title order={4}>{strings.transcribe?.models.title}</Title>
         <SegmentedControl
           value={model}
+          fullWidth
           onChange={(value) => {
-            dispatch(setModel(value as 'tiny' | 'base' | 'small' | 'medium' | 'large'));
+            if (value && (allowLargeModels || value !== 'large')) {
+              console.log(value);
+              dispatch(setModel(value));
+            } else {
+              dispatch(setModel(value === 'large' ? 'medium' : value));
+            }
           }}
           data={options.map((option) => ({
             label: option.label,
