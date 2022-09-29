@@ -1,15 +1,22 @@
-import { Text, Card, Select, Stack, Title } from '@mantine/core';
+import { Card, Select, Stack, Text, Title } from '@mantine/core';
 import React from 'react';
-import { languages } from './languages';
 
+// Redux
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { selectLanguage, setLanguage, setLanguageValid, selectHighlightInvalid } from '../../../views/input/inputSlice';
+
+// Localization
 import strings from '../../../localization';
 
-interface Props {
-  selectedLanguage: typeof languages[number];
-  setSelectedLanguage: (value: typeof languages[number]) => void;
-}
+// Types
+import { languages } from './languages';
 
-function Language({ selectedLanguage, setSelectedLanguage }: Props) {
+function Language() {
+  // Redux
+  const dispatch = useAppDispatch();
+  const { language, languageValid } = useAppSelector(selectLanguage);
+  const highlightInvalid = useAppSelector(selectHighlightInvalid);
+
   return (
     <Card shadow="xs" p="md" withBorder title="Language">
       <Stack>
@@ -19,15 +26,19 @@ function Language({ selectedLanguage, setSelectedLanguage }: Props) {
           label={strings.transcribe.language.prompt}
           placeholder={strings.transcribe.language.placeholder}
           searchable
+          error={languageValid && highlightInvalid}
           data={Object.values(languages)}
-          value={selectedLanguage}
+          value={language}
           onChange={(value) => {
             if (value) {
-              setSelectedLanguage(value as typeof languages[number]);
+              dispatch(setLanguage(value));
+              dispatch(setLanguageValid(true));
+            } else {
+              dispatch(setLanguageValid(false));
             }
           }}
         />
-        {selectedLanguage !== 'english' && (
+        {language !== 'english' && (
           <Text color="dimmed" italic size="sm">
             {strings.transcribe.language.non_english_warning}
           </Text>
