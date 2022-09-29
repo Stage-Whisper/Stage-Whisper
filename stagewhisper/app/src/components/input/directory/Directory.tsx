@@ -1,18 +1,18 @@
 import { Text, Card, Input, Stack, Title } from '@mantine/core';
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 
+// Redux
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../../views/input/inputSlice';
+
+// Localization
 import strings from '../../../localization';
 
-interface Props {
-  setSelectedDirectory: Dispatch<SetStateAction<string | undefined>>;
-  selectedDirectory: string | undefined;
-  showWarning: {
-    audio: boolean;
-    directory: boolean;
-  };
-}
-
-function Directory({ setSelectedDirectory, selectedDirectory, showWarning }: Props) {
+function Directory() {
+  // Redux
+  const dispatch = useAppDispatch();
+  const { directory, directoryValid } = useAppSelector(selectDirectory);
+  const highlightInvalid = useAppSelector(selectHighlightInvalid);
   return (
     <Card shadow="xs" p="md" withBorder title="Output">
       <Stack>
@@ -20,12 +20,12 @@ function Directory({ setSelectedDirectory, selectedDirectory, showWarning }: Pro
         <Input.Wrapper label={strings.transcribe.directory.prompt}>
           <Input
             placeholder={strings.transcribe.directory.placeholder}
-            invalid={showWarning.directory}
+            invalid={directoryValid && highlightInvalid}
             component="button"
             onClick={() => {
               if (window.Main) {
                 window.Main.openDirectoryDialog().then((result: string) => {
-                  setSelectedDirectory(result);
+                  dispatch(setDirectory(result));
                 });
               } else {
                 // eslint-disable-next-line no-alert
@@ -35,7 +35,7 @@ function Directory({ setSelectedDirectory, selectedDirectory, showWarning }: Pro
               }
             }}
           >
-            {selectedDirectory || strings.transcribe.directory.placeholder}
+            {directory || strings.transcribe.directory.placeholder}
           </Input>
         </Input.Wrapper>
         <Text italic size="xs" color="dimmed" align="center">
