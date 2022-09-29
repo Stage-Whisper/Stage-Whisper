@@ -1,4 +1,4 @@
-import { Card, Center, HoverCard, Select, Stack, Title } from '@mantine/core';
+import { Text, Card, Center, Divider, Group, HoverCard, Select, Space, Stack, Switch, Title } from '@mantine/core';
 import React from 'react';
 
 // Components
@@ -37,9 +37,9 @@ function Settings() {
   return (
     <Center my="lg" style={{ maxWidth: '1200px' }}>
       <Stack>
-        <Card>Setting</Card>
         <Card withBorder>
           <Title order={3}>{strings.settings?.language.title}</Title>
+          <Divider my={'sm'} />
           <HoverCard shadow="md" openDelay={200} width={300} withinPortal position="top">
             <HoverCard.Target>
               <Select
@@ -61,26 +61,21 @@ function Settings() {
           </HoverCard>
         </Card>
         <Card withBorder>
-          <Title order={3}>{strings.settings?.language.title}</Title>
-          <HoverCard shadow="md" openDelay={200} width={300} withinPortal position="top">
-            <HoverCard.Target>
-              <Select
-                withinPortal
-                dropdownPosition="bottom"
-                label={strings.settings?.language.prompt}
-                placeholder={strings.transcribe?.language.placeholder}
-                searchable
-                data={languageList.sort((a, b) => (a.label > b.label ? 1 : -1))}
-                onChange={(value) => {
-                  if (value) {
-                    dispatch(setDisplayLanguage(value));
-                  }
-                }}
-              />
-            </HoverCard.Target>
+          <Group position="apart">
+            <Title order={3}>{strings.settings?.large_model_support?.title}</Title>
 
-            <HoverCard.Dropdown>{strings.settings?.language.subtitle}</HoverCard.Dropdown>
-          </HoverCard>
+            <Switch
+              onLabel={strings.util?.on}
+              offLabel={strings.util?.off}
+              onChange={(value) => {
+                if (value) {
+                  dispatch(setDisplayLanguage(value));
+                }
+              }}
+            />
+          </Group>
+          <Divider my={'sm'} />
+          <Text italic> {strings.settings?.large_model_support?.subtitle}</Text>
         </Card>
       </Stack>
     </Center>
