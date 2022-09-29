@@ -18,7 +18,15 @@ import {
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
-import { IconHome, IconLanguage, IconMicrophone2, IconMoonStars, IconSettings, IconSun } from '@tabler/icons';
+import {
+  IconHome,
+  IconInfoCircle,
+  IconLanguage,
+  IconMicrophone2,
+  IconMoonStars,
+  IconSettings,
+  IconSun
+} from '@tabler/icons';
 import strings from './localization';
 import { useAppDispatch, useAppSelector } from './redux/hooks';
 
@@ -82,6 +90,13 @@ function App() {
                 to="/settings"
                 icon={<IconSettings size={18} />}
                 active={location.pathname === '/settings'}
+              />
+              <NavLink
+                label={strings.about?.title}
+                component={Link}
+                to="/about"
+                icon={<IconInfoCircle size={18} />}
+                active={location.pathname === '/about'}
               />
             </Navbar.Section>
           </Navbar>
