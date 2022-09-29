@@ -93,21 +93,21 @@ function App() {
         //     </Aside>
         //   </MediaQuery>
         // }
-        footer={
-          <Footer height={60} p="md">
-            <Group position="apart">
-              <Text>{strings.about?.title}</Text>
-              <ActionIcon
-                variant="outline"
-                color={darkMode ? 'yellow' : 'blue'}
-                onClick={() => dispatch(toggleDarkMode())}
-                title={strings.settings?.toggle_dark_mode}
-              >
-                {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
-              </ActionIcon>
-            </Group>
-          </Footer>
-        }
+        // footer={
+        //   <Footer height={60} p="md">
+        //     <Group position="apart">
+        //       <Text>{strings.about?.title}</Text>
+        //       <ActionIcon
+        //         variant="outline"
+        //         color={darkMode ? 'yellow' : 'blue'}
+        //         onClick={() => dispatch(toggleDarkMode())}
+        //         title={strings.settings?.toggle_dark_mode}
+        //       >
+        //         {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
+        //       </ActionIcon>
+        //     </Group>
+        //   </Footer>
+        // }
         header={
           <Header height={70} p="md">
             <Group style={{ display: 'flex', height: '100%' }}>
