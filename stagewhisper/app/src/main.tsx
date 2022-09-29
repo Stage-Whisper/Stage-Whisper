@@ -12,7 +12,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom';
 // Redux
 import { Provider } from 'react-redux';
 import { setupStore } from './redux/store';
-import Settings from './views/settings/Settings';
+import Settings from './features/settings/Settings';
 export const store = setupStore();
 
 ReactDOM.render(

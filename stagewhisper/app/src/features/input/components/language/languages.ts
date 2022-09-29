@@ -1,5 +1,5 @@
 import { useAppSelector } from '../../../../redux/hooks';
-import { selectDisplayLanguage } from '../../../../views/settings/settingsSlice';
+import { selectDisplayLanguage } from '../../../settings/settingsSlice';
 import strings from '../../../../localization';
 
 // List of languages {Country Code: Valid Whisper Language String}
