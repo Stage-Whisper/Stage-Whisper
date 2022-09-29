@@ -3,7 +3,7 @@ import App from './App';
 import ReactDOM from 'react-dom';
 
 // Views
-import Dashboard from './views/dashboard/Dashboard';
+import Dashboard from './features/dashboard/Dashboard';
 import Input from './features/input/Input';
 
 // React Router
