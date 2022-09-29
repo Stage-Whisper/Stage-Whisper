@@ -5,18 +5,6 @@ import { RootState } from '../../redux/store';
 // Settings Slice
 // This slice is used to store the state of the settings
 
-// enum SettingsView {
-//   DASHBOARD = 'DASHBOARD',
-//   INPUT = 'INPUT',
-//   TRANSCRIBE = 'TRANSCRIBE',
-//   RESULTS = 'RESULTS',
-//   SETTINGS = 'SETTINGS',
-//   ABOUT = 'ABOUT',
-//   HELP = 'HELP',
-//   ERROR = 'ERROR',
-//   LOADING = 'LOADING'
-// }
-
 export interface settingsState {
   // currentView: SettingsView;
   darkMode: boolean;
@@ -35,9 +23,6 @@ export const settingsSlice = createSlice({
   name: 'settings',
   initialState,
   reducers: {
-    // setCurrentView: (state, action) => {
-    //   state.currentView = action.payload;
-    // },
     toggleDarkMode: (state) => {
       state.darkMode = !state.darkMode;
     },
