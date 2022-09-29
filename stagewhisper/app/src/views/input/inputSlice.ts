@@ -2,6 +2,7 @@ import { DescriptionType } from './../../components/input/description/Descriptio
 import { createSlice } from '@reduxjs/toolkit';
 import { AudioType } from '../../components/input/audio/Audio';
 import { RootState } from '../../redux/store';
+import { WhisperLanguages } from '../../components/input/language/languages';
 
 // input Slice
 // This slice is used to store the state of the inputs for transcription
@@ -14,7 +15,7 @@ export interface inputState {
   audio: AudioType;
   audioValid: boolean;
 
-  language: string;
+  language: keyof typeof WhisperLanguages;
   languageValid: boolean;
 
   directory: string | undefined;
@@ -40,12 +41,11 @@ const initialState: inputState = {
   audio: {
     name: undefined,
     path: undefined,
-    type: undefined,
-    file: undefined
+    type: undefined
   },
   audioValid: false,
 
-  language: 'english',
+  language: 'en',
   languageValid: false,
 
   directory: undefined,
