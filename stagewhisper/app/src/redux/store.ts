@@ -3,12 +3,13 @@ import { combineReducers, configureStore, PreloadedState } from '@reduxjs/toolki
 // Redux reducers
 import inputReducer from '../views/input/inputSlice';
 import settingsReducer from '../views/settings/settingsSlice';
+import appReducer from '../appSlice';
 
 // Combine reducers to create a root reducer
 const rootReducer = combineReducers({
   settings: settingsReducer,
-  input: inputReducer
-  // group: groupReducer,
+  input: inputReducer,
+  app: appReducer
   // register: registerReducer,
   // dashboard: dashboardReducer
 });
