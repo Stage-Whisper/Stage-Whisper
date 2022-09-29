@@ -4,6 +4,9 @@ import { join } from 'path';
 // Python-Shell
 import { PythonShell } from 'python-shell';
 
+// Dev Tools
+import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
+
 // Packages
 import { BrowserWindow, app, ipcMain, IpcMainEvent, dialog, IpcMainInvokeEvent } from 'electron';
 import isDev from 'electron-is-dev';
@@ -65,6 +68,9 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  installExtension(REDUX_DEVTOOLS)
+    .then((name) => console.log(`Added Extension:  ${name}`))
+    .catch((err) => console.log('An error occurred: ', err));
   createWindow();
 
   app.on('activate', () => {

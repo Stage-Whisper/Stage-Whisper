@@ -13,6 +13,7 @@ import {
   MediaQuery,
   Navbar,
   NavLink,
+  Space,
   Text,
   Title,
   useMantineTheme
@@ -20,7 +21,7 @@ import {
 import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
-import { IconHome, IconLanguage, IconMicrophone2, IconMoonStars, IconSun } from '@tabler/icons';
+import { IconHome, IconLanguage, IconMicrophone2, IconMoonStars, IconSettings, IconSun } from '@tabler/icons';
 import strings from './localization';
 
 // React Components
@@ -49,48 +50,59 @@ function App() {
           navbarOffsetBreakpoint="sm"
           asideOffsetBreakpoint="sm"
           navbar={
-            <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
-              <NavLink
-                label={strings.dashboard.title}
-                icon={<IconHome size={18} />}
-                active={location.pathname === '/'}
-                component={Link}
-                to="/"
-              />
+            <Navbar hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
+              <Navbar.Section grow m={0}>
+                <NavLink
+                  label={strings.dashboard?.title}
+                  icon={<IconHome size={18} />}
+                  active={location.pathname === '/'}
+                  component={Link}
+                  to="/"
+                />
+                <NavLink
+                  label={strings.transcribe?.title}
+                  icon={<IconLanguage size={18} />}
+                  active={location.pathname === '/transcribe'}
+                  component={Link}
+                  to="/transcribe"
+                />
+                <NavLink
+                  label={strings.interview?.title}
+                  component={Link}
+                  disabled
+                  to="/interview"
+                  icon={<IconMicrophone2 size={18} />}
+                  active={location.pathname === '/interview'}
+                />
+              </Navbar.Section>
 
-              <NavLink
-                label={strings.transcribe.title}
-                icon={<IconLanguage size={18} />}
-                active={location.pathname === '/transcribe'}
-                component={Link}
-                to="/transcribe"
-              />
-              <NavLink
-                label={strings.interview.title}
-                component={Link}
-                disabled
-                to="/interview"
-                icon={<IconMicrophone2 size={18} />}
-                active={location.pathname === '/interview'}
-              />
+              <Navbar.Section>
+                <NavLink
+                  label={strings.settings?.title}
+                  component={Link}
+                  to="/settings"
+                  icon={<IconSettings size={18} />}
+                  active={location.pathname === '/settings'}
+                />
+              </Navbar.Section>
             </Navbar>
           }
           aside={
             <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
               <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
-                <Text>{strings.sidebar.title}</Text>
+                <Text>{strings.sidebar?.title}</Text>
               </Aside>
             </MediaQuery>
           }
           footer={
             <Footer height={60} p="md">
               <Group position="apart">
-                <Text>{strings.about.title}</Text>
+                <Text>{strings.about?.title}</Text>
                 <ActionIcon
                   variant="outline"
                   color={colorScheme === 'dark' ? 'yellow' : 'blue'}
                   onClick={() => toggleColorScheme()}
-                  title={strings.settings.toggle_dark_mode}
+                  title={strings.settings?.toggle_dark_mode}
                 >
                   {colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoonStars size={18} />}
                 </ActionIcon>

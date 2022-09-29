@@ -1,14 +1,18 @@
 import { Card, Stack, Title, SegmentedControl, Alert } from '@mantine/core';
 import React from 'react';
 
-import strings from '../../localization';
+// Redux
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { selectModel, setModel } from '../../../views/input/inputSlice';
 
-interface Props {
-  selectedModel: 'tiny' | 'base' | 'small' | 'medium' | 'large';
-  setSelectedModel: (value: 'tiny' | 'base' | 'small' | 'medium' | 'large') => void;
-}
+// Localization
+import strings from '../../../localization';
 
-function model({ selectedModel, setSelectedModel }: Props) {
+function model() {
+  // Redux
+  const dispatch = useAppDispatch();
+  const { model } = useAppSelector(selectModel);
+
   const options = [
     {
       label: strings.transcribe.models.options.tiny.title,
@@ -42,9 +46,9 @@ function model({ selectedModel, setSelectedModel }: Props) {
       <Stack>
         <Title order={4}>{strings.transcribe.models.title}</Title>
         <SegmentedControl
-          value={selectedModel}
+          value={model}
           onChange={(value) => {
-            setSelectedModel(value as 'tiny' | 'base' | 'small' | 'medium' | 'large');
+            dispatch(setModel(value as 'tiny' | 'base' | 'small' | 'medium' | 'large'));
           }}
           data={options.map((option) => ({
             label: option.label,
@@ -53,7 +57,7 @@ function model({ selectedModel, setSelectedModel }: Props) {
         />
 
         {/* Show the description of the selected option */}
-        <Alert>{options.find((option) => option.value === selectedModel)?.description}</Alert>
+        <Alert>{options.find((option) => option.value === model)?.description}</Alert>
       </Stack>
     </Card>
   );
