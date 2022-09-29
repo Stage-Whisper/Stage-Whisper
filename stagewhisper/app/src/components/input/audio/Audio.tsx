@@ -14,7 +14,6 @@ export interface AudioType {
   name: string | undefined;
   type: string | undefined;
   path: string | undefined;
-  file?: File;
 }
 
 function Audio() {
@@ -38,8 +37,7 @@ function Audio() {
                 setAudio({
                   name: file.name,
                   path: file.path,
-                  type: file.type,
-                  file
+                  type: file.type
                 })
               );
               dispatch(setAudioValid(true));
