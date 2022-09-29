@@ -1,11 +1,11 @@
 import { combineReducers, configureStore, PreloadedState } from '@reduxjs/toolkit';
 
 // Redux reducers
-// import surveyReducer from '../features/survey/surveySlice';
+import inputReducer from '../views/input/inputSlice';
 
 // Combine reducers to create a root reducer
 const rootReducer = combineReducers({
-  // page: pageReducer,
+  input: inputReducer
   // group: groupReducer,
   // app: appReducer,
   // register: registerReducer,
