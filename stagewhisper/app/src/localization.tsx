@@ -138,7 +138,7 @@ export const strings = new LocalizedStrings({
   // FIXME: This is a placeholder translation
   tr: {
     transcribe: {
-      title: 'Transkribe',
+      title: 'Deşifre',
       submit_button: 'Gönder',
       audio: {
         title: 'Ses',
@@ -146,53 +146,53 @@ export const strings = new LocalizedStrings({
         placeholder: 'Röportaj.mp3'
       },
       directory: {
-        title: 'Çıktı Dizini',
-        prompt: 'Çıktıyı kaydetmek için bir dizin seçin',
-        placeholder: 'Bir dizin seçin',
+        title: 'Çıktı Klasörü',
+        prompt: 'Çıktıyı kaydetmek için bir klasör seçin',
+        placeholder: 'Bir klasör seçin',
         not_functional: 'Henüz çalışmıyor, masaüstüne kaydedilecek'
       },
       language: {
         title: 'Dil',
-        prompt: 'Seste konuşulan dili belirtin, otomatik dil algılama yapmak için hiçbiri seçin',
+        prompt: 'Kayıtta konuşulan dili belirtin, dilin otomatik algılanması için boş bırakın',
         placeholder: 'Bir dil seçin',
-        non_english_warning: 'Not: İngilizce dışı diğer dillerde hata oranı artabilir'
+        non_english_warning: 'Not: İngilizce dışındaki dillerde doğruluk payı daha düşük olabilir'
       },
       models: {
         title: 'AI Modeli',
         options: {
           tiny: {
             title: 'Tiny',
-            description: 'Bu en küçük modeldir, en hızlıdır ancak İngilizce dışı dillerde sorun yaşar'
+            description: 'En küçük en hızlı çalışan model. İngilizce dışındaki dillerde zorlanabilir.'
           },
           base: {
             title: 'Base',
             description:
-              'Bu varsayılan modeldir, İngilizce transkripsiyonu için hız ve doğruluk açısından iyi bir denge sağlar'
+              'Öntanımlı gelen model. İngilizce deşifresi için hız ve doğruluk açısından iyi bir denge sağlar.'
           },
           small: {
             title: 'Small',
-            description: 'Bu daha büyük bir modeldir, İngilizce dışı dil transkripsiyonu ve çevirisinde kullanılabilir'
+            description: 'Daha büyük bir model. İngilizce dışı dil deşifresinde ve çevirisinde kullanıma uygundur.'
           },
           medium: {
             title: 'Medium',
             description:
-              'Bu büyük bir modeldir, herhangi bir dil için kullanılabilir, İngilizce kullanıyorsanız muhtemelen çoğu insan için en iyi modeldir'
+              'Büyük bir model. Herhangi bir dil için kullanılabilir. İngilizce kullanılacaksa çoğu insan için en iyi sonucu verecektir.'
           },
           large: {
             title: 'Large',
             description:
-              'Bu en büyük modeldir, en doğru ancak en yavaştır. Çalıştırmak için çok fazla bellek gerektirir'
+              'En büyük model. Doğruluk payı diğerlerinden daha yüksek ancak çalışma hızı diğerlerinden yavaştır. Çalıştırmak için çok yüksek bellek gerektirir.'
           }
         }
       }
     },
     dashboard: {
       title: 'Kontrol Paneli',
-      subtitle: 'Transkripsiyon işlerinizi görüntüleyin ve yönetin',
-      no_jobs: 'İş bulunamadı',
+      subtitle: 'Deşifre işlemlerinizi görüntüleyin ve yönetin',
+      no_jobs: 'İşlem bulunmamaktadır',
       job: {
-        title: 'İş',
-        subtitle: 'Transkripsiyon işinizi görüntüleyin ve yönetin',
+        title: 'İşlem',
+        subtitle: 'Deşifre işleminizi görüntüleyin ve yönetin',
         status: {
           title: 'Durum',
           options: {
@@ -203,24 +203,24 @@ export const strings = new LocalizedStrings({
           }
         },
         progress: {
-          title: 'İlerleme',
-          subtitle: 'İşin ilerlemesi'
+          title: 'İlerleyiş',
+          subtitle: 'İşlem ilerleyişi'
         },
         output: {
           title: 'Çıktı',
-          subtitle: 'İşin çıktısı',
+          subtitle: 'İşlemin çıktısı',
           download: 'İndir'
         },
         error: {
           title: 'Hata',
-          subtitle: 'İşten gelen hata mesajı'
+          subtitle: 'İşlemden gelen hata mesajı'
         },
         delete: 'Sil'
       }
     },
     interview: {
       title: 'Röportaj',
-      subtitle: 'Röportaj kaydedin ve transkribe edin',
+      subtitle: 'Röportaj kaydedin ve deşifre edin',
       record: {
         title: 'Kayıt',
         subtitle: 'Röportaj kaydedin',
@@ -239,7 +239,7 @@ export const strings = new LocalizedStrings({
       toggle_dark_mode: 'Karanlık Modu Aç/Kapa',
       language: {
         title: 'Dil',
-        subtitle: 'Uygulamanın dili değiştirin',
+        subtitle: 'Uygulamanın dilini değiştirin',
         prompt: 'Bir dil seçin',
         placeholder: 'Bir dil seçin'
       }
@@ -255,7 +255,7 @@ export const strings = new LocalizedStrings({
       terms_of_service: 'Hizmet Şartları'
     },
     sidebar: {
-      title: 'Son Transkripsiyonlar'
+      title: 'Son Deşifreler'
     }
   }
 });

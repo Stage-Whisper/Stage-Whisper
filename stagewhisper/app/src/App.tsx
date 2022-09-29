@@ -30,6 +30,9 @@ function App() {
   // eslint-disable-next-line no-console
   console.debug(window.ipcRenderer);
 
+  // Debug Location override
+  // strings.setLanguage('tr');
+
   // Theming
   const theme = useMantineTheme();
   const [colorScheme, setColorScheme] = useState<ColorScheme>('dark');
