@@ -121,7 +121,7 @@ function App() {
                 />
               </MediaQuery>
 
-              <Title>Stage Whisper</Title>
+              <Title>{strings.util.app_name}</Title>
             </Group>
           </Header>
         }

@@ -5,6 +5,7 @@ export const strings = new LocalizedStrings(
   {
     en: {
       util: {
+        app_name: 'StageWhisper',
         yes: 'Yes',
         no: 'No',
         ok: 'OK',
@@ -279,6 +280,9 @@ export const strings = new LocalizedStrings(
     // Turkish translation -- Ai
     // FIXME: This is a placeholder translation
     tr: {
+      util: {
+        app_name: 'Turkish - Stage Whisper - Needs Translation'
+      },
       transcribe: {
         title: 'Deşifre',
         submit_button: 'Gönder',
@@ -407,6 +411,9 @@ export const strings = new LocalizedStrings(
     },
     // French translation -- Ai
     fr: {
+      util: {
+        app_name: 'French - Stage Whisper - Needs Translation'
+      },
       languages: {
         fr: 'Français',
         en: 'Anglais'
@@ -414,6 +421,9 @@ export const strings = new LocalizedStrings(
     },
     // German translation -- Ai
     de: {
+      util: {
+        app_name: 'German - Stage Whisper - Needs Translation'
+      },
       languages: {
         de: 'Deutsch',
         en: 'Englisch'
@@ -421,6 +431,9 @@ export const strings = new LocalizedStrings(
     },
     // Spanish translation -- Ai
     es: {
+      util: {
+        app_name: 'Spanish - Stage Whisper - Needs Translation'
+      },
       languages: {
         es: 'Español',
         en: 'Inglés'
