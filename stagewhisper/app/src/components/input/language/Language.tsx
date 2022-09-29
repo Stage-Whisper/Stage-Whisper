@@ -7,9 +7,7 @@ import { selectLanguage, setLanguage, setLanguageValid, selectHighlightInvalid }
 
 // Localization
 import strings from '../../../localization';
-
-// Types
-import { languages } from './languages';
+import { generateLanguageList } from './languages';
 
 function Language() {
   // Redux
@@ -21,9 +19,11 @@ function Language() {
   const transcribedLanguages = strings.getAvailableLanguages();
 
   // Generate a list of languages to display in the dropdown
+  const languages = generateLanguageList();
+
   const languageList = languages.map((language) => {
     // Get the language name in the current language
-    const displayName = strings.getString(`languages.${language.code}`);
+    const displayName = language.localized;
 
     // If we have a translation for the language, check to see how it is displayed natively (e.g. English is displayed as English)
     if (transcribedLanguages.includes(language.code)) {
