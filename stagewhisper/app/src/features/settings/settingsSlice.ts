@@ -32,9 +32,7 @@ export const settingsSlice = createSlice({
     setDisplayLanguage: (state, action) => {
       state.displayLanguage = action.payload;
     },
-    toggleBurger: (state) => {
-      state.burgerOpen = !state.burgerOpen;
-    },
+
     setTheme: (state, action) => {
       state.theme = action.payload;
     }
@@ -45,14 +43,12 @@ export const {
   //  setCurrentView,
   setTheme,
   toggleDarkMode,
-  setDisplayLanguage,
-  toggleBurger
+  setDisplayLanguage
 } = settingsSlice.actions;
 
 // export const selectCurrentView = (state: RootState) => state.settings.currentView;
 export const selectTheme = (state: RootState) => state.settings.theme;
 export const selectDarkMode = (state: RootState) => state.settings.darkMode;
 export const selectDisplayLanguage = (state: RootState) => state.settings.displayLanguage;
-export const selectBurgerOpen = (state: RootState) => state.settings.burgerOpen;
 
 export default settingsSlice.reducer;
