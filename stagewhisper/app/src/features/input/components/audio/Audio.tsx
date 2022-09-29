@@ -3,11 +3,11 @@ import { IconUpload } from '@tabler/icons';
 import React from 'react';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { selectAudio, selectHighlightInvalid, setAudio, setAudioValid } from '../../../features/input/inputSlice';
+import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
+import { selectAudio, selectHighlightInvalid, setAudio, setAudioValid } from '../../inputSlice';
 
 // Localization
-import strings from '../../../localization';
+import strings from '../../../../localization';
 
 // Types
 export interface AudioType {

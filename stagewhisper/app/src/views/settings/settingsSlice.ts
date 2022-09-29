@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { WhisperLanguages } from '../../components/input/language/languages';
+import { WhisperLanguages } from '../../features/input/components/language/languages';
 import { RootState } from '../../redux/store';
 
 // Settings Slice

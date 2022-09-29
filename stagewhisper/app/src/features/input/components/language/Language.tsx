@@ -2,16 +2,11 @@ import { Card, Select, Stack, Text, Title } from '@mantine/core';
 import React from 'react';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import {
-  selectLanguage,
-  setLanguage,
-  setLanguageValid,
-  selectHighlightInvalid
-} from '../../../features/input/inputSlice';
+import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
+import { selectLanguage, setLanguage, setLanguageValid, selectHighlightInvalid } from '../../inputSlice';
 
 // Localization
-import strings from '../../../localization';
+import strings from '../../../../localization';
 import { generateLanguageList } from './languages';
 
 function Language() {

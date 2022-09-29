@@ -2,11 +2,11 @@ import { Text, Card, Input, Stack, Title } from '@mantine/core';
 import React from 'react';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../../features/input/inputSlice';
+import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
+import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../inputSlice';
 
 // Localization
-import strings from '../../../localization';
+import strings from '../../../../localization';
 
 function Directory() {
   // Redux

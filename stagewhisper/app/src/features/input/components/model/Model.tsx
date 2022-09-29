@@ -2,11 +2,11 @@ import { Card, Stack, Title, SegmentedControl, Alert } from '@mantine/core';
 import React from 'react';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { selectModel, setModel } from '../../../features/input/inputSlice';
+import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
+import { selectModel, setModel } from '../../inputSlice';
 
 // Localization
-import strings from '../../../localization';
+import strings from '../../../../localization';
 
 function model() {
   // Redux
@@ -15,36 +15,36 @@ function model() {
 
   const options = [
     {
-      label: strings.transcribe.models.options.tiny.title,
+      label: strings.transcribe?.models.options.tiny.title,
       value: 'tiny',
-      description: strings.transcribe.models.options.tiny.description
+      description: strings.transcribe?.models.options.tiny.description
     },
     {
-      label: strings.transcribe.models.options.base.title,
+      label: strings.transcribe?.models.options.base.title,
       value: 'base',
-      description: strings.transcribe.models.options.base.description
+      description: strings.transcribe?.models.options.base.description
     },
     {
-      label: strings.transcribe.models.options.small.title,
+      label: strings.transcribe?.models.options.small.title,
       value: 'small',
-      description: strings.transcribe.models.options.small.description
+      description: strings.transcribe?.models.options.small.description
     },
     {
-      label: strings.transcribe.models.options.medium.title,
+      label: strings.transcribe?.models.options.medium.title,
       value: 'medium',
-      description: strings.transcribe.models.options.medium.description
+      description: strings.transcribe?.models.options.medium.description
     },
     {
-      label: strings.transcribe.models.options.large.title,
+      label: strings.transcribe?.models.options.large.title,
       value: 'large',
-      description: strings.transcribe.models.options.large.description
+      description: strings.transcribe?.models.options.large.description
     }
   ];
 
   return (
     <Card shadow="xs" p="md" withBorder title="Model">
       <Stack>
-        <Title order={4}>{strings.transcribe.models.title}</Title>
+        <Title order={4}>{strings.transcribe?.models.title}</Title>
         <SegmentedControl
           value={model}
           onChange={(value) => {

@@ -1,11 +1,11 @@
 import React from 'react';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../../features/input/inputSlice';
+import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
+import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../inputSlice';
 
 // Localization
-import strings from '../../../localization';
+import strings from '../../../../localization';
 
 // Types
 export interface DescriptionType {
