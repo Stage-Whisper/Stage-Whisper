@@ -1,6 +1,6 @@
-import { useAppSelector } from './../../../redux/hooks';
-import { selectDisplayLanguage } from './../../../appSlice';
-import strings from '../../../localization';
+import { useAppSelector } from '../../../../redux/hooks';
+import { selectDisplayLanguage } from '../../../settings/settingsSlice';
+import strings from '../../../../localization';
 
 // List of languages {Country Code: Valid Whisper Language String}
 export enum WhisperLanguages {

@@ -2,11 +2,11 @@ import { Card, Select, Stack, Text, Title } from '@mantine/core';
 import React from 'react';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { selectLanguage, setLanguage, setLanguageValid, selectHighlightInvalid } from '../../../views/input/inputSlice';
+import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
+import { selectLanguage, setLanguage, setLanguageValid, selectHighlightInvalid } from '../../inputSlice';
 
 // Localization
-import strings from '../../../localization';
+import strings from '../../../../localization';
 import { generateLanguageList } from './languages';
 
 function Language() {
@@ -29,7 +29,7 @@ function Language() {
     if (transcribedLanguages.includes(language.code)) {
       // Get the language name in its own language
       const nativeName = strings.getString(`languages.${language.code}`, language.code) as string;
-      console.warn(nativeName, displayName);
+
       // Decide which language name to display and add it to the list
       return {
         value: language.code,
@@ -44,10 +44,6 @@ function Language() {
         label: displayName
       };
     }
-    // Cast to enum
-    // const languageEnum: WhisperLanguages = language.code as WhisperLanguages;
-    // const languageEnum = language.code as WhisperLanguages;
-    // return { value: language.code, label: strings.languages?.[language.code] };
   });
 
   return (
