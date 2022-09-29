@@ -1,6 +1,7 @@
 import React from 'react';
 
 function Description() {
+  // Used to input the transcription name, description, tags and notes
   return <div>Description</div>;
 }
 
