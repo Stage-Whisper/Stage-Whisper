@@ -12,6 +12,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom';
 // Redux
 import { Provider } from 'react-redux';
 import { setupStore } from './redux/store';
+import Settings from './views/settings/Settings';
 export const store = setupStore();
 
 ReactDOM.render(
@@ -21,10 +22,8 @@ ReactDOM.render(
         <Routes>
           <Route element={<App />}>
             <Route index element={<Dashboard />} />
-            <Route path="/transcribe" element={<Input />}>
-              <Route index element={<Input />} />
-              {/* TODO: Replace this with a redux state */}
-            </Route>
+            <Route path="/transcribe" element={<Input />} />
+            <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<div>404</div>} />
           </Route>
         </Routes>
