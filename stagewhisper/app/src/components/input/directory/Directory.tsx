@@ -16,10 +16,10 @@ function Directory() {
   return (
     <Card shadow="xs" p="md" withBorder title="Output">
       <Stack>
-        <Title order={4}>{strings.transcribe.directory.title}</Title>
-        <Input.Wrapper label={strings.transcribe.directory.prompt}>
+        <Title order={4}>{strings.transcribe?.directory.title}</Title>
+        <Input.Wrapper label={strings.transcribe?.directory.prompt}>
           <Input
-            placeholder={strings.transcribe.directory.placeholder}
+            placeholder={strings.transcribe?.directory.placeholder}
             invalid={directoryValid && highlightInvalid}
             component="button"
             onClick={() => {
@@ -35,11 +35,11 @@ function Directory() {
               }
             }}
           >
-            {directory || strings.transcribe.directory.placeholder}
+            {directory || strings.transcribe?.directory.placeholder}
           </Input>
         </Input.Wrapper>
         <Text italic size="xs" color="dimmed" align="center">
-          {strings.transcribe.directory.not_functional}
+          {strings.transcribe?.directory.not_functional}
         </Text>
       </Stack>
     </Card>

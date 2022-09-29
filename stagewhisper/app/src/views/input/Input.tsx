@@ -48,7 +48,7 @@ function Input() {
                   model,
                   language,
                   output_dir: directory,
-                  translate: language !== 'english'
+                  translate: language !== 'en'
                 });
               } else {
                 // eslint-disable-next-line no-alert
@@ -62,7 +62,7 @@ function Input() {
             }
           }}
         >
-          {strings.transcribe.submit_button}
+          {strings.transcribe?.submit_button}
         </Button>
       </Center>
     </>

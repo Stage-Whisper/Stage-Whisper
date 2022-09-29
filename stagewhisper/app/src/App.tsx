@@ -51,7 +51,7 @@ function App() {
           navbar={
             <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
               <NavLink
-                label={strings.dashboard.title}
+                label={strings.dashboard?.title}
                 icon={<IconHome size={18} />}
                 active={location.pathname === '/'}
                 component={Link}
@@ -59,14 +59,14 @@ function App() {
               />
 
               <NavLink
-                label={strings.transcribe.title}
+                label={strings.transcribe?.title}
                 icon={<IconLanguage size={18} />}
                 active={location.pathname === '/transcribe'}
                 component={Link}
                 to="/transcribe"
               />
               <NavLink
-                label={strings.interview.title}
+                label={strings.interview?.title}
                 component={Link}
                 disabled
                 to="/interview"
@@ -78,19 +78,19 @@ function App() {
           aside={
             <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
               <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
-                <Text>{strings.sidebar.title}</Text>
+                <Text>{strings.sidebar?.title}</Text>
               </Aside>
             </MediaQuery>
           }
           footer={
             <Footer height={60} p="md">
               <Group position="apart">
-                <Text>{strings.about.title}</Text>
+                <Text>{strings.about?.title}</Text>
                 <ActionIcon
                   variant="outline"
                   color={colorScheme === 'dark' ? 'yellow' : 'blue'}
                   onClick={() => toggleColorScheme()}
-                  title={strings.settings.toggle_dark_mode}
+                  title={strings.settings?.toggle_dark_mode}
                 >
                   {colorScheme === 'dark' ? <IconSun size={18} /> : <IconMoonStars size={18} />}
                 </ActionIcon>
