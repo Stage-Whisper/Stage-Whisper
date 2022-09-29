@@ -18,13 +18,13 @@ export const appSlice = createSlice({
   name: 'app',
   initialState,
   reducers: {
-    toggleBurger: (state) => {
-      state.burgerOpen = !state.burgerOpen;
+    setBurgerOpen: (state, action) => {
+      state.burgerOpen = action.payload;
     }
   }
 });
 
-export const { toggleBurger } = appSlice.actions;
+export const { setBurgerOpen } = appSlice.actions;
 
 export const selectBurgerOpen = (state: RootState) => state.app.burgerOpen;
 
