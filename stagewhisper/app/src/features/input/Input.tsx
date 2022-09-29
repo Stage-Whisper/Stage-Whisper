@@ -2,10 +2,10 @@ import { SimpleGrid, Center, Button } from '@mantine/core';
 import React from 'react';
 
 // Components
-import Directory from '../../components/input/directory/Directory';
-import Language from '../../components/input/language/Language';
-import Model from '../../components/input/model/Model';
-import Audio from '../../components/input/audio/Audio';
+import Directory from './components/directory/Directory';
+import Language from './components/language/Language';
+import Model from './components/model/Model';
+import Audio from './components/audio/Audio';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';

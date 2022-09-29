@@ -1,8 +1,8 @@
-import { DescriptionType } from './../../components/input/description/Description';
+import { DescriptionType } from './components/description/Description';
 import { createSlice } from '@reduxjs/toolkit';
-import { AudioType } from '../../components/input/audio/Audio';
+import { AudioType } from './components/audio/Audio';
 import { RootState } from '../../redux/store';
-import { WhisperLanguages } from '../../components/input/language/languages';
+import { WhisperLanguages } from './components/language/languages';
 
 // input Slice
 // This slice is used to store the state of the inputs for transcription

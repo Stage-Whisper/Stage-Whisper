@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { WhisperLanguages } from '../../components/input/language/languages';
+import { WhisperLanguages } from '../input/components/language/languages';
 import { RootState } from '../../redux/store';
 
 // Settings Slice
@@ -8,12 +8,15 @@ import { RootState } from '../../redux/store';
 export interface settingsState {
   // currentView: SettingsView;
   darkMode: boolean;
+  theme: string;
   displayLanguage: keyof typeof WhisperLanguages;
   burgerOpen: boolean;
 }
 
 const initialState: settingsState = {
   // currentView: SettingsView.DASHBOARD,
+  theme: 'default',
+
   darkMode: false,
   displayLanguage: 'en', // TODO: Change to user's language
   burgerOpen: false
@@ -31,18 +34,23 @@ export const settingsSlice = createSlice({
     },
     toggleBurger: (state) => {
       state.burgerOpen = !state.burgerOpen;
+    },
+    setTheme: (state, action) => {
+      state.theme = action.payload;
     }
   }
 });
 
 export const {
   //  setCurrentView,
+  setTheme,
   toggleDarkMode,
   setDisplayLanguage,
   toggleBurger
 } = settingsSlice.actions;
 
 // export const selectCurrentView = (state: RootState) => state.settings.currentView;
+export const selectTheme = (state: RootState) => state.settings.theme;
 export const selectDarkMode = (state: RootState) => state.settings.darkMode;
 export const selectDisplayLanguage = (state: RootState) => state.settings.displayLanguage;
 export const selectBurgerOpen = (state: RootState) => state.settings.burgerOpen;
