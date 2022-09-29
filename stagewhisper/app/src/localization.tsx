@@ -158,7 +158,11 @@ export const strings = new LocalizedStrings(
         twitter: 'Twitter',
         email: 'Email',
         privacy_policy: 'Privacy Policy',
-        terms_of_service: 'Terms of Service'
+        terms_of_service: {
+          title: 'Terms of Service',
+          subtitle: 'Terms of Service for Stage Whisper',
+          paragraph1: 'By using Stage Whisper you agree to the following terms of service: XYZ'
+        }
       },
       // Text for the sidebar which shows recent transcriptions
       sidebar: {
