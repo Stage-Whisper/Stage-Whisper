@@ -4,6 +4,29 @@ import LocalizedStrings from 'react-localization';
 export const strings = new LocalizedStrings(
   {
     en: {
+      util: {
+        yes: 'Yes',
+        no: 'No',
+        ok: 'OK',
+        cancel: 'Cancel',
+        close: 'Close',
+        save: 'Save',
+        saving: 'Saving...',
+        loading: 'Loading...',
+        error: 'Error',
+        warning: 'Warning',
+        info: 'Info',
+        success: 'Success',
+        unknown: 'Unknown',
+        unknownError: 'Unknown error',
+        unknownWarning: 'Unknown warning',
+        unknownInfo: 'Unknown info',
+        on: 'On',
+        off: 'Off',
+        enabled: 'Enabled',
+        disabled: 'Disabled'
+      },
+
       // Text for the transcribe page which allows the user to input files and transcribe them
       transcribe: {
         title: 'Transcribe',
@@ -118,6 +141,11 @@ export const strings = new LocalizedStrings(
             'This is the language that the application will be displayed in, it will not affect the language of the transcriptions',
           prompt: 'Select a language for the application',
           placeholder: 'Select a language'
+        },
+        large_model_support: {
+          title: 'Large Model Support',
+          subtitle:
+            'This will enable the use of the large models, this will require a significant amount of memory and is not suitable for most users'
         }
       },
       // Text for the about page
