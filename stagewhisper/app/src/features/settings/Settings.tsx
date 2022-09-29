@@ -35,8 +35,8 @@ function Settings() {
   }, []);
 
   return (
-    <Center my="lg" style={{ maxWidth: '1200px' }}>
-      <Stack>
+    <Center my="lg">
+      <Stack style={{ maxWidth: '700px' }}>
         <Card withBorder>
           <Title order={3}>{strings.settings?.language.title}</Title>
           <Divider my={'sm'} />
