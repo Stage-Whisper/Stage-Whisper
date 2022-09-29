@@ -2,7 +2,7 @@ import { Card, FileInput, Stack, Title } from '@mantine/core';
 import React, { Dispatch, SetStateAction } from 'react';
 import { IconUpload } from '@tabler/icons';
 
-import strings from '../../localization';
+import strings from '../../../localization';
 
 export interface AudioFile {
   name: string | undefined;

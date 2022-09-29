@@ -1,7 +1,7 @@
 import { Text, Card, Input, Stack, Title } from '@mantine/core';
 import React, { Dispatch, SetStateAction } from 'react';
 
-import strings from '../../localization';
+import strings from '../../../localization';
 
 interface Props {
   setSelectedDirectory: Dispatch<SetStateAction<string | undefined>>;

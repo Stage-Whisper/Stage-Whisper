@@ -2,7 +2,7 @@ import { Text, Card, Select, Stack, Title } from '@mantine/core';
 import React from 'react';
 import { languages } from './languages';
 
-import strings from '../../localization';
+import strings from '../../../localization';
 
 interface Props {
   selectedLanguage: typeof languages[number];

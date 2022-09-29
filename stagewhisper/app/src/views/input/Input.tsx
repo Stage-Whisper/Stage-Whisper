@@ -1,12 +1,12 @@
 import { SimpleGrid, Center, Button } from '@mantine/core';
 import React, { useState } from 'react';
-import Directory from '../../components/directory/Directory';
-import Language from '../../components/language/Language';
-import Model from '../../components/model/Model';
-import Audio, { AudioFile } from '../../components/audio/Audio';
+import Directory from '../../components/input/directory/Directory';
+import Language from '../../components/input/language/Language';
+import Model from '../../components/input/model/Model';
+import Audio, { AudioFile } from '../../components/input/audio/Audio';
 
 import strings from '../../localization';
-import { languages } from '../../components/language/languages';
+import { languages } from '../../components/input/language/languages';
 
 function Input() {
   // Selections for the user

@@ -1,7 +1,7 @@
 import { Card, Stack, Title, SegmentedControl, Alert } from '@mantine/core';
 import React from 'react';
 
-import strings from '../../localization';
+import strings from '../../../localization';
 
 interface Props {
   selectedModel: 'tiny' | 'base' | 'small' | 'medium' | 'large';
