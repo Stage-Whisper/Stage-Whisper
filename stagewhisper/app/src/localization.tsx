@@ -370,7 +370,30 @@ export const strings = new LocalizedStrings({
       title: 'Son Deşifreler'
     },
     languages: {
-      en: 'İngilizce -- REMOVE ME --'
+      en: 'İngilizce',
+      tr: 'Türkçe',
+      fr: 'Fransızca'
+    }
+  },
+  // French translation -- Ai
+  fr: {
+    languages: {
+      fr: 'Français',
+      en: 'Anglais'
+    }
+  },
+  // German translation -- Ai
+  de: {
+    languages: {
+      de: 'Deutsch',
+      en: 'Englisch'
+    }
+  },
+  // Spanish translation -- Ai
+  es: {
+    languages: {
+      es: 'Español',
+      en: 'Inglés'
     }
   }
 });
