@@ -771,6 +771,11 @@
   dependencies:
     "@types/ms" "*"
 
+"@types/electron-devtools-installer@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@types/electron-devtools-installer/-/electron-devtools-installer-2.2.2.tgz#5a91929ee76b5de0d171edec5bd049292d48a2a4"
+  integrity sha512-8o2XkyAw2HZoVD5KpIoUJmEgZ7BPVv33p7rY1jmn/wJUbugtQUc44vNMDTguUNUGiLv+oqgtyYmiYctHDZEzdQ==
+
 "@types/eslint-plugin-prettier@3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@types/eslint-plugin-prettier/-/eslint-plugin-prettier-3.1.0.tgz#451b5e1e5f148a38dc41e9c5b61d45cd2e97af2c"

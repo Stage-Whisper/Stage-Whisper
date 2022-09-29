@@ -56,6 +56,7 @@
     "vite-plugin-electron-renderer": "^0.9.3"
   },
   "devDependencies": {
+    "@types/electron-devtools-installer": "^2.2.2",
     "@types/eslint": "8.4.6",
     "@types/eslint-plugin-prettier": "3.1.0",
     "@types/node": "^17.0.22",
