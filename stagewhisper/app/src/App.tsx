@@ -1,19 +1,18 @@
 import {
+  Text,
   ActionIcon,
   AppShell,
-  Aside,
   // Aside,
   Burger,
-  Footer,
   Group,
   Header,
   MantineProvider,
   MediaQuery,
   Navbar,
   NavLink,
-  Text,
   Title,
-  useMantineTheme
+  useMantineTheme,
+  Affix
 } from '@mantine/core';
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
@@ -30,8 +29,8 @@ import {
 import strings from './localization';
 import { useAppDispatch, useAppSelector } from './redux/hooks';
 
-import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
 import { selectBurgerOpen, setBurgerOpen } from './appSlice';
+import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
 
 // React Components
 
@@ -60,21 +59,21 @@ function App() {
           <Navbar hiddenBreakpoint="sm" hidden={!burgerOpen} width={{ sm: 200, lg: 300 }}>
             <Navbar.Section grow m={0}>
               <NavLink
-                label={strings.dashboard?.title}
+                label={<Text>{strings.dashboard?.title}</Text>}
                 icon={<IconHome size={18} />}
                 active={location.pathname === '/'}
                 component={Link}
                 to="/"
               />
               <NavLink
-                label={strings.transcribe?.title}
+                label={<Text>{strings.transcribe?.title}</Text>}
                 icon={<IconLanguage size={18} />}
                 active={location.pathname === '/transcribe'}
                 component={Link}
                 to="/transcribe"
               />
               <NavLink
-                label={strings.interview?.title}
+                label={<Text>{strings.interview?.title} </Text>}
                 component={Link}
                 disabled
                 to="/interview"
@@ -85,14 +84,14 @@ function App() {
 
             <Navbar.Section>
               <NavLink
-                label={strings.settings?.title}
+                label={<Text>{strings.settings?.title}</Text>}
                 component={Link}
                 to="/settings"
                 icon={<IconSettings size={18} />}
                 active={location.pathname === '/settings'}
               />
               <NavLink
-                label={strings.about?.title}
+                label={<Text>{strings.about?.title}</Text>}
                 component={Link}
                 to="/about"
                 icon={<IconInfoCircle size={18} />}
@@ -112,14 +111,7 @@ function App() {
         //   <Footer height={60} p="md">
         //     <Group position="apart">
         //       <Text>{strings.about?.title}</Text>
-        //       <ActionIcon
-        //         variant="outline"
-        //         color={darkMode ? 'yellow' : 'blue'}
-        //         onClick={() => dispatch(toggleDarkMode())}
-        //         title={strings.settings?.toggle_dark_mode}
-        //       >
-        //         {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
-        //       </ActionIcon>
+
         //     </Group>
         //   </Footer>
         // }
@@ -136,12 +128,25 @@ function App() {
                 />
               </MediaQuery>
 
-              <Title>{strings.util.app_name}</Title>
+              <Title variant="gradient" weight={800} gradient={{ from: 'red', to: 'blue', deg: 135 }}>
+                {strings.util.app_name}
+              </Title>
             </Group>
           </Header>
         }
       >
         <Outlet />
+        <Affix position={{ bottom: 20, right: 20 }}>
+          <ActionIcon
+            variant="gradient"
+            gradient={darkMode ? { from: 'red', to: 'yellow', deg: 135 } : { from: 'blue', to: 'violet', deg: 135 }}
+            color={darkMode ? 'yellow' : 'dark'}
+            onClick={() => dispatch(toggleDarkMode())}
+            title={strings.settings?.toggle_dark_mode}
+          >
+            {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
+          </ActionIcon>
+        </Affix>
       </AppShell>
     </MantineProvider>
   );
