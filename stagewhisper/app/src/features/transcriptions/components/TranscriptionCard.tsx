@@ -6,18 +6,20 @@ import {
   Grid,
   Group,
   MantineColor,
+  Paper,
   Progress,
   Stack,
   Text,
   Title
 } from '@mantine/core';
 import React from 'react';
-import strings from '../../../localization';
 
 // Redux
-import { transcription, transcriptionStatus } from '../transcriptionsSlice';
+import { transcription } from '../transcriptionsSlice';
 
 // Localization
+import strings from '../../../localization';
+import { useDispatch } from 'react-redux';
 
 //#region Component Helpers
 const progressIndicator = (transcript: transcription) => {
@@ -118,115 +120,131 @@ const progressIndicator = (transcript: transcription) => {
     />
   );
 };
+type buttonTypes =
+  | 'edit' // Edit the transcription
+  | 'delete' // Delete the transcription
+  | 'cancel' // Cancel the transcription (if it is queued or pending)
+  | 'pause' // Pause the transcription (if it is processing)
+  | 'resume' // Resume the transcription (if it is paused)
+  | 'download' // Download the transcription
+  | 'retry' // Retry the transcription (if it is in an error state)
+  | 'restore' // Restore the transcription (if it is deleted)
+  | 'queue' // Queue the transcription (if it is idle)
+  | 'open' // Open the transcription detail view (if it is complete)
+  | 'close' // Close the transcription in the editor
+  | 'play' // Play the transcription original audio
+  | 'stop'; // Stop the transcription original audio
 
-const buttonBlock = (transcript: transcription) => {
-  // Import localization strings
+const buttonConstructor = (buttonType: buttonTypes, buttonId: number) => {
+  const dispatch = useDispatch();
+
   const buttonStrings = strings.util.buttons;
-
-  type buttonTypes =
-    | 'edit' // Edit the transcription
-    | 'delete' // Delete the transcription
-    | 'cancel' // Cancel the transcription (if it is queued or pending)
-    | 'pause' // Pause the transcription (if it is processing)
-    | 'resume' // Resume the transcription (if it is paused)
-    | 'download' // Download the transcription
-    | 'retry' // Retry the transcription (if it is in an error state)
-    | 'restore' // Restore the transcription (if it is deleted)
-    | 'queue' // Queue the transcription (if it is idle)
-    | 'open' // Open the transcription detail view (if it is complete)
-    | 'close' // Close the transcription in the editor
-    | 'play' // Play the transcription original audio
-    | 'stop'; // Stop the transcription original audio
 
   const buttons: {
     [key in buttonTypes]: {
-      action: () => void;
+      dispatchAction: string;
       label: string;
       color: MantineColor;
       style: ButtonVariant;
     };
   } = {
     edit: {
-      action: () => console.log('Edit'),
+      dispatchAction: 'transcriptions/editTranscription',
       label: buttonStrings?.edit || 'Edit',
       color: 'red',
       style: 'default'
     },
     delete: {
-      action: () => console.log('Delete'),
+      dispatchAction: 'transcriptions/deleteTranscription',
       label: buttonStrings?.delete || 'Delete',
       color: 'red',
       style: 'default'
     },
     cancel: {
-      action: () => console.log('Cancel'),
+      dispatchAction: 'transcriptions/cancelTranscription',
       label: buttonStrings?.cancel || 'Cancel',
       color: 'red',
       style: 'default'
     },
     pause: {
-      action: () => console.log('Pause'),
+      dispatchAction: 'transcriptions/pauseTranscription',
       label: buttonStrings?.pause || 'Pause',
       color: 'red',
       style: 'default'
     },
     resume: {
-      action: () => console.log('Resume'),
+      dispatchAction: 'transcriptions/resumeTranscription',
       label: buttonStrings?.resume || 'Resume',
       color: 'red',
       style: 'default'
     },
     download: {
-      action: () => console.log('Download'),
+      dispatchAction: 'transcriptions/downloadTranscription',
       label: buttonStrings?.download || 'Download',
       color: 'red',
       style: 'default'
     },
     retry: {
-      action: () => console.log('Retry'),
+      dispatchAction: 'transcriptions/retryTranscription',
       label: buttonStrings?.retry || 'Retry',
       color: 'red',
       style: 'default'
     },
     restore: {
-      action: () => console.log('Restore'),
+      dispatchAction: 'transcriptions/restoreTranscription',
       label: buttonStrings?.restore || 'Restore',
       color: 'red',
       style: 'default'
     },
     queue: {
-      action: () => console.log('Queue'),
+      dispatchAction: 'transcriptions/queueTranscription',
       label: buttonStrings?.queue || 'Queue',
       color: 'red',
       style: 'default'
     },
     open: {
-      action: () => console.log('Open'),
+      dispatchAction: 'transcriptions/openTranscription',
       label: buttonStrings?.open || 'Open',
       color: 'red',
       style: 'default'
     },
     close: {
-      action: () => console.log('Close'),
+      dispatchAction: 'transcriptions/closeTranscription',
       label: buttonStrings?.close || 'Close',
       color: 'red',
       style: 'default'
     },
     play: {
-      action: () => console.log('Play'),
+      dispatchAction: 'transcriptions/playTranscription',
       label: buttonStrings?.play || 'Play',
       color: 'red',
       style: 'default'
     },
     stop: {
-      action: () => console.log('Stop'),
+      dispatchAction: 'transcriptions/stopTranscription',
       label: buttonStrings?.stop || 'Stop',
       color: 'red',
       style: 'default'
     }
   };
 
-  // Create a list of buttons to display based on the current state of the transcription
+  return (
+    <Button
+      key={buttonType}
+      onClick={() => {
+        dispatch({ type: buttons[buttonType].dispatchAction, payload: { id: buttonId } });
+      }}
+      size="sm"
+      color={buttons[buttonType].color}
+      variant={buttons[buttonType].style}
+    >
+      {buttons[buttonType].label}
+    </Button>
+  );
+};
+
+const buttonBlock = (transcript: transcription) => {
+  // Create a group of buttons to display based on the current state of the transcription
   const buttonList: buttonTypes[] = [];
 
   switch (transcript.status) {
@@ -264,21 +282,7 @@ const buttonBlock = (transcript: transcription) => {
 
   // Return a list of buttons
   return (
-    <>
-      {buttonList.map((buttonType) => (
-        <Button
-          key={buttonType}
-          onClick={() => {
-            buttons[buttonType].action;
-          }}
-          size="sm"
-          color={buttons[buttonType].color}
-          variant={buttons[buttonType].style}
-        >
-          {buttons[buttonType].label}
-        </Button>
-      ))}
-    </>
+    <Group position={'left'}>{buttonList.map((buttonType) => buttonConstructor(buttonType, transcript.id))}</Group>
   );
 };
 
@@ -297,25 +301,100 @@ function TranscriptionCard({ transcription }: { transcription: transcription }) 
         {transcription.description}
       </Title>
       <Divider mt="xs" mb="xs" />
-      <Group position="center">{buttonBlock(transcription)}</Group>
-      <Divider mt="xs" mb="xs" />
 
-      <Grid>
+      <Grid align={'flex-start'}>
         <Grid.Col md={6} sm={12}>
           {/* Column containing information about the transcription */}
-          <Stack spacing={'xs'} justify={'flex-start'}>
-            <Text>ID: {transcription.id}</Text>
-            <Text>Status: {transcription.status}</Text>
-            <Text>Created: {transcription.created}</Text>
+          <Stack spacing="xs" justify={'space-between'} style={{ minHeight: '900' }}>
+            <Paper p="md" withBorder>
+              {/* Audio File Information */}
+              <Title order={3}>{strings.transcriptions?.card.audio_section_title}</Title>
+              <Divider my={'xs'} />
+              {/* Audio File Name  */}
+              <Text weight={700}>
+                {strings.transcriptions?.card.file_name}:{' '}
+                <Text weight={500} transform="capitalize" span>
+                  {transcription.audioTitle}
+                </Text>
+              </Text>
+              {/* Audio File Type  */}
+              <Text weight={700}>
+                {strings.transcriptions?.card.file_type}:{' '}
+                <Text weight={500} transform="capitalize" span>
+                  {transcription.audioFormat}
+                </Text>
+              </Text>
+              {/* Audio File Size  */}
+              <Text weight={700}>
+                {strings.transcriptions?.card.file_length}:{' '}
+                <Text weight={500} transform="capitalize" span>
+                  {transcription.length
+                    ? transcription.length < 60
+                      ? `${transcription.length} ${strings.util.time?.seconds}`
+                      : `${Math.floor(transcription.length / 60)} ${strings.util.time?.minutes} ${
+                          transcription.length % 60
+                        } ${strings.util.time?.seconds}`
+                    : strings.util.status?.unknown}
+                </Text>
+              </Text>
+              {/* Audio File Language  */}
+              <Text weight={700}>
+                {strings.transcriptions?.card.file_language}:{' '}
+                <Text weight={500} transform="capitalize" span>
+                  {strings.getString(`languages.${transcription.language}`) || transcription.language}
+                </Text>
+              </Text>
+            </Paper>
+            <Paper p="md" withBorder>
+              {/* StageWhisper information */}
+              <Title order={3}>{strings.transcriptions?.card.transcription_section_title}</Title>
+              <Divider my={'xs'} />
+              {/* Transcription Completed Date  */}
+              <Text weight={700}>
+                {strings.transcriptions?.card.completed_on}:{' '}
+                {transcription.status === 'complete' ? (
+                  <Text weight={500} span>
+                    {transcription.created}
+                  </Text>
+                ) : (
+                  <Text weight={500} span transform="capitalize">
+                    {strings.transcriptions?.card.never_completed}
+                  </Text>
+                )}
+              </Text>
+              {/* Transcription Model Used  */}
+              <Text weight={700}>
+                {strings.transcriptions?.card.model_used}:{' '}
+                <Text weight={500} transform="capitalize" span>
+                  {transcription.model}
+                </Text>
+              </Text>
+              {/* Transcription File Length */}
+              <Text weight={700}>
+                Model:{' '}
+                <Text weight={500} transform="capitalize" span>
+                  {transcription.model}
+                </Text>
+              </Text>
+              {/* Transcription File Location  */}
+              <Text weight={700}>
+                {strings.transcriptions?.card.output_directory}:{' '}
+                <Text weight={500} transform="capitalize" italic span>
+                  {transcription.directory}
+                </Text>
+              </Text>
+            </Paper>
           </Stack>
         </Grid.Col>
         <Grid.Col md={6} sm={12}>
-          <Text italic color={'dimmed'} lineClamp={10}>
+          {/* Column containing a preview of the transcription */}
+          <Text italic color={'dimmed'} lineClamp={15}>
             {transcription.transcript}
           </Text>
-          {/* Column containing a preview of the transcription */}
         </Grid.Col>
       </Grid>
+      <Divider mt="xs" mb="xs" />
+      {buttonBlock(transcription)}
       <Divider mt="xs" mb="xs" />
       {progressIndicator(transcription)}
     </Card>
