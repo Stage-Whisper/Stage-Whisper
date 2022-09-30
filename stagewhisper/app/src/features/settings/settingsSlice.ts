@@ -18,7 +18,7 @@ const initialState: settingsState = {
   // currentView: SettingsView.DASHBOARD,
   theme: 'default',
 
-  darkMode: false,
+  darkMode: true,
   displayLanguage: 'en', // TODO: Change to user's language
   burgerOpen: false,
   allowLargeModels: false
