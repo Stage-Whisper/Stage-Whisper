@@ -85,30 +85,45 @@ export const strings = new LocalizedStrings(
       transcriptions: {
         title: 'Transcriptions',
         // The following are the labels for the table that displays the transcriptions
-        table: {
-          title: 'Transcriptions',
-          columns: {
-            name: 'Name',
-            date: 'Date',
-            duration: 'Duration',
-            language: 'Language',
-            model: 'Model',
-            status: 'Status',
-            actions: 'Actions'
-          },
-          status: {
-            pending: 'Pending',
-            processing: 'Processing',
-            complete: 'Complete',
-            error: 'Error'
-          },
-          actions: {
-            edit: 'Edit',
-            play: 'Play',
-            open: 'Open',
-            delete: 'Delete'
-          }
+        status: {
+          pending: 'Pending',
+          processing: 'Processing',
+          complete: 'Complete',
+          error: 'Error',
+          cancelled: 'Cancelled',
+          deleted: 'Deleted',
+          paused: 'Paused',
+          queued: 'Queued',
+          stalled: 'Stalled'
+        },
+        card: {
+          title: 'Transcription',
+          status: 'Status',
+          created: 'Created',
+          updated: 'Updated',
+          duration: 'Duration',
+          language: 'Language',
+          model: 'Model',
+          actions: 'Actions'
         }
+        // table: {
+        //   title: 'Transcriptions',
+        //   columns: {
+        //     name: 'Name',
+        //     date: 'Date',
+        //     duration: 'Duration',
+        //     language: 'Language',
+        //     model: 'Model',
+        //     status: 'Status',
+        //     actions: 'Actions'
+        //   },
+        //   actions: {
+        //     edit: 'Edit',
+        //     play: 'Play',
+        //     open: 'Open',
+        //     delete: 'Delete'
+        //   }
+        // }
       },
       // Text for the dashboard home page
       dashboard: {
