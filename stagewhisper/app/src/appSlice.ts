@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from './redux/store';
 
 // app Slice
-// This slice is used to store the state of the app
+// This slice is used to store the state of the app shell
 
 export interface appState {
   burgerOpen: boolean;

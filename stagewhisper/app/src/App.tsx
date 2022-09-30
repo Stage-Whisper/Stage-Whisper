@@ -18,6 +18,7 @@ import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import {
+  IconFileDescription,
   IconHome,
   IconInfoCircle,
   IconLanguage,
@@ -79,6 +80,13 @@ function App() {
                 to="/interview"
                 icon={<IconMicrophone2 size={18} />}
                 active={location.pathname === '/interview'}
+              />
+              <NavLink
+                label={<Text>{strings.transcriptions?.title} </Text>}
+                component={Link}
+                to="/transcriptions"
+                icon={<IconFileDescription size={18} />}
+                active={location.pathname === '/transcriptions'}
               />
             </Navbar.Section>
 

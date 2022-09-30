@@ -6,26 +6,97 @@ export const strings = new LocalizedStrings(
     en: {
       util: {
         app_name: 'StageWhisper',
+        buttons: {
+          // Window Actions
+          open: 'Open',
+          close: 'Close',
+
+          // Process Actions
+          cancel: 'Cancel',
+          confirm: 'Confirm',
+          retry: 'Retry',
+          resume: 'Resume',
+          submit: 'Submit',
+          stop: 'Stop',
+          start: 'Start',
+
+          // File Actions
+          delete: 'Delete',
+          edit: 'Edit',
+          save: 'Save',
+          upload: 'Upload',
+          uploadFile: 'Upload File',
+          uploadFiles: 'Upload Files',
+          uploadFolder: 'Upload Folder',
+          uploadFolders: 'Upload Folders',
+          restore: 'Restore',
+
+          // User Actions
+          login: 'Login',
+          logout: 'Logout',
+
+          // Media Actions
+          play: 'Play',
+          next: 'Next',
+          previous: 'Previous',
+          pause: 'Pause',
+
+          // Queue Actions
+          queue: 'Queue',
+          download: 'Download'
+        },
+        time: {
+          seconds: 'seconds',
+          second: 'second',
+          minutes: 'minutes',
+          minute: 'minute',
+          hours: 'hours',
+          hour: 'hour',
+          days: 'days',
+          day: 'day',
+          weeks: 'weeks',
+          week: 'week',
+          months: 'months',
+          month: 'month',
+          years: 'years',
+          year: 'year'
+        },
+
+        // Generic Labels
         yes: 'Yes',
         no: 'No',
         ok: 'OK',
-        cancel: 'Cancel',
-        close: 'Close',
-        save: 'Save',
-        saving: 'Saving...',
-        loading: 'Loading...',
         error: 'Error',
         warning: 'Warning',
         info: 'Info',
-        success: 'Success',
-        unknown: 'Unknown',
         unknownError: 'Unknown error',
         unknownWarning: 'Unknown warning',
         unknownInfo: 'Unknown info',
+        unknown: 'Unknown',
         on: 'On',
         off: 'Off',
         enabled: 'Enabled',
-        disabled: 'Disabled'
+        disabled: 'Disabled',
+        status: {
+          idle: 'Idle',
+          status: 'Status',
+          saving: 'Saving...',
+          loading: 'Loading...',
+          pending: 'Pending',
+          processing: 'Processing',
+          complete: 'Complete',
+          error: 'Error',
+          cancelled: 'Cancelled',
+          deleted: 'Deleted',
+          paused: 'Paused',
+          queued: 'Queued',
+          stalled: 'Stalled',
+          created: 'Created',
+          updated: 'Updated',
+          duration: 'Duration',
+          success: 'Success',
+          unknown: 'Unknown'
+        }
       },
 
       // Text for the transcribe page which allows the user to input files and transcribe them
@@ -82,6 +153,31 @@ export const strings = new LocalizedStrings(
           }
         }
       },
+      // Text for the transcriptions page which shows the user a list of all their transcriptions
+      transcriptions: {
+        title: 'Transcriptions', // Title of the page
+        buttons: {
+          re_transcribe: 'Re-Transcribe',
+          add_to_queue: 'Add to Queue'
+        },
+        // Text for the table that shows the user a list of all their transcriptions and their status
+        card: {
+          // Audio
+          audio_section_title: 'Audio File', // Label for the audio file card
+          file_name: 'Name', // The name of the file that was transcribed
+          file_type: 'Type', // This is the type of file, ie mp3, wav, etc
+          file_length: 'Length', // Length of the file in seconds
+          file_language: 'Language', // The language of the input audio file
+
+          // Transcription
+          transcription_section_title: 'Transcription', // Title of the card that shows information about the transcription
+          output_directory: 'Location', // The directory that the file was saved to
+          completed_on: 'Completed', // What time the transcription was completed
+          never_completed: 'Never', // If the transcription has never been completed
+          model_used: 'Model', // Which model was used to transcribe the file
+          transcript_length: 'Transcript Length' // How long the transcript is in words
+        }
+      },
       // Text for the dashboard home page
       dashboard: {
         title: 'Dashboard',
@@ -90,46 +186,17 @@ export const strings = new LocalizedStrings(
         job: {
           title: 'Job',
           subtitle: 'View and manage your transcription job',
-          status: {
-            title: 'Status',
-            options: {
-              pending: 'Pending',
-              processing: 'Processing',
-              complete: 'Complete',
-              error: 'Error'
-            }
-          },
+
           progress: {
             title: 'Progress',
             subtitle: 'Progress of the job'
-          },
-          output: {
-            title: 'Output',
-            subtitle: 'Output of the job',
-            download: 'Download'
-          },
-          error: {
-            title: 'Error',
-            subtitle: 'Error message from the job'
-          },
-          delete: 'Delete'
+          }
         }
       },
       // Text for the interview mode where a user can record audio and have it transcribed in real time
       interview: {
         title: 'Interview',
-        subtitle: 'Record an interview and transcribe it',
-        record: {
-          title: 'Record',
-          subtitle: 'Record an interview',
-          start: 'Start',
-          stop: 'Stop',
-          pause: 'Pause',
-          resume: 'Resume',
-          recording: 'Recording...',
-          paused: 'Paused',
-          stopped: 'Stopped'
-        }
+        subtitle: 'Record an interview and transcribe it'
       },
       // Text for the settings page
       settings: {
@@ -285,7 +352,13 @@ export const strings = new LocalizedStrings(
     // FIXME: This is a placeholder translation
     tr: {
       util: {
-        app_name: 'Turkish - Stage Whisper - Needs Translation'
+        app_name: 'Turkish - Stage Whisper - Needs Translation',
+
+        buttons: {
+          cancel: 'İptal - temp',
+          close: 'Kapat - temp',
+          confirm: 'Onayla -temp'
+        }
       },
       transcribe: {
         title: 'Deşifre',
