@@ -11,15 +11,15 @@ function TranscriptionCard({ transcription }: { transcription: transcription }) 
   //'pending' | 'processing' | 'complete' | 'error' | 'cancelled' | 'deleted' | 'paused' | 'queued' | 'stalled';
 
   const colors = {
-    pending: 'dimmed',
+    queued: 'dimmed',
+    pending: 'violet',
     processing: 'blue',
+    stalled: 'orange',
     error: 'red',
     paused: 'yellow',
     complete: 'green',
-    stalled: 'orange',
     cancelled: 'gray',
-    deleted: 'gray',
-    queued: 'dimmed'
+    deleted: 'red'
   };
 
   const labels = strings.transcriptions?.status;
@@ -43,7 +43,7 @@ function TranscriptionCard({ transcription }: { transcription: transcription }) 
         );
         break;
       case 'error':
-        return <Progress size={'xl'} value={100} label={labels?.error} color={colors.error} />;
+        return <Progress size={'xl'} value={100} label={labels?.error} striped color={colors.error} />;
         break;
       case 'paused':
         return (
@@ -51,15 +51,29 @@ function TranscriptionCard({ transcription }: { transcription: transcription }) 
         );
         break;
       case 'queued':
-        return <Progress size={'xl'} value={100} color={colors.queued} striped label={labels?.queued} />;
+        return <Progress size={'xl'} value={100} color={colors.queued} striped label={labels?.queued} animate />;
         break;
       case 'stalled':
         return (
-          <Progress size={'xl'} value={transcript.progress} color={colors.stalled} striped label={labels?.stalled} />
+          <Progress
+            size={'xl'}
+            value={transcript.progress}
+            color={colors.stalled}
+            striped
+            label={labels?.stalled}
+            animate
+          />
         );
         break;
       case 'complete':
-        return <Progress size={'xl'} value={100} color={'green'} label={labels?.complete} />;
+        return <Progress size={'xl'} value={100} color={colors.complete} striped label={labels?.complete} />;
+        break;
+      case 'cancelled':
+        return <Progress size={'xl'} value={100} color={colors.cancelled} striped label={labels?.cancelled} />;
+        break;
+      case 'deleted':
+        return <Progress size={'xl'} value={100} color={colors.deleted} striped label={labels?.deleted} />;
+        break;
       default:
         return null;
     }
@@ -67,7 +81,6 @@ function TranscriptionCard({ transcription }: { transcription: transcription }) 
 
   return (
     <Card withBorder>
-      {progressIndicator(transcription)}
       <Title order={2} lineClamp={1}>
         {transcription.title}
       </Title>
@@ -93,7 +106,12 @@ function TranscriptionCard({ transcription }: { transcription: transcription }) 
         </Grid.Col>
       </Grid>
       <Divider mt="xs" mb="xs" />
-      <Group position="center">{/* Buttons */}</Group>
+      {progressIndicator(transcription)}
+      <Divider mt="xs" mb="xs" />
+      <Group position="center">
+        {/* Buttons */}
+        button
+      </Group>
     </Card>
   );
 }
