@@ -45,6 +45,22 @@ export const strings = new LocalizedStrings(
           queue: 'Queue',
           download: 'Download'
         },
+        time: {
+          seconds: 'seconds',
+          second: 'second',
+          minutes: 'minutes',
+          minute: 'minute',
+          hours: 'hours',
+          hour: 'hour',
+          days: 'days',
+          day: 'day',
+          weeks: 'weeks',
+          week: 'week',
+          months: 'months',
+          month: 'month',
+          years: 'years',
+          year: 'year'
+        },
 
         // Generic Labels
         yes: 'Yes',
@@ -56,6 +72,7 @@ export const strings = new LocalizedStrings(
         unknownError: 'Unknown error',
         unknownWarning: 'Unknown warning',
         unknownInfo: 'Unknown info',
+        unknown: 'Unknown',
         on: 'On',
         off: 'Off',
         enabled: 'Enabled',
@@ -138,10 +155,27 @@ export const strings = new LocalizedStrings(
       },
       // Text for the transcriptions page which shows the user a list of all their transcriptions
       transcriptions: {
-        title: 'Transcriptions',
+        title: 'Transcriptions', // Title of the page
         buttons: {
           re_transcribe: 'Re-Transcribe',
           add_to_queue: 'Add to Queue'
+        },
+        // Text for the table that shows the user a list of all their transcriptions and their status
+        card: {
+          // Audio
+          audio_section_title: 'Audio File', // Label for the audio file card
+          file_name: 'Name', // The name of the file that was transcribed
+          file_type: 'Type', // This is the type of file, ie mp3, wav, etc
+          file_length: 'Length', // Length of the file in seconds
+          file_language: 'Language', // The language of the input audio file
+
+          // Transcription
+          transcription_section_title: 'Transcription', // Title of the card that shows information about the transcription
+          output_directory: 'Location', // The directory that the file was saved to
+          completed_on: 'Completed', // What time the transcription was completed
+          never_completed: 'Never', // If the transcription has never been completed
+          model_used: 'Model', // Which model was used to transcribe the file
+          transcript_length: 'Transcript Length' // How long the transcript is in words
         }
       },
       // Text for the dashboard home page
