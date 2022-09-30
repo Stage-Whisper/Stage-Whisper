@@ -15,6 +15,7 @@ import { setupStore } from './redux/store';
 
 import About from './features/about/About';
 import Settings from './features/settings/Settings';
+import Transcriptions from './features/transcriptions/Transcriptions';
 export const store = setupStore();
 
 ReactDOM.render(
@@ -27,6 +28,7 @@ ReactDOM.render(
             <Route path="/transcribe" element={<Input />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/about" element={<About />} />
+            <Route path="/transcriptions" element={<Transcriptions />} />
             <Route path="*" element={<div>404</div>} />
           </Route>
         </Routes>
