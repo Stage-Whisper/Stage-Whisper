@@ -84,7 +84,6 @@ function App() {
               <NavLink
                 label={<Text>{strings.transcriptions?.title} </Text>}
                 component={Link}
-                disabled
                 to="/transcriptions"
                 icon={<IconFileDescription size={18} />}
                 active={location.pathname === '/transcriptions'}
