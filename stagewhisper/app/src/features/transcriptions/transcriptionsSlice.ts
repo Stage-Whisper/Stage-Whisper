@@ -11,6 +11,7 @@ export interface transcriptionState {
 }
 
 export enum transcriptionStatus {
+  IDLE = 'idle', // User has added a file to be transcribed but it has not been added to the queue
   QUEUED = 'queued', // User has indicated they want to transcribe this file
   PENDING = 'pending', // Transcription has started but its progress is unknown
   PROCESSING = 'processing', // Transcription is in progress
@@ -63,7 +64,8 @@ const initialState: transcriptionState = {
     },
     {
       id: 1,
-      title: 'Adventures of Sherlock Holmes',
+      title:
+        'Adventures of Sherlock Holmes - Very long title that will be truncated or break something in one of the ui views',
       description: 'A collection of short stories by Sir Arthur Conan Doyle',
       date: '2020-01-01',
       created: '2020-01-01',
@@ -210,6 +212,24 @@ const initialState: transcriptionState = {
       opened: false,
       progress: 20,
       status: transcriptionStatus.QUEUED,
+      directory: 'test',
+      transcript:
+        'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there '
+    },
+    {
+      id: 9,
+      title: 'Test Title9',
+      description: 'Test Description',
+      date: '2020-01-01',
+      created: '2020-01-01',
+      tags: ['test', 'tags'],
+      audio: 'test audio',
+      language: 'en',
+      translated: false,
+      model: 'base',
+      opened: false,
+      progress: 20,
+      status: transcriptionStatus.IDLE,
       directory: 'test',
       transcript:
         'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there '
