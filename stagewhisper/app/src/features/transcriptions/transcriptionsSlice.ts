@@ -4,6 +4,7 @@ import { RootState } from './../../redux/store';
 // This holds the state of the transcriptions and will be updated by electron/node processes
 
 import { createSlice } from '@reduxjs/toolkit';
+import { WhisperLanguages } from '../input/components/language/languages';
 
 export interface transcriptionState {
   transcriptions: transcription[];
@@ -16,9 +17,9 @@ export interface transcription {
   date: string;
   tags: string[];
   audio: string;
-  language: string;
+  language: keyof typeof WhisperLanguages;
   translated: boolean;
-  model: string;
+  model: 'tiny' | 'base' | 'small' | 'medium' | 'large';
   progress: number;
   status: 'pending' | 'in progress' | 'complete';
   directory: string;
@@ -37,7 +38,7 @@ const initialState: transcriptionState = {
       audio: 'test audio 0',
       language: 'en',
       translated: false,
-      model: 'default model test',
+      model: 'base',
       progress: 0,
       status: 'pending',
       directory: 'test',
@@ -48,13 +49,24 @@ const initialState: transcriptionState = {
     {
       id: 1,
       title: 'Test Title1',
-      description: 'Test Description',
+      description:
+        'This is a description that is very very long and will wrap to the next line or will have issues displaying in the layout, the way I am building around this is by using mantines Clamp component which prevents it from overflowing the container',
       date: '2020-01-01',
-      tags: ['test', 'tags'],
+      tags: [
+        'test',
+        'tags',
+        'more tags',
+        'even more tags',
+        'many tags',
+        'tags2',
+        ' more more tags',
+        'repeating tags',
+        'very very very very very very long tags'
+      ],
       audio: 'test audio',
-      language: 'en',
+      language: 'tr',
       translated: false,
-      model: 'default model test',
+      model: 'tiny',
       progress: 0,
       status: 'pending',
       directory: 'test',
@@ -71,7 +83,7 @@ const initialState: transcriptionState = {
       audio: 'test audio',
       language: 'en',
       translated: false,
-      model: 'default model test',
+      model: 'large',
       progress: 0,
       status: 'pending',
       directory: 'test',
@@ -88,7 +100,7 @@ const initialState: transcriptionState = {
       audio: 'test audio',
       language: 'en',
       translated: false,
-      model: 'default model test',
+      model: 'medium',
       progress: 0,
       status: 'pending',
       directory: 'test',
@@ -105,7 +117,7 @@ const initialState: transcriptionState = {
       audio: 'test audio',
       language: 'en',
       translated: false,
-      model: 'default model test',
+      model: 'base',
       opened: false,
       progress: 0,
       status: 'pending',
