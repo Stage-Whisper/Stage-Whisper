@@ -1,19 +1,99 @@
-import { SimpleGrid, Center, Button, Title, Card, Group, Divider } from '@mantine/core';
+import { Text, Card, Divider, Grid, Group, Title, Stack, Progress } from '@mantine/core';
 import React from 'react';
+import strings from '../../../localization';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { transcription } from '../transcriptionsSlice';
 
 // Localization
-import strings from '../../../localization';
 
 function TranscriptionCard({ transcription }: { transcription: transcription }) {
+  //'pending' | 'processing' | 'complete' | 'error' | 'cancelled' | 'deleted' | 'paused' | 'queued' | 'stalled';
+
+  const colors = {
+    pending: 'dimmed',
+    processing: 'blue',
+    error: 'red',
+    paused: 'yellow',
+    complete: 'green',
+    stalled: 'orange',
+    cancelled: 'gray',
+    deleted: 'gray',
+    queued: 'dimmed'
+  };
+
+  const labels = strings.transcriptions?.status;
+
+  // Constructor
+  const progressIndicator = (transcript: transcription) => {
+    switch (transcript.status) {
+      case 'pending':
+        return <Progress size={'xl'} value={100} color={colors.pending} animate striped label={labels?.pending} />;
+        break;
+      case 'processing':
+        return (
+          <Progress
+            size={'xl'}
+            value={transcript.progress}
+            color={colors.processing}
+            animate
+            striped
+            label={labels?.processing}
+          />
+        );
+        break;
+      case 'error':
+        return <Progress size={'xl'} value={100} label={labels?.error} color={colors.error} />;
+        break;
+      case 'paused':
+        return (
+          <Progress size={'xl'} value={transcript.progress} color={colors.paused} striped label={labels?.paused} />
+        );
+        break;
+      case 'queued':
+        return <Progress size={'xl'} value={100} color={colors.queued} striped label={labels?.queued} />;
+        break;
+      case 'stalled':
+        return (
+          <Progress size={'xl'} value={transcript.progress} color={colors.stalled} striped label={labels?.stalled} />
+        );
+        break;
+      case 'complete':
+        return <Progress size={'xl'} value={100} color={'green'} label={labels?.complete} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Card withBorder>
-      <Title order={2}>{transcription.title}</Title>
-      <Divider mt="xs" mb="md" />
-      <Title order={4}>{transcription.description}</Title>
+      {progressIndicator(transcription)}
+      <Title order={2} lineClamp={1}>
+        {transcription.title}
+      </Title>
+      <Title italic order={6} lineClamp={1}>
+        {transcription.description}
+      </Title>
+      <Divider mt="xs" mb="xs" />
+
+      <Grid>
+        <Grid.Col md={6} sm={12}>
+          {/* Column containing information about the transcription */}
+          <Stack spacing={'xs'} justify={'flex-start'}>
+            <Text>ID: {transcription.id}</Text>
+            <Text>Status: {transcription.status}</Text>
+            <Text>Created: {transcription.created}</Text>
+          </Stack>
+        </Grid.Col>
+        <Grid.Col md={6} sm={12}>
+          <Text italic color={'dimmed'} lineClamp={10}>
+            {transcription.transcript}
+          </Text>
+          {/* Column containing a preview of the transcription */}
+        </Grid.Col>
+      </Grid>
+      <Divider mt="xs" mb="xs" />
+      <Group position="center">{/* Buttons */}</Group>
     </Card>
   );
 }
