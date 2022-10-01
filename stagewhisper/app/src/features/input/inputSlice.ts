@@ -1,3 +1,4 @@
+import { WhisperArgs } from './../../../electron/handlers/runWhisper';
 import { DescriptionType } from './components/description/Description';
 import { createSlice } from '@reduxjs/toolkit';
 import { AudioType } from './components/audio/Audio';
@@ -15,13 +16,13 @@ export interface inputState {
   audio: AudioType;
   audioValid: boolean;
 
-  language: keyof typeof WhisperLanguages;
+  language: WhisperArgs['language'];
   languageValid: boolean;
 
   directory: string | undefined;
   directoryValid: boolean;
 
-  model: 'tiny' | 'base' | 'small' | 'medium' | 'large';
+  model: WhisperArgs['model'];
   modelValid: boolean;
 
   // Page States
@@ -45,7 +46,7 @@ const initialState: inputState = {
   },
   audioValid: false,
 
-  language: 'en',
+  language: 'English',
   languageValid: false,
 
   directory: undefined,
