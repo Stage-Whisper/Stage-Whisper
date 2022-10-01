@@ -203,7 +203,8 @@ export const strings = new LocalizedStrings(
       settings: {
         title: 'Settings',
         subtitle: 'Manage your account settings',
-        toggle_dark_mode: 'Toggle Dark Mode',
+        dark_mode: 'Dark Mode',
+        debug_menu: 'Debug Menu',
         language: {
           title: 'Language',
           subtitle:
