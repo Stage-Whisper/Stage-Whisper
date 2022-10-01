@@ -20,6 +20,8 @@ import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import {
+  IconBug,
+  IconBugOff,
   IconFileDescription,
   IconHome,
   IconInfoCircle,
@@ -32,9 +34,13 @@ import {
 import strings from './localization';
 import { useAppDispatch, useAppSelector } from './redux/hooks';
 
-import { selectBurgerOpen, setBurgerOpen } from './appSlice';
+import { selectBurgerOpen, selectDebugMenu, setBurgerOpen, toggleDebugMenu } from './appSlice';
 import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
-import { selectTranscriptions, setActiveTranscription } from './features/transcriptions/transcriptionsSlice';
+import {
+  selectNumberOfTranscriptions,
+  selectTranscriptions,
+  setActiveTranscription
+} from './features/transcriptions/transcriptionsSlice';
 import Debug from './debug/Debug';
 
 // Recent Transcription Constructor
@@ -52,7 +58,7 @@ function RecentTranscriptions() {
           {transcriptions.map((transcription) => (
             <NavLink
               key={transcription.id}
-              label={transcription.audioTitle}
+              label={<Text lineClamp={1}>{transcription.audioTitle}</Text>}
               component={Link}
               to={`/transcriptions`}
               onClick={() => {
@@ -81,8 +87,8 @@ function App() {
 
   const location = useLocation();
 
-  // States
   const burgerOpen = useAppSelector(selectBurgerOpen);
+  const numberOfTranscriptions = useAppSelector(selectNumberOfTranscriptions);
 
   return (
     <MantineProvider theme={{ colorScheme: darkMode ? 'dark' : 'light' }} withGlobalStyles withNormalizeCSS>
@@ -121,6 +127,7 @@ function App() {
                 to="/transcriptions"
                 icon={<IconFileDescription size={18} />}
                 onClick={() => dispatch(setActiveTranscription(null))}
+                disabled={numberOfTranscriptions === 0}
                 active={location.pathname === '/transcriptions'}
               />
             </Navbar.Section>
@@ -185,17 +192,27 @@ function App() {
         }
       >
         <Outlet />
+        {/* Debugging Component */}
+        {useAppSelector(selectDebugMenu) ? <Affix position={{ bottom: 60, right: 20 }}>{<Debug />}</Affix> : <></>}
+
         <Affix position={{ bottom: 20, right: 20 }}>
-          {<Debug />}
-          <ActionIcon
-            variant="gradient"
-            gradient={darkMode ? { from: 'red', to: 'yellow', deg: 135 } : { from: 'blue', to: 'violet', deg: 135 }}
-            color={darkMode ? 'yellow' : 'dark'}
-            onClick={() => dispatch(toggleDarkMode())}
-            title={strings.settings?.toggle_dark_mode}
-          >
-            {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
-          </ActionIcon>
+          <Group>
+            <ActionIcon
+              variant="gradient"
+              gradient={darkMode ? { from: 'red', to: 'yellow', deg: 135 } : { from: 'blue', to: 'violet', deg: 135 }}
+              onClick={() => dispatch(toggleDarkMode())}
+              title={strings.settings?.dark_mode}
+            >
+              {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
+            </ActionIcon>
+            <ActionIcon
+              variant="filled"
+              onClick={() => dispatch(toggleDebugMenu())}
+              title={strings.settings?.debug_menu}
+            >
+              {useAppSelector(selectDebugMenu) ? <IconBugOff size={18} /> : <IconBug size={18} />}
+            </ActionIcon>
+          </Group>
         </Affix>
       </AppShell>
     </MantineProvider>
