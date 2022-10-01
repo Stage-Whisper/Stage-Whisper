@@ -28,7 +28,9 @@ ReactDOM.render(
             <Route path="/transcribe" element={<Input />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/about" element={<About />} />
-            <Route path="/transcriptions" element={<Transcriptions />} />
+            <Route path="/transcriptions" element={<Transcriptions />}>
+              <Route path=":transcriptionId" element={<Transcriptions />} />
+            </Route>
             <Route path="*" element={<div>404</div>} />
           </Route>
         </Routes>
