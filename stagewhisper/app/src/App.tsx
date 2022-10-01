@@ -12,7 +12,9 @@ import {
   NavLink,
   Title,
   useMantineTheme,
-  Affix
+  Affix,
+  Divider,
+  ScrollArea
 } from '@mantine/core';
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
@@ -32,9 +34,36 @@ import { useAppDispatch, useAppSelector } from './redux/hooks';
 
 import { selectBurgerOpen, setBurgerOpen } from './appSlice';
 import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
+import { selectTranscriptions } from './features/transcriptions/transcriptionsSlice';
 
-// React Components
+// Recent Transcription Constructor
+function RecentTranscriptions() {
+  const transcriptions = useAppSelector(selectTranscriptions);
+  const dispatch = useAppDispatch();
 
+  if (!transcriptions.length) {
+    return <></>;
+  } else {
+    return (
+      <>
+        <Divider mt={'sm'} />
+        <NavLink label={strings.transcriptions?.recent_transcriptions} icon={<IconFileDescription />}>
+          {transcriptions.map((transcription) => (
+            <NavLink
+              key={transcription.id}
+              label={transcription.audioTitle}
+              component={Link}
+              to={`/transcriptions/${transcription.id}`}
+              onClick={() => dispatch(setBurgerOpen(false))}
+            />
+          ))}
+        </NavLink>
+      </>
+    );
+  }
+}
+
+// Main App Component
 function App() {
   // Redux
   const dispatch = useAppDispatch();
@@ -57,8 +86,9 @@ function App() {
         navbarOffsetBreakpoint="sm"
         asideOffsetBreakpoint="sm"
         navbar={
+          // Main navigation sidebar with Dashboard, Transcribe, Interview and Transcription pages
           <Navbar hiddenBreakpoint="sm" hidden={!burgerOpen} width={{ sm: 200, lg: 300 }}>
-            <Navbar.Section grow m={0}>
+            <Navbar.Section m={0}>
               <NavLink
                 label={<Text>{strings.dashboard?.title}</Text>}
                 icon={<IconHome size={18} />}
@@ -90,6 +120,12 @@ function App() {
               />
             </Navbar.Section>
 
+            {/* Recent Transcription Section */}
+            <Navbar.Section grow component={ScrollArea}>
+              {RecentTranscriptions()}
+            </Navbar.Section>
+
+            {/* Settings Section */}
             <Navbar.Section>
               <NavLink
                 label={<Text>{strings.settings?.title}</Text>}
