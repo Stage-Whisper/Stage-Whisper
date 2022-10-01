@@ -7,6 +7,7 @@ import {
   Divider,
   Group,
   Header,
+  Loader,
   MantineProvider,
   MediaQuery,
   Navbar,
@@ -20,16 +21,25 @@ import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import {
+  IconAlertTriangle,
   IconBug,
   IconBugOff,
+  IconCaretRight,
+  IconFileAlert,
+  IconFileCheck,
   IconFileDescription,
   IconHome,
   IconInfoCircle,
   IconLanguage,
   IconMicrophone2,
   IconMoonStars,
+  IconPlayerPause,
+  IconQuestionMark,
+  IconRefreshAlert,
   IconSettings,
-  IconSun
+  IconSun,
+  IconTrash,
+  TablerIcon
 } from '@tabler/icons';
 import strings from './localization';
 import { useAppDispatch, useAppSelector } from './redux/hooks';
@@ -37,6 +47,7 @@ import { useAppDispatch, useAppSelector } from './redux/hooks';
 import { selectBurgerOpen, selectDebugMenu, setBurgerOpen, toggleDebugMenu } from './appSlice';
 import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
 import {
+  selectActiveTranscription,
   selectNumberOfTranscriptions,
   selectTranscriptions,
   setActiveTranscription
@@ -46,6 +57,7 @@ import Debug from './debug/Debug';
 // Recent Transcription Constructor
 function RecentTranscriptions() {
   const transcriptions = useAppSelector(selectTranscriptions);
+  const activeTranscription = useAppSelector(selectActiveTranscription);
   const dispatch = useAppDispatch();
 
   if (!transcriptions.length) {
@@ -54,8 +66,46 @@ function RecentTranscriptions() {
     return (
       <>
         <Divider mt={'sm'} />
-        <NavLink label={strings.transcriptions?.recent_transcriptions} icon={<IconFileDescription />}>
-          {transcriptions.map((transcription) => (
+        {/* <Title order={6}>{strings.transcriptions?.recent_transcriptions}</Title> */}
+
+        {transcriptions.map((transcription) => {
+          let icon: JSX.Element;
+
+          switch (transcription.status) {
+            case 'idle' || 'paused':
+              icon = <IconPlayerPause />;
+              break;
+            case 'processing':
+              icon = <Loader size={'xs'} variant="oval" />;
+              break;
+            case 'error':
+              icon = <IconFileAlert />;
+              break;
+            case 'complete':
+              icon = <IconFileCheck />;
+              break;
+            case 'queued':
+              icon = <IconCaretRight />;
+              break;
+            case 'deleted':
+              icon = <IconTrash />;
+              break;
+            case 'unknown':
+              icon = <IconQuestionMark />;
+              break;
+            case 'stalled':
+              icon = <IconRefreshAlert />;
+              break;
+            case 'cancelled':
+              icon = <IconFileAlert />;
+              break;
+
+            default:
+              icon = <IconAlertTriangle/>
+              break;
+          }
+
+          return (
             <NavLink
               key={transcription.id}
               label={<Text lineClamp={1}>{transcription.audioTitle}</Text>}
@@ -65,9 +115,21 @@ function RecentTranscriptions() {
                 dispatch(setActiveTranscription(transcription.id));
                 dispatch(setBurgerOpen(false));
               }}
+              active={transcription.id === activeTranscription}
+              icon={
+                icon
+                // transcription.status === 'error' || transcription.status === 'unknown' ? ( // If transcription is error or unknown show error icon
+                //   <IconBugOff />
+                // ) : transcription.status === '' ? ( // If transcription is in progress show loading icon
+                //   <Loader size={'xs'} variant="oval" />
+                // ) : (
+                //   // Else show nothing
+                //   <></>
+                // )
+              }
             />
-          ))}
-        </NavLink>
+          );
+        })}
       </>
     );
   }
@@ -79,6 +141,10 @@ function App() {
   const dispatch = useAppDispatch();
   const darkMode = useAppSelector(selectDarkMode);
   const displayLanguage = useAppSelector(selectDisplayLanguage);
+  const activeTranscription = useAppSelector(selectActiveTranscription);
+  const burgerOpen = useAppSelector(selectBurgerOpen);
+  const numberOfTranscriptions = useAppSelector(selectNumberOfTranscriptions);
+
   // Theming
   const theme = useMantineTheme();
 
@@ -86,9 +152,6 @@ function App() {
   strings.setLanguage(displayLanguage);
 
   const location = useLocation();
-
-  const burgerOpen = useAppSelector(selectBurgerOpen);
-  const numberOfTranscriptions = useAppSelector(selectNumberOfTranscriptions);
 
   return (
     <MantineProvider theme={{ colorScheme: darkMode ? 'dark' : 'light' }} withGlobalStyles withNormalizeCSS>
@@ -128,7 +191,7 @@ function App() {
                 icon={<IconFileDescription size={18} />}
                 onClick={() => dispatch(setActiveTranscription(null))}
                 disabled={numberOfTranscriptions === 0}
-                active={location.pathname === '/transcriptions'}
+                active={location.pathname === '/transcriptions' && activeTranscription === null}
               />
             </Navbar.Section>
 
