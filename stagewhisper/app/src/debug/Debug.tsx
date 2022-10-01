@@ -17,7 +17,7 @@ function Debug() {
           onClick={() => {
             if (window.Main) {
               window.Main.loadVttFromFile('dev', true).then((vtt) => {
-                console.log(vtt.toString());
+                console.log(vtt);
               });
             }
           }}
