@@ -8,6 +8,7 @@ import { WhisperLanguages } from '../input/components/language/languages';
 
 export interface transcriptionState {
   transcriptions: transcription[];
+  activeTranscription: number | null;
 }
 
 export enum transcriptionStatus {
@@ -294,39 +295,54 @@ const initialState: transcriptionState = {
       transcript:
         'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there '
     }
-  ]
+  ],
+  activeTranscription: 0
 };
 
 export const transcriptionsSlice = createSlice({
   name: 'transcriptions',
   initialState,
   reducers: {
+    setActiveTranscription: (state, action) => {
+      // This action is called when a transcription is opened by the user
+      state.activeTranscription = action.payload;
+    },
+
     addTranscription: (state, action) => {
+      // This action is called when a transcription is added
       state.transcriptions.push(action.payload);
     },
+
     updateTranscription: (state, action) => {
+      // This action is called when a transcription is updated
       const index = state.transcriptions.findIndex((transcription) => transcription.id === action.payload.id);
       if (index !== -1) {
         state.transcriptions[index] = action.payload;
       }
     },
+
     removeTranscription: (state, action) => {
+      // This action is called when a transcription is removed
       const index = state.transcriptions.findIndex((transcription) => transcription.id === action.payload);
       if (index !== -1) {
         state.transcriptions.splice(index, 1);
       }
     },
+
     test: (state, action) => {
+      // This action is a test action
       console.log('test');
       console.log(action.payload);
     }
   }
 });
 
-export const { addTranscription, updateTranscription, removeTranscription, test } = transcriptionsSlice.actions;
+export const { addTranscription, updateTranscription, removeTranscription, test, setActiveTranscription } =
+  transcriptionsSlice.actions;
 
 // Export Transcription States
 export const selectTranscriptions = (state: RootState) => state.transcriptions.transcriptions;
+export const selectActiveTranscription = (state: RootState) => state.transcriptions.activeTranscription;
 
 // Export the reducer
 export default transcriptionsSlice.reducer;
