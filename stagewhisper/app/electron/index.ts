@@ -1,6 +1,6 @@
 // Native
 import { join } from 'path';
-
+import { parseSync } from 'subtitle';
 // Python-Shell
 import { PythonShell } from 'python-shell';
 
@@ -11,6 +11,7 @@ import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 import { BrowserWindow, app, ipcMain, IpcMainEvent, dialog, IpcMainInvokeEvent } from 'electron';
 import isDev from 'electron-is-dev';
 import { whisperArgs } from './preload';
+import { existsSync, readFile } from 'fs';
 
 // Electron Defaults
 const height = 600;
@@ -22,6 +23,23 @@ declare global {
     api: any;
   }
 }
+
+//#region Utility Functions
+// Promise wrapper for readFile
+const readFilePromise = (path: string): Promise<string> =>
+  new Promise((resolve, reject) => {
+    existsSync(path)
+      ? readFile(path, 'utf8', (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        })
+      : reject(new Error('File does not exist'));
+  });
+
+//#endregion
 
 function createWindow() {
   // Create the browser window.
@@ -134,4 +152,22 @@ ipcMain.handle('run-whisper', (event: IpcMainInvokeEvent, args: whisperArgs) => 
     console.log('results: %j', results);
     event.sender.send('whisper-complete', results);
   });
+});
+
+// Get example vtt file
+ipcMain.handle('load-vtt-from-file', async (_event: IpcMainInvokeEvent, ...args) => {
+  const path = args[0];
+  const exampleData = args?.[1];
+
+  if (exampleData) {
+    console.log('Getting example vtt file');
+    const file = await readFilePromise(join(__dirname, '../src/debug/data/example.vtt'));
+    const parsed = parseSync(file); // Parse vtt file
+    return parsed;
+  } else {
+    console.log('Getting vtt file from path: ', path);
+    const file = await readFilePromise(path);
+    const parsed = parseSync(file); // Parse vtt file
+    return parsed;
+  }
 });

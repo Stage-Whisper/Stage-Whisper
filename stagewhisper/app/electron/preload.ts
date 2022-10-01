@@ -33,6 +33,18 @@ const api = {
     ipcRenderer.send('message', message);
   },
 
+  loadVttFromFile: async (path: string, exampleData?: boolean) => {
+    if (exampleData === true) {
+      const result = await ipcRenderer.invoke('load-vtt-from-file', path, exampleData);
+
+      return result;
+    } else {
+      const result = await ipcRenderer.invoke('load-vtt-from-file', path);
+
+      return result;
+    }
+  },
+
   /**
    * Provide an easier way to listen to events
    */
