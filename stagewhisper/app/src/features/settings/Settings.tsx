@@ -5,7 +5,7 @@ import React from 'react';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { selectDisplayLanguage, selectTheme, setDisplayLanguage } from './settingsSlice';
+import { selectDisplayLanguage, selectTheme, setAllowLargeModel, setDisplayLanguage } from './settingsSlice';
 
 // Localization
 import strings from '../../localization';
@@ -67,10 +67,9 @@ function Settings() {
             <Switch
               onLabel={strings.util?.on}
               offLabel={strings.util?.off}
-              onChange={(value) => {
-                if (value) {
-                  dispatch(setDisplayLanguage(value));
-                }
+              onChange={(event) => {
+                console.log(event.target.checked);
+                dispatch(setAllowLargeModel(event.target.checked));
               }}
             />
           </Group>
