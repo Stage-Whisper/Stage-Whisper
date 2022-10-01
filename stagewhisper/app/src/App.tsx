@@ -1,20 +1,20 @@
 import {
-  Text,
   ActionIcon,
+  Affix,
   AppShell,
   // Aside,
   Burger,
+  Divider,
   Group,
   Header,
   MantineProvider,
   MediaQuery,
   Navbar,
   NavLink,
+  ScrollArea,
+  Text,
   Title,
-  useMantineTheme,
-  Affix,
-  Divider,
-  ScrollArea
+  useMantineTheme
 } from '@mantine/core';
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
@@ -35,6 +35,7 @@ import { useAppDispatch, useAppSelector } from './redux/hooks';
 import { selectBurgerOpen, setBurgerOpen } from './appSlice';
 import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
 import { selectTranscriptions, setActiveTranscription } from './features/transcriptions/transcriptionsSlice';
+import Debug from './debug/Debug';
 
 // Recent Transcription Constructor
 function RecentTranscriptions() {
@@ -185,6 +186,7 @@ function App() {
       >
         <Outlet />
         <Affix position={{ bottom: 20, right: 20 }}>
+          {<Debug />}
           <ActionIcon
             variant="gradient"
             gradient={darkMode ? { from: 'red', to: 'yellow', deg: 135 } : { from: 'blue', to: 'violet', deg: 135 }}
