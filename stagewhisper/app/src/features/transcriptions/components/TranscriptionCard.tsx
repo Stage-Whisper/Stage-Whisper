@@ -3,12 +3,10 @@ import {
   Button,
   ButtonVariant,
   Card,
-  Collapse,
   Divider,
   Grid,
   Group,
   MantineColor,
-  Paper,
   Progress,
   Stack,
   Text,
@@ -17,11 +15,11 @@ import {
 import React, { useState } from 'react';
 
 // Redux
-import { transcription } from '../transcriptionsSlice';
+import { transcription, transcriptionStatus } from '../transcriptionsSlice';
 
 // Localization
-import strings from '../../../localization';
 import { useDispatch } from 'react-redux';
+import strings from '../../../localization';
 
 //#region Component Helpers
 const progressIndicator = (transcript: transcription) => {
@@ -29,7 +27,7 @@ const progressIndicator = (transcript: transcription) => {
   const labels = strings.util.status;
 
   const states: {
-    [key: string]: {
+    [key in transcriptionStatus]: {
       color: string; // Color of the progress bar
       showFilled: boolean; // Whether the progress bar should be filled or reflect the transcript.progress value
       animated: boolean; // Whether the progress bar should be animated
@@ -106,6 +104,13 @@ const progressIndicator = (transcript: transcription) => {
       animated: false,
       striped: true,
       label: labels?.deleted
+    },
+    unknown: {
+      color: 'gray',
+      showFilled: true,
+      animated: false,
+      striped: true,
+      label: labels?.unknown
     }
   };
 
