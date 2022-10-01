@@ -1,7 +1,9 @@
 import {
+  Accordion,
   Button,
   ButtonVariant,
   Card,
+  Collapse,
   Divider,
   Grid,
   Group,
@@ -12,7 +14,7 @@ import {
   Text,
   Title
 } from '@mantine/core';
-import React from 'react';
+import React, { useState } from 'react';
 
 // Redux
 import { transcription } from '../transcriptionsSlice';
@@ -289,6 +291,9 @@ const buttonBlock = (transcript: transcription) => {
 // #endregion
 
 function TranscriptionCard({ transcription }: { transcription: transcription }) {
+  // Local state for the transcription card - used to show/hide the file/transcription details
+  const [expanded, setExpanded] = useState<string[]>([]);
+
   return (
     <Card withBorder>
       <Group>
@@ -306,84 +311,93 @@ function TranscriptionCard({ transcription }: { transcription: transcription }) 
         <Grid.Col md={6} sm={12}>
           {/* Column containing information about the transcription */}
           <Stack spacing="xs" justify={'space-between'} style={{ minHeight: '900' }}>
-            <Paper p="md" withBorder>
-              {/* Audio File Information */}
-              <Title order={3}>{strings.transcriptions?.card.audio_section_title}</Title>
-              <Divider my={'xs'} />
-              {/* Audio File Name  */}
-              <Text weight={700}>
-                {strings.transcriptions?.card.file_name}:{' '}
-                <Text weight={500} transform="capitalize" span>
-                  {transcription.audioTitle}
-                </Text>
-              </Text>
-              {/* Audio File Type  */}
-              <Text weight={700}>
-                {strings.transcriptions?.card.file_type}:{' '}
-                <Text weight={500} transform="capitalize" span>
-                  {transcription.audioFormat}
-                </Text>
-              </Text>
-              {/* Audio File Size  */}
-              <Text weight={700}>
-                {strings.transcriptions?.card.file_length}:{' '}
-                <Text weight={500} transform="capitalize" span>
-                  {transcription.length
-                    ? transcription.length < 60
-                      ? `${transcription.length} ${strings.util.time?.seconds}`
-                      : `${Math.floor(transcription.length / 60)} ${strings.util.time?.minutes} ${
-                          transcription.length % 60
-                        } ${strings.util.time?.seconds}`
-                    : strings.util.status?.unknown}
-                </Text>
-              </Text>
-              {/* Audio File Language  */}
-              <Text weight={700}>
-                {strings.transcriptions?.card.file_language}:{' '}
-                <Text weight={500} transform="capitalize" span>
-                  {strings.getString(`languages.${transcription.language}`) || transcription.language}
-                </Text>
-              </Text>
-            </Paper>
-            <Paper p="md" withBorder>
+            <Accordion multiple variant="contained" value={expanded} onChange={setExpanded}>
               {/* StageWhisper information */}
-              <Title order={3}>{strings.transcriptions?.card.transcription_section_title}</Title>
-              <Divider my={'xs'} />
-              {/* Transcription Completed Date  */}
-              <Text weight={700}>
-                {strings.transcriptions?.card.completed_on}:{' '}
-                {transcription.status === 'complete' ? (
-                  <Text weight={500} span>
-                    {transcription.created}
+              <Accordion.Item value="transcription">
+                <Accordion.Control>
+                  <Title order={3}>{strings.transcriptions?.card.transcription_section_title}</Title>
+                </Accordion.Control>
+                <Accordion.Panel>
+                  {/* Transcription Completed Date  */}
+                  <Text weight={700}>
+                    {strings.transcriptions?.card.completed_on}:{' '}
+                    {transcription.status === 'complete' ? (
+                      <Text weight={500} span>
+                        {transcription.created}
+                      </Text>
+                    ) : (
+                      <Text weight={500} span transform="capitalize">
+                        {strings.transcriptions?.card.never_completed}
+                      </Text>
+                    )}
                   </Text>
-                ) : (
-                  <Text weight={500} span transform="capitalize">
-                    {strings.transcriptions?.card.never_completed}
+                  {/* Transcription Model Used  */}
+                  <Text weight={700}>
+                    {strings.transcriptions?.card.model_used}:{' '}
+                    <Text weight={500} transform="capitalize" span>
+                      {transcription.model}
+                    </Text>
                   </Text>
-                )}
-              </Text>
-              {/* Transcription Model Used  */}
-              <Text weight={700}>
-                {strings.transcriptions?.card.model_used}:{' '}
-                <Text weight={500} transform="capitalize" span>
-                  {transcription.model}
-                </Text>
-              </Text>
-              {/* Transcription File Length */}
-              <Text weight={700}>
-                Model:{' '}
-                <Text weight={500} transform="capitalize" span>
-                  {transcription.model}
-                </Text>
-              </Text>
-              {/* Transcription File Location  */}
-              <Text weight={700}>
-                {strings.transcriptions?.card.output_directory}:{' '}
-                <Text weight={500} transform="capitalize" italic span>
-                  {transcription.directory}
-                </Text>
-              </Text>
-            </Paper>
+                  {/* Transcription File Length */}
+                  <Text weight={700}>
+                    Model:{' '}
+                    <Text weight={500} transform="capitalize" span>
+                      {transcription.model}
+                    </Text>
+                  </Text>
+                  {/* Transcription File Location  */}
+                  <Text weight={700}>
+                    {strings.transcriptions?.card.output_directory}:{' '}
+                    <Text weight={500} transform="capitalize" italic span>
+                      {transcription.directory}
+                    </Text>
+                  </Text>
+                </Accordion.Panel>
+              </Accordion.Item>
+
+              <Accordion.Item value="audio">
+                {/* Audio File Information */}
+                <Accordion.Control>
+                  <Title order={3}>{strings.transcriptions?.card.audio_section_title}</Title>
+                </Accordion.Control>
+                <Accordion.Panel>
+                  {/* Audio File Name  */}
+                  <Text weight={700}>
+                    {strings.transcriptions?.card.file_name}:{' '}
+                    <Text weight={500} transform="capitalize" span>
+                      {transcription.audioTitle}
+                    </Text>
+                  </Text>
+                  {/* Audio File Type  */}
+                  <Text weight={700}>
+                    {strings.transcriptions?.card.file_type}:{' '}
+                    <Text weight={500} transform="capitalize" span>
+                      {transcription.audioFormat}
+                    </Text>
+                  </Text>
+                  {/* Audio File Size  */}
+                  <Text weight={700}>
+                    {strings.transcriptions?.card.file_length}:{' '}
+                    <Text weight={500} transform="capitalize" span>
+                      {transcription.length
+                        ? transcription.length < 60
+                          ? `${transcription.length} ${strings.util.time?.seconds}`
+                          : `${Math.floor(transcription.length / 60)} ${strings.util.time?.minutes} ${
+                              transcription.length % 60
+                            } ${strings.util.time?.seconds}`
+                        : strings.util.status?.unknown}
+                    </Text>
+                  </Text>
+                  {/* Audio File Language  */}
+                  <Text weight={700}>
+                    {strings.transcriptions?.card.file_language}:{' '}
+                    <Text weight={500} transform="capitalize" span>
+                      {strings.getString(`languages.${transcription.language}`) || transcription.language}
+                    </Text>
+                  </Text>
+                </Accordion.Panel>
+              </Accordion.Item>
+            </Accordion>
           </Stack>
         </Grid.Col>
         <Grid.Col md={6} sm={12}>
