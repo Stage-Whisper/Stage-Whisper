@@ -31,7 +31,7 @@ function Transcriptions() {
       </Stack>
     );
   } else {
-    return <TranscriptionEditor />;
+    return <TranscriptionEditor active={transcriptions.filter((transcription) => transcription.id === activeId)[0]} />;
   }
 }
 

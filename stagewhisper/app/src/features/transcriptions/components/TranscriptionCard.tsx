@@ -403,7 +403,7 @@ function TranscriptionCard({ transcription }: { transcription: transcription }) 
         <Grid.Col md={6} sm={12}>
           {/* Column containing a preview of the transcription */}
           <Text italic color={'dimmed'} lineClamp={15}>
-            {transcription.transcript}
+            {transcription.transcriptText}
           </Text>
         </Grid.Col>
       </Grid>
