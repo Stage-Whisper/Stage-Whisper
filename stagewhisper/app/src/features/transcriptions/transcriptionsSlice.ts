@@ -5,11 +5,24 @@ import { RootState } from './../../redux/store';
 
 import { createSlice } from '@reduxjs/toolkit';
 import { WhisperLanguages } from '../input/components/language/languages';
+import { NodeList } from 'subtitle';
+import { LoremIpsum } from 'lorem-ipsum';
 
 export interface transcriptionState {
   transcriptions: transcription[];
   activeTranscription: number | null;
 }
+
+const lorem = new LoremIpsum({
+  sentencesPerParagraph: {
+    max: 8,
+    min: 4
+  },
+  wordsPerSentence: {
+    max: 16,
+    min: 4
+  }
+});
 
 export enum transcriptionStatus {
   IDLE = 'idle', // User has added a file to be transcribed but it has not been added to the queue
@@ -46,268 +59,18 @@ export interface transcription {
   status: transcriptionStatus; // Status of the transcription
   directory: string; // Directory where the transcription is stored
   transcriptText: string | undefined; // Text of the transcription
-  transcriptVtt: VTTCue[] | undefined; // VTT of the transcription
+  transcriptVtt: NodeList | undefined; // VTT of the transcription
 
   transcriptLength: number; // Length of the transcript file in words
 
   // Transcription metadata
   opened: boolean; // Whether the transcription has been opened in the editor
   id: number; // Unique internal id
+  error: string | undefined; // Error message if the transcription failed
 }
 
 const initialState: transcriptionState = {
-  transcriptions: [
-    {
-      id: 0,
-      title: 'Test Title0',
-      transcriptLength: 300,
-      description: 'Test Description0',
-      date: '2020-01-01',
-      created: '2020-01-01',
-      tags: ['test', 'tags'],
-      audio: 'test audio 0',
-      audioTitle: 'Fancy twice mp3',
-      audioAdded: '2020-01-01',
-      language: 'en',
-      translated: false,
-      model: 'base',
-      progress: 0,
-      status: transcriptionStatus.PENDING,
-      directory: '/test/user/desktop/output.txt',
-      transcriptText:
-        'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there ',
-      opened: false,
-      length: 100,
-      audioFormat: 'mp3',
-      transcriptVtt: undefined
-    },
-    {
-      id: 1,
-      title:
-        'Adventures of Sherlock Holmes - Very long title that will be truncated or break something in one of the ui views',
-      transcriptLength: 300,
-      description: 'A collection of short stories by Sir Arthur Conan Doyle',
-      date: '2020-01-01',
-      created: '2020-01-01',
-      audioTitle: 'SherlockHolmes.mp3',
-      audioAdded: '2020-01-01',
-      tags: [
-        'sherlock',
-        'holmes',
-        'more tags',
-        'even more tags',
-        'many tags',
-        'tags2',
-        ' more more tags',
-        'repeating tags',
-        'very very very very very very long tags'
-      ],
-      audio: 'original sherlock holmes audio',
-      language: 'en',
-      translated: false,
-      model: 'tiny',
-      progress: 100,
-      status: transcriptionStatus.COMPLETE,
-      directory: '/test/user/desktop/output.txt',
-      transcriptText: `I found Renfield sitting placidly in his room with his hands folded, smiling benignly. At the moment he seemed as sane as any one I ever saw. I sat down and talked with him on a lot of subjects, all of which he treated naturally. He then, of his own accord, spoke of going home, a subject he has never mentioned to my knowledge during his sojourn here. In fact, he spoke quite confidently of getting his discharge at once. I believe that, had I not had the chat with Harker and read the letters and the dates of his outbursts, I should have been prepared to sign for him after a brief time of observation. As it is, I am darkly suspicious. All those outbreaks were in some way linked with the proximity of the Count. What then does this absolute content mean? Can it be that his instinct is satisfied as to the vampire's ultimate triumph? Stay; he is himself zoöphagous, and in his wild ravings outside the chapel door of the deserted house he always spoke of "master." This all seems confirmation of our idea. However, after a while I came away; my friend is just a little too sane at present to make it safe to probe him too deep with questions. He might begin to think, and then--! So I came away. I mistrust these quiet moods of his; so I have given the attendant a hint to look closely after him, and to have a strait-waistcoat ready in case of need. 29 September, in train to London.--When I received Mr. Billington's courteous message that he would give me any information in his power I thought it best to go down to Whitby and make, on the spot, such inquiries as I wanted. It was now my object to trace that horrid cargo of the Count's to its place in London. Later, we may be able to deal with it. Billington junior, a nice lad, met me at the station, and brought me to his father's house, where they had decided that I must stay the night. They are hospitable, with true Yorkshire hospitality: give a guest everything, and leave him free to do as he likes. They all knew that I was busy, and that my stay was short, and Mr. Billington had ready in his office all the papers concerning the consignment of boxes. It gave me almost a turn to see again one of the letters which I had seen on the Count's table before I knew of his diabolical plans. Everything had been carefully thought out, and done systematically and with precision. He seemed to have been prepared for every obstacle which might be placed by accident in the way of his intentions being carried out. To use an Americanism, he had "taken no chances," and the absolute accuracy with which his instructions were fulfilled, was simply the logical result of his care. I saw the invoice, and took note of it: "Fifty cases of common earth, to be used for experimental purposes." Also the copy of letter to Carter Paterson, and their reply; of both of these I got copies. This was all the information Mr. Billington could give me, so I went down to the port and saw the coastguards, the Customs officers and the harbour-master. They had all something to say of the strange entry of the ship, which is already taking its place in local tradition; but no one could add to the simple description "Fifty cases of common earth." I then saw the station-master, who kindly put me in communication with the men who had actually received the boxes. Their tally was exact with the list, and they had nothing to add except that the boxes were "main and mortal heavy," and that shifting them was dry work. One of them added that it was hard lines that there wasn't any gentleman "such-like as yourself, squire," to show some sort of appreciation of their efforts in a liquid form; another put in a rider that the thirst then generated was such that even the time which had elapsed had not completely allayed it. Needless to add, I took care before leaving to lift, for ever and adequately, this source of reproach. 30 September.--The station-master was good enough to give me a line to his old companion the station-master at King's Cross, so that when I arrived there in the morning I was able to ask him about the arrival of the boxes. He, too, put me at once in communication with the proper officials, and I saw that their tally was correct with the original invoice. The opportunities of acquiring an abnormal thirst had been here limited; a noble use of them had, however, been made, and again I was compelled to deal with the result in an ex post facto manner.`,
-      opened: false,
-      length: 100,
-      audioFormat: 'mp3',
-      transcriptVtt: undefined
-    },
-    {
-      id: 2,
-      title: 'Test Title2',
-      transcriptLength: 300,
-      description: 'Test Description',
-      date: '2020-01-01',
-      created: '2020-01-01',
-      tags: ['test', 'tags'],
-      audio: 'test audio',
-      audioTitle: 'Batman.mp3',
-      audioAdded: '2020-01-01',
-      language: 'tr',
-      translated: false,
-      model: 'large',
-      progress: 70,
-      status: transcriptionStatus.ERROR,
-      directory: '/test/user/desktop/output.txt',
-      transcriptText:
-        'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there ',
-      opened: false,
-      length: 100,
-      audioFormat: 'mp3',
-      transcriptVtt: undefined
-    },
-    {
-      id: 3,
-      title: 'Test Title3',
-      transcriptLength: 300,
-      description: 'Test Description',
-      date: '2020-01-01',
-      created: '2020-01-01',
-      tags: ['test', 'tags'],
-      audio: 'test audio',
-      audioTitle: 'Interview_with_John_Doe.mp3',
-      audioAdded: '2020-01-01',
-      language: 'en',
-      translated: false,
-      model: 'medium',
-      progress: 40,
-      status: transcriptionStatus.STALLED,
-      directory: '/test/user/desktop/output.txt',
-      transcriptText:
-        'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there ',
-      opened: false,
-      length: 100,
-      audioFormat: 'mp3',
-      transcriptVtt: undefined
-    },
-    {
-      id: 4,
-      title: 'Test Title4',
-      transcriptLength: 300,
-      description: 'Test Description',
-      date: '2020-01-01',
-      created: '2020-01-01',
-      tags: ['test', 'tags'],
-      audio: 'test audio',
-      audioTitle: 'test audio title',
-      audioAdded: '2020-01-01',
-      language: 'en',
-      translated: false,
-      model: 'base',
-      opened: false,
-      length: 100,
-      audioFormat: 'mp3',
-      transcriptVtt: undefined,
-      progress: 20,
-      status: transcriptionStatus.PAUSED,
-      directory: '/test/user/desktop/output.txt',
-      transcriptText:
-        'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there '
-    },
-    {
-      id: 5,
-      title: 'Test Title5',
-      transcriptLength: 300,
-      description: 'Test Description',
-      date: '2020-01-01',
-      created: '2020-01-01',
-      tags: ['test', 'tags'],
-      audio: 'test audio',
-      audioTitle: 'test audio title',
-      audioAdded: '2020-01-01',
-      language: 'en',
-      translated: false,
-      model: 'base',
-      opened: false,
-      length: 100,
-      audioFormat: 'mp3',
-      transcriptVtt: undefined,
-      progress: 20,
-      status: transcriptionStatus.PROCESSING,
-      directory: '/test/user/desktop/output.txt',
-      transcriptText:
-        'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there '
-    },
-    {
-      id: 6,
-      title: 'Test Title6',
-      transcriptLength: 300,
-      description: 'Test Description',
-      date: '2020-01-01',
-      created: '2020-01-01',
-      tags: ['test', 'tags'],
-      audio: 'test audio',
-      audioTitle: 'test audio title',
-      audioAdded: '2020-01-01',
-      language: 'en',
-      translated: false,
-      model: 'base',
-      opened: false,
-      length: 100,
-      audioFormat: 'mp3',
-      transcriptVtt: undefined,
-      progress: 20,
-      status: transcriptionStatus.CANCELLED,
-      directory: '/test/user/desktop/output.txt',
-      transcriptText:
-        'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there '
-    },
-    {
-      id: 7,
-      title: 'Test Title7',
-      transcriptLength: 300,
-      description: 'Test Description',
-      date: '2020-01-01',
-      created: '2020-01-01',
-      tags: ['test', 'tags'],
-      audio: 'test audio',
-      audioTitle: 'test audio title',
-      audioAdded: '2020-01-01',
-      language: 'en',
-      translated: false,
-      model: 'base',
-      opened: false,
-      length: 10000,
-      audioFormat: 'mp3',
-      transcriptVtt: undefined,
-      progress: 20,
-      status: transcriptionStatus.DELETED,
-      directory: '/test/user/desktop/output.txt',
-      transcriptText:
-        'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there '
-    },
-    {
-      id: 8,
-      title: 'Test Title8',
-      transcriptLength: 300,
-      description: 'Test Description',
-      date: '2020-01-01',
-      created: '2020-01-01',
-      tags: ['test', 'tags'],
-      audio: 'test audio',
-      audioTitle: 'test audio title',
-      audioAdded: '2020-01-01',
-      language: 'en',
-      translated: false,
-      model: 'base',
-      opened: false,
-      length: 100,
-      audioFormat: 'mp3',
-      transcriptVtt: undefined,
-      progress: 20,
-      status: transcriptionStatus.QUEUED,
-      directory: '/test/user/desktop/output.txt',
-      transcriptText:
-        'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there '
-    },
-    {
-      id: 9,
-      title: 'Test Title9',
-      transcriptLength: 300,
-      description: 'Test Description',
-      date: '2020-01-01',
-      created: '2020-01-01',
-      tags: ['test', 'tags'],
-      audio: 'test audio',
-      audioTitle: 'test audio title',
-      audioAdded: '2020-01-01',
-      language: 'en',
-      translated: false,
-      model: 'base',
-      opened: false,
-      length: 100,
-      audioFormat: 'mp3',
-      transcriptVtt: undefined,
-      progress: 20,
-      status: transcriptionStatus.IDLE,
-      directory: '/test/user/desktop/output.txt',
-      transcriptText:
-        'test transcript text that will be replaced with a complicated object with timings and other things, I am filling space so that we can see what it might look like hello there '
-    }
-  ],
+  transcriptions: [],
   activeTranscription: 0
 };
 
@@ -340,7 +103,93 @@ export const transcriptionsSlice = createSlice({
         state.transcriptions.splice(index, 1);
       }
     },
+    createDebugTranscriptions: (state) => {
+      // Generate a list of transcriptions for testing
+      const states = [
+        {
+          state: transcriptionStatus.IDLE,
+          progress: 0
+        },
+        {
+          state: transcriptionStatus.QUEUED,
+          progress: 0
+        },
+        {
+          state: transcriptionStatus.PENDING,
+          progress: 0
+        },
+        {
+          state: transcriptionStatus.PROCESSING,
+          progress: 5
+        },
+        {
+          state: transcriptionStatus.PROCESSING,
+          progress: 40
+        },
+        {
+          state: transcriptionStatus.PROCESSING,
+          progress: 100
+        },
+        {
+          state: transcriptionStatus.STALLED,
+          progress: 75
+        },
+        {
+          state: transcriptionStatus.UNKNOWN,
+          progress: 20
+        },
+        {
+          state: transcriptionStatus.UNKNOWN,
+          progress: 0
+        },
+        {
+          state: transcriptionStatus.COMPLETE,
+          progress: 100
+        },
+        {
+          state: transcriptionStatus.CANCELLED,
+          progress: 40,
+          error: 'Cancelled by user'
+        },
+        {
+          state: transcriptionStatus.ERROR,
+          progress: 40,
+          error: 'Error message'
+        },
+        {
+          state: transcriptionStatus.DELETED,
+          progress: 40,
+          error: 'Deleted by user'
+        }
+      ];
 
+      for (const [index, value] of states.entries()) {
+        state.transcriptions.push({
+          id: index,
+          title: lorem.generateSentences(1),
+          transcriptLength: 300 * index,
+          description: `Test Description ${index}`,
+          date: `2020-0${index}-0${index}`,
+          created: `2020-0${index}-0${index}`,
+          tags: ['test', 'tags', `${index}`],
+          audio: 'test',
+          audioTitle: lorem.generateSentences(1),
+          audioAdded: `2020-0${index}-0${index}`,
+          language: 'en',
+          translated: false,
+          model: 'base',
+          opened: false,
+          length: 100 * index,
+          audioFormat: 'mp3',
+          transcriptVtt: undefined,
+          progress: value.progress,
+          status: value.state,
+          directory: `/test/user/desktop/output${index}.txt`,
+          transcriptText: undefined,
+          error: value.error
+        });
+      }
+    },
     test: (state, action) => {
       // This action is a test action
       console.log('test');
@@ -349,12 +198,19 @@ export const transcriptionsSlice = createSlice({
   }
 });
 
-export const { addTranscription, updateTranscription, removeTranscription, test, setActiveTranscription } =
-  transcriptionsSlice.actions;
+export const {
+  addTranscription,
+  updateTranscription,
+  removeTranscription,
+  test,
+  setActiveTranscription,
+  createDebugTranscriptions
+} = transcriptionsSlice.actions;
 
 // Export Transcription States
 export const selectTranscriptions = (state: RootState) => state.transcriptions.transcriptions;
 export const selectActiveTranscription = (state: RootState) => state.transcriptions.activeTranscription;
+export const selectNumberOfTranscriptions = (state: RootState) => state.transcriptions.transcriptions.length;
 
 // Export the reducer
 export default transcriptionsSlice.reducer;
