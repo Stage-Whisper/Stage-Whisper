@@ -7,11 +7,13 @@ import { RootState } from './redux/store';
 
 export interface appState {
   burgerOpen: boolean;
+  debugMenu: boolean;
 }
 
 const initialState: appState = {
   // currentView: appView.DASHBOARD,
-  burgerOpen: false
+  burgerOpen: false,
+  debugMenu: false
 };
 
 export const appSlice = createSlice({
@@ -20,12 +22,16 @@ export const appSlice = createSlice({
   reducers: {
     setBurgerOpen: (state, action) => {
       state.burgerOpen = action.payload;
+    },
+    toggleDebugMenu: (state) => {
+      state.debugMenu = !state.debugMenu;
     }
   }
 });
 
-export const { setBurgerOpen } = appSlice.actions;
+export const { setBurgerOpen, toggleDebugMenu } = appSlice.actions;
 
 export const selectBurgerOpen = (state: RootState) => state.app.burgerOpen;
+export const selectDebugMenu = (state: RootState) => state.app.debugMenu;
 
 export default appSlice.reducer;

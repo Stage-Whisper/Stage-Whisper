@@ -156,6 +156,7 @@ export const strings = new LocalizedStrings(
       // Text for the transcriptions page which shows the user a list of all their transcriptions
       transcriptions: {
         title: 'Transcriptions', // Title of the page
+        recent_transcriptions: 'Recent Transcriptions', // Title of the recent transcriptions section
         buttons: {
           re_transcribe: 'Re-Transcribe',
           add_to_queue: 'Add to Queue'
@@ -202,7 +203,8 @@ export const strings = new LocalizedStrings(
       settings: {
         title: 'Settings',
         subtitle: 'Manage your account settings',
-        toggle_dark_mode: 'Toggle Dark Mode',
+        dark_mode: 'Dark Mode',
+        debug_menu: 'Debug Menu',
         language: {
           title: 'Language',
           subtitle:
