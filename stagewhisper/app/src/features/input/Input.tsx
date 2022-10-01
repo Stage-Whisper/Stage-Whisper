@@ -44,11 +44,9 @@ function Input() {
               dispatch(setHighlightInvalid(false));
               if (window.Main) {
                 window.Main.runWhisper({
-                  file: audio.path,
-                  model,
-                  language,
-                  output_dir: directory,
-                  translate: language !== 'en'
+                  // TODO: Turn this into a redux thunk
+                  inputPath: audio.path,
+                  output_dir: directory
                 });
               } else {
                 // eslint-disable-next-line no-alert

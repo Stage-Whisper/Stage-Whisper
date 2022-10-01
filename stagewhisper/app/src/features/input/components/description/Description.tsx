@@ -1,11 +1,11 @@
 import React from 'react';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
-import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../inputSlice';
+// import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
+// import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../inputSlice';
 
 // Localization
-import strings from '../../../../localization';
+// import strings from '../../../../localization';
 
 // Types
 export interface DescriptionType {
@@ -20,5 +20,5 @@ function Description() {
   return <div>Description</div>;
 }
 
-// TODO: Add Description component with name, description, and tags
+// TODO: Add Description component with fields for name, description, and tags
 export default Description;

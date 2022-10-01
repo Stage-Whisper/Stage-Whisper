@@ -1,8 +1,8 @@
+import { WhisperArgs } from '../../../electron/whisperTypes';
 import { DescriptionType } from './components/description/Description';
 import { createSlice } from '@reduxjs/toolkit';
 import { AudioType } from './components/audio/Audio';
 import { RootState } from '../../redux/store';
-import { WhisperLanguages } from './components/language/languages';
 
 // input Slice
 // This slice is used to store the state of the inputs for transcription
@@ -15,13 +15,13 @@ export interface inputState {
   audio: AudioType;
   audioValid: boolean;
 
-  language: keyof typeof WhisperLanguages;
+  language: WhisperArgs['language'];
   languageValid: boolean;
 
   directory: string | undefined;
   directoryValid: boolean;
 
-  model: 'tiny' | 'base' | 'small' | 'medium' | 'large';
+  model: WhisperArgs['model'];
   modelValid: boolean;
 
   // Page States
@@ -45,7 +45,7 @@ const initialState: inputState = {
   },
   audioValid: false,
 
-  language: 'en',
+  language: 'English',
   languageValid: false,
 
   directory: undefined,
@@ -71,7 +71,7 @@ const inputSlice = createSlice({
     setAudioValid: (state, action) => {
       state.audioValid = action.payload;
     },
-    setLanguage: (state, action) => {
+    setLanguage: (state, action: { payload: WhisperArgs['language'] }) => {
       state.language = action.payload;
     },
     setLanguageValid: (state, action) => {
@@ -83,7 +83,12 @@ const inputSlice = createSlice({
     setDirectoryValid: (state, action) => {
       state.directoryValid = action.payload;
     },
-    setModel: (state, action) => {
+    setModel: (
+      state,
+      action: {
+        payload: WhisperArgs['model'];
+      }
+    ) => {
       state.model = action.payload;
     },
     setModelValid: (state, action) => {

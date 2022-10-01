@@ -11,9 +11,7 @@ function About() {
             {strings.about?.title}
           </Title>
           <Divider my="md" />
-          <Text> {strings.about?.subtitle} </Text>
-          <Text>{strings.about?.terms_of_service.subtitle}</Text>
-          <Text>{strings.about?.terms_of_service.paragraph1}</Text>
+          <Text> {strings.about?.title} </Text>
         </Card>
       </Stack>
     </Center>

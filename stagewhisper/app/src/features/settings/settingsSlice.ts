@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { WhisperLanguages } from '../input/components/language/languages';
 import { RootState } from '../../redux/store';
+import { WhisperArgs } from '../../../electron/whisperTypes';
 
 // Settings Slice
 // This slice is used to store the state of the settings
@@ -9,7 +9,7 @@ export interface settingsState {
   // currentView: SettingsView;
   darkMode: boolean;
   theme: string;
-  displayLanguage: keyof typeof WhisperLanguages;
+  displayLanguage: WhisperArgs['language'];
   burgerOpen: boolean;
   allowLargeModels: boolean;
 }
@@ -19,7 +19,7 @@ const initialState: settingsState = {
   theme: 'default',
 
   darkMode: true,
-  displayLanguage: 'en', // TODO: Change to user's language
+  displayLanguage: 'English', // TODO: Change to user's language
   burgerOpen: false,
   allowLargeModels: false
 };

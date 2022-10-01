@@ -1,5 +1,5 @@
+import { WhisperArgs } from './whisperTypes';
 import { ipcRenderer, contextBridge } from 'electron';
-import vttFromFile from './functions/vttFromFile';
 
 // import { languages } from '../src/components/language/languages';
 
@@ -10,19 +10,8 @@ declare global {
   }
 }
 
-// Arguments to be passed to the Whisper AI python script
-export interface whisperArgs {
-  file: string;
-  model: 'tiny' | 'base' | 'small' | 'medium' | 'large';
-  language: string;
-  translate: boolean;
-  output_dir: string;
-  // detect_language: boolean;
-  // output_format: string;
-}
-
 const api = {
-  runWhisper: (args: whisperArgs) => {
+  runWhisper: (args: WhisperArgs) => {
     ipcRenderer.invoke('run-whisper', args);
   },
 
@@ -35,15 +24,14 @@ const api = {
     ipcRenderer.send('message', message);
   },
   loadVttFromFile: async (path: string, exampleData: boolean) => {
-    return await vttFromFile(path, exampleData);
+    if (exampleData === true) {
+      const result = (await ipcRenderer.invoke('load-vtt-from-file', path, exampleData)) as NodeList;
+      return result;
+    } else {
+      const result = (await ipcRenderer.invoke('load-vtt-from-file', path)) as NodeList;
+      return result;
+    }
   },
-  // loadVttFromFile: async (path: string, exampleData: boolean) => {
-  //   return await vttFromFile(path, exampleData);
-  // },
-
-  /**
-   * Provide an easier way to listen to events
-   */
   on: (channel: string, callback: (data: any) => void) => {
     ipcRenderer.on(channel, (_, data) => callback(data));
   }
