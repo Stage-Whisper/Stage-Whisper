@@ -1,4 +1,6 @@
 import { ipcRenderer, contextBridge } from 'electron';
+import vttFromFile from './functions/vttFromFile';
+
 // import { languages } from '../src/components/language/languages';
 
 declare global {
@@ -32,18 +34,12 @@ const api = {
   sendMessage: (message: string) => {
     ipcRenderer.send('message', message);
   },
-
-  loadVttFromFile: async (path: string, exampleData?: boolean) => {
-    if (exampleData === true) {
-      const result = await ipcRenderer.invoke('load-vtt-from-file', path, exampleData);
-
-      return result;
-    } else {
-      const result = await ipcRenderer.invoke('load-vtt-from-file', path);
-
-      return result;
-    }
+  loadVttFromFile: async (path: string, exampleData: boolean) => {
+    return await vttFromFile(path, exampleData);
   },
+  // loadVttFromFile: async (path: string, exampleData: boolean) => {
+  //   return await vttFromFile(path, exampleData);
+  // },
 
   /**
    * Provide an easier way to listen to events
