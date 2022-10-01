@@ -101,7 +101,7 @@ function RecentTranscriptions() {
               break;
 
             default:
-              icon = <IconAlertTriangle/>
+              icon = <IconAlertTriangle />;
               break;
           }
 
