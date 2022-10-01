@@ -1,16 +1,14 @@
 // Native
 import { join } from 'path';
-import { parseSync } from 'subtitle';
 // Python-Shell
-import { PythonShell } from 'python-shell';
 
 // Dev Tools
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent, dialog, IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent } from 'electron';
 import isDev from 'electron-is-dev';
-import { whisperArgs } from './preload';
+
 import { existsSync, readFile } from 'fs';
 
 // Electron Defaults
@@ -26,7 +24,7 @@ declare global {
 
 //#region Utility Functions
 // Promise wrapper for readFile
-const readFilePromise = (path: string): Promise<string> =>
+export const readFilePromise = (path: string): Promise<string> =>
   new Promise((resolve, reject) => {
     existsSync(path)
       ? readFile(path, 'utf8', (err, data) => {
@@ -124,50 +122,5 @@ ipcMain.handle('open-directory-dialog', async () => {
   return directory.canceled ? null : directory.filePaths[0];
 });
 
-ipcMain.handle('run-whisper', (event: IpcMainInvokeEvent, args: whisperArgs) => {
-  // eslint-disable-next-line no-console
-
-  // Format model name
-  const model = args.language === 'english' ? `${args.model}.en` : args.model || 'base';
-
-  const options = {
-    scriptPath: join(__dirname, '../src/python'),
-    args: [
-      args.file,
-      `--model ${model}`,
-      args.language || 'en',
-      args.translate ? '--task translate' : '',
-      args.output_dir ? `--output_dir ${args.output_dir}` : ''
-    ]
-    // TODO: Add this option to the frontend to allow for automatic language detection
-    // args.detect_language
-  };
-
-  // eslint-disable-next-line no-console
-  console.log('Running python script with options: ', options);
-  PythonShell.run('whisper.py', options, (err, results) => {
-    if (err) throw err;
-    // results is an array consisting of messages collected during execution
-    // eslint-disable-next-line no-console
-    console.log('results: %j', results);
-    event.sender.send('whisper-complete', results);
-  });
-});
-
-// Get example vtt file
-ipcMain.handle('load-vtt-from-file', async (_event: IpcMainInvokeEvent, ...args) => {
-  const path = args[0];
-  const exampleData = args?.[1];
-
-  if (exampleData) {
-    console.log('Getting example vtt file');
-    const file = await readFilePromise(join(__dirname, '../src/debug/data/example.vtt'));
-    const parsed = parseSync(file); // Parse vtt file
-    return parsed;
-  } else {
-    console.log('Getting vtt file from path: ', path);
-    const file = await readFilePromise(path);
-    const parsed = parseSync(file); // Parse vtt file
-    return parsed;
-  }
-});
+import './handlers/loadVttFromFile';
+import './handlers/runWhisper';
