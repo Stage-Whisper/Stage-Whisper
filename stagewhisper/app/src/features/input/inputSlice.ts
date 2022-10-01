@@ -3,7 +3,6 @@ import { DescriptionType } from './components/description/Description';
 import { createSlice } from '@reduxjs/toolkit';
 import { AudioType } from './components/audio/Audio';
 import { RootState } from '../../redux/store';
-import { WhisperLanguages } from './components/language/languages';
 
 // input Slice
 // This slice is used to store the state of the inputs for transcription
@@ -72,7 +71,7 @@ const inputSlice = createSlice({
     setAudioValid: (state, action) => {
       state.audioValid = action.payload;
     },
-    setLanguage: (state, action) => {
+    setLanguage: (state, action: { payload: WhisperArgs['language'] }) => {
       state.language = action.payload;
     },
     setLanguageValid: (state, action) => {
@@ -84,7 +83,12 @@ const inputSlice = createSlice({
     setDirectoryValid: (state, action) => {
       state.directoryValid = action.payload;
     },
-    setModel: (state, action) => {
+    setModel: (
+      state,
+      action: {
+        payload: WhisperArgs['model'];
+      }
+    ) => {
       state.model = action.payload;
     },
     setModelValid: (state, action) => {

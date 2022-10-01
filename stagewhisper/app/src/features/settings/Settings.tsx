@@ -1,34 +1,32 @@
-import { Text, Card, Center, Divider, Group, HoverCard, Select, Space, Stack, Switch, Title } from '@mantine/core';
+import { Card, Center, Divider, Group, HoverCard, Select, Stack, Switch, Text, Title } from '@mantine/core';
 import React from 'react';
 
 // Components
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { selectDisplayLanguage, selectTheme, setAllowLargeModel, setDisplayLanguage } from './settingsSlice';
+import { useAppDispatch } from '../../redux/hooks';
+import { setAllowLargeModel, setDisplayLanguage } from './settingsSlice';
 
 // Localization
 import strings from '../../localization';
-import { generateLanguageList } from '../input/components/language/languages';
+import { generateLanguageList } from '../input/components/language/Language';
 
 function Settings() {
   // Redux
   const dispatch = useAppDispatch();
-  const displayLanguage = useAppSelector(selectDisplayLanguage);
-  const theme = useAppSelector(selectTheme);
 
   // Get a list of all languages and their codes
-  const languages = generateLanguageList(displayLanguage);
+  const languages = generateLanguageList();
 
   // Get a list of all the languages that the app has been localized into
   const localized = strings.getAvailableLanguages();
 
   // Generate a list of languages to display in the dropdown
   const languageList = languages.reduce((acc: { label: string; value: string }[], cur) => {
-    if (localized.includes(cur.code)) {
+    if (localized.includes(cur.languageCode)) {
       acc.push({
-        label: `${cur.localized} (${strings.getString(`languages.${cur.code}`, cur.code)})`,
-        value: cur.code
+        label: `${cur.label} (${strings.getString(`languages.${cur.languageCode}`, cur.languageCode)})`,
+        value: cur.languageCode
       });
     }
     return acc;
