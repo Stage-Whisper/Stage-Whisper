@@ -1,4 +1,4 @@
-import { WhisperArgs } from './handlers/runWhisper';
+import { WhisperArgs } from './whisperTypes';
 import { ipcRenderer, contextBridge } from 'electron';
 
 // import { languages } from '../src/components/language/languages';

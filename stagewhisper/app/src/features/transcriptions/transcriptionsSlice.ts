@@ -1,10 +1,11 @@
+import { WhisperArgs } from '../../../electron/whisperTypes';
 import { RootState } from './../../redux/store';
 
 // Transcription Slice
 // This holds the state of the transcriptions and will be updated by electron/node processes
 
 import { createSlice } from '@reduxjs/toolkit';
-import { WhisperLanguages } from '../input/components/language/languages';
+// import { WhisperLanguages } from '../input/components/language/languages';
 import { NodeList } from 'subtitle';
 import { LoremIpsum } from 'lorem-ipsum';
 
@@ -45,7 +46,7 @@ export interface transcription {
   audioAdded: string; // Date of when the audio file was added to the system (YYYY-MM-DD)
   length: number; // Length of the audio file in seconds
   audioFormat: string; // Format of the audio file
-  language: keyof typeof WhisperLanguages; // Language of the audio file
+  language: WhisperArgs['language']; // Language of the audio file
   date: string; // Date value for interview (YYYY-MM-DD)
 
   // Transcription information
@@ -107,6 +108,18 @@ export const transcriptionsSlice = createSlice({
       // Generate a list of transcriptions for testing
       const states = [
         {
+          state: transcriptionStatus.PROCESSING,
+          progress: 40
+        },
+        {
+          state: transcriptionStatus.STALLED,
+          progress: 75
+        },
+        {
+          state: transcriptionStatus.COMPLETE,
+          progress: 100
+        },
+        {
           state: transcriptionStatus.IDLE,
           progress: 0
         },
@@ -122,18 +135,12 @@ export const transcriptionsSlice = createSlice({
           state: transcriptionStatus.PROCESSING,
           progress: 5
         },
-        {
-          state: transcriptionStatus.PROCESSING,
-          progress: 40
-        },
+
         {
           state: transcriptionStatus.PROCESSING,
           progress: 100
         },
-        {
-          state: transcriptionStatus.STALLED,
-          progress: 75
-        },
+
         {
           state: transcriptionStatus.UNKNOWN,
           progress: 20
@@ -142,10 +149,7 @@ export const transcriptionsSlice = createSlice({
           state: transcriptionStatus.UNKNOWN,
           progress: 0
         },
-        {
-          state: transcriptionStatus.COMPLETE,
-          progress: 100
-        },
+
         {
           state: transcriptionStatus.CANCELLED,
           progress: 40,
@@ -175,8 +179,7 @@ export const transcriptionsSlice = createSlice({
           audio: 'test',
           audioTitle: lorem.generateSentences(1),
           audioAdded: `2020-0${index}-0${index}`,
-          language: 'en',
-          translated: false,
+          language: 'English',
           model: 'base',
           opened: false,
           length: 100 * index,
@@ -184,6 +187,7 @@ export const transcriptionsSlice = createSlice({
           transcriptVtt: undefined,
           progress: value.progress,
           status: value.state,
+          translated: false,
           directory: `/test/user/desktop/output${index}.txt`,
           transcriptText: undefined,
           error: value.error

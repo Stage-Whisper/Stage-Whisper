@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../redux/store';
-import { WhisperArgs } from '../../../electron/handlers/runWhisper';
+import { WhisperArgs } from '../../../electron/whisperTypes';
 
 // Settings Slice
 // This slice is used to store the state of the settings

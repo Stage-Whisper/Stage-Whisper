@@ -6,7 +6,7 @@ import { join } from 'path';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
 // Packages
-import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
 import isDev from 'electron-is-dev';
 
 import { existsSync, readFile } from 'fs';
@@ -80,6 +80,11 @@ function createWindow() {
   });
 }
 
+import './handlers/loadVttFromFile';
+import './whisperTypes';
+import { spawn } from 'child_process';
+import { WhisperArgs } from './whisperTypes';
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -122,5 +127,25 @@ ipcMain.handle('open-directory-dialog', async () => {
   return directory.canceled ? null : directory.filePaths[0];
 });
 
-import './handlers/loadVttFromFile';
-import './handlers/runWhisper';
+ipcMain.handle('run-whisper', async (_event: IpcMainInvokeEvent, args: WhisperArgs) => {
+  const { inputPath, output_dir } = args;
+  console.log('Running whisper script');
+  console.log('args: ', args);
+
+  // const out = spawn('whisper', ['--model', 'base.en', '--output_dir', join(__dirname, '../src/debug/data')]);
+  const out = spawn('whisper', [inputPath, '--model', 'base.en', '--output_dir', output_dir]);
+
+  out.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+  out.stderr.on('data', (err) => {
+    console.log(`stderr: ${err}`);
+  });
+  out.on('message', (message) => {
+    console.log(`message: ${message}`);
+  });
+
+  out.on('close', (code) => {
+    console.log(`child process exited with code ${code}`);
+  });
+});

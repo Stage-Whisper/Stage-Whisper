@@ -47,7 +47,7 @@ function Debug() {
             Debug Menu
           </Title>
 
-          <Button
+          {/* <Button // TODO: Fix this by reworking the electron code
             onClick={() => {
               if (window.Main) {
                 window.Main.loadVttFromFile('dev', true).then((vtt: NodeList) => {
@@ -66,7 +66,7 @@ function Debug() {
             variant="outline"
           >
             Test VTT Loading
-          </Button>
+          </Button> */}
           <Button
             onClick={() => {
               dispatch(createDebugTranscriptions());
@@ -75,6 +75,14 @@ function Debug() {
           >
             Create Debug Transcriptions
           </Button>
+          {/* <Button // TODO: Fix this by implementing a short demo file for testing
+            onClick={() => {
+              // window.Main.runWhisper({});
+            }}
+            variant="outline"
+          >
+            Call Whisper
+          </Button> */}
         </Stack>
       </Card>
     </Stack>

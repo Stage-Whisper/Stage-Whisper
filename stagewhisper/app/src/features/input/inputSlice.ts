@@ -1,4 +1,4 @@
-import { WhisperArgs } from './../../../electron/handlers/runWhisper';
+import { WhisperArgs } from '../../../electron/whisperTypes';
 import { DescriptionType } from './components/description/Description';
 import { createSlice } from '@reduxjs/toolkit';
 import { AudioType } from './components/audio/Audio';
