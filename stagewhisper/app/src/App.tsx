@@ -34,7 +34,7 @@ import { useAppDispatch, useAppSelector } from './redux/hooks';
 
 import { selectBurgerOpen, setBurgerOpen } from './appSlice';
 import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
-import { selectTranscriptions } from './features/transcriptions/transcriptionsSlice';
+import { selectTranscriptions, setActiveTranscription } from './features/transcriptions/transcriptionsSlice';
 
 // Recent Transcription Constructor
 function RecentTranscriptions() {
@@ -53,8 +53,11 @@ function RecentTranscriptions() {
               key={transcription.id}
               label={transcription.audioTitle}
               component={Link}
-              to={`/transcriptions/${transcription.id}`}
-              onClick={() => dispatch(setBurgerOpen(false))}
+              to={`/transcriptions`}
+              onClick={() => {
+                dispatch(setActiveTranscription(transcription.id));
+                dispatch(setBurgerOpen(false));
+              }}
             />
           ))}
         </NavLink>
@@ -116,6 +119,7 @@ function App() {
                 component={Link}
                 to="/transcriptions"
                 icon={<IconFileDescription size={18} />}
+                onClick={() => dispatch(setActiveTranscription(null))}
                 active={location.pathname === '/transcriptions'}
               />
             </Navbar.Section>
