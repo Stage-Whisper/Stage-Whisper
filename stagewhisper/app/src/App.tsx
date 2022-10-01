@@ -1,45 +1,150 @@
 import {
-  Text,
   ActionIcon,
+  Affix,
   AppShell,
   // Aside,
   Burger,
+  Divider,
   Group,
   Header,
+  Loader,
   MantineProvider,
   MediaQuery,
   Navbar,
   NavLink,
+  ScrollArea,
+  Text,
   Title,
-  useMantineTheme,
-  Affix
+  useMantineTheme
 } from '@mantine/core';
 import React from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import {
+  IconAlertTriangle,
+  IconBug,
+  IconBugOff,
+  IconCaretRight,
+  IconFileAlert,
+  IconFileCheck,
   IconFileDescription,
   IconHome,
   IconInfoCircle,
   IconLanguage,
   IconMicrophone2,
   IconMoonStars,
+  IconPlayerPause,
+  IconQuestionMark,
+  IconRefreshAlert,
   IconSettings,
-  IconSun
+  IconSun,
+  IconTrash,
+  TablerIcon
 } from '@tabler/icons';
 import strings from './localization';
 import { useAppDispatch, useAppSelector } from './redux/hooks';
 
-import { selectBurgerOpen, setBurgerOpen } from './appSlice';
+import { selectBurgerOpen, selectDebugMenu, setBurgerOpen, toggleDebugMenu } from './appSlice';
 import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
+import {
+  selectActiveTranscription,
+  selectNumberOfTranscriptions,
+  selectTranscriptions,
+  setActiveTranscription
+} from './features/transcriptions/transcriptionsSlice';
+import Debug from './debug/Debug';
 
-// React Components
+// Recent Transcription Constructor
+function RecentTranscriptions() {
+  const transcriptions = useAppSelector(selectTranscriptions);
+  const activeTranscription = useAppSelector(selectActiveTranscription);
+  const dispatch = useAppDispatch();
 
+  if (!transcriptions.length) {
+    return <></>;
+  } else {
+    return (
+      <>
+        <Divider mt={'sm'} />
+        {/* <Title order={6}>{strings.transcriptions?.recent_transcriptions}</Title> */}
+
+        {transcriptions.map((transcription) => {
+          let icon: JSX.Element;
+
+          switch (transcription.status) {
+            case 'idle' || 'paused':
+              icon = <IconPlayerPause />;
+              break;
+            case 'processing':
+              icon = <Loader size={'xs'} variant="oval" />;
+              break;
+            case 'error':
+              icon = <IconFileAlert />;
+              break;
+            case 'complete':
+              icon = <IconFileCheck />;
+              break;
+            case 'queued':
+              icon = <IconCaretRight />;
+              break;
+            case 'deleted':
+              icon = <IconTrash />;
+              break;
+            case 'unknown':
+              icon = <IconQuestionMark />;
+              break;
+            case 'stalled':
+              icon = <IconRefreshAlert />;
+              break;
+            case 'cancelled':
+              icon = <IconFileAlert />;
+              break;
+
+            default:
+              icon = <IconAlertTriangle/>
+              break;
+          }
+
+          return (
+            <NavLink
+              key={transcription.id}
+              label={<Text lineClamp={1}>{transcription.audioTitle}</Text>}
+              component={Link}
+              to={`/transcriptions`}
+              onClick={() => {
+                dispatch(setActiveTranscription(transcription.id));
+                dispatch(setBurgerOpen(false));
+              }}
+              active={transcription.id === activeTranscription}
+              icon={
+                icon
+                // transcription.status === 'error' || transcription.status === 'unknown' ? ( // If transcription is error or unknown show error icon
+                //   <IconBugOff />
+                // ) : transcription.status === '' ? ( // If transcription is in progress show loading icon
+                //   <Loader size={'xs'} variant="oval" />
+                // ) : (
+                //   // Else show nothing
+                //   <></>
+                // )
+              }
+            />
+          );
+        })}
+      </>
+    );
+  }
+}
+
+// Main App Component
 function App() {
   // Redux
   const dispatch = useAppDispatch();
   const darkMode = useAppSelector(selectDarkMode);
   const displayLanguage = useAppSelector(selectDisplayLanguage);
+  const activeTranscription = useAppSelector(selectActiveTranscription);
+  const burgerOpen = useAppSelector(selectBurgerOpen);
+  const numberOfTranscriptions = useAppSelector(selectNumberOfTranscriptions);
+
   // Theming
   const theme = useMantineTheme();
 
@@ -48,17 +153,15 @@ function App() {
 
   const location = useLocation();
 
-  // States
-  const burgerOpen = useAppSelector(selectBurgerOpen);
-
   return (
     <MantineProvider theme={{ colorScheme: darkMode ? 'dark' : 'light' }} withGlobalStyles withNormalizeCSS>
       <AppShell
         navbarOffsetBreakpoint="sm"
         asideOffsetBreakpoint="sm"
         navbar={
+          // Main navigation sidebar with Dashboard, Transcribe, Interview and Transcription pages
           <Navbar hiddenBreakpoint="sm" hidden={!burgerOpen} width={{ sm: 200, lg: 300 }}>
-            <Navbar.Section grow m={0}>
+            <Navbar.Section m={0}>
               <NavLink
                 label={<Text>{strings.dashboard?.title}</Text>}
                 icon={<IconHome size={18} />}
@@ -86,10 +189,18 @@ function App() {
                 component={Link}
                 to="/transcriptions"
                 icon={<IconFileDescription size={18} />}
-                active={location.pathname === '/transcriptions'}
+                onClick={() => dispatch(setActiveTranscription(null))}
+                disabled={numberOfTranscriptions === 0}
+                active={location.pathname === '/transcriptions' && activeTranscription === null}
               />
             </Navbar.Section>
 
+            {/* Recent Transcription Section */}
+            <Navbar.Section grow component={ScrollArea}>
+              {RecentTranscriptions()}
+            </Navbar.Section>
+
+            {/* Settings Section */}
             <Navbar.Section>
               <NavLink
                 label={<Text>{strings.settings?.title}</Text>}
@@ -144,16 +255,27 @@ function App() {
         }
       >
         <Outlet />
+        {/* Debugging Component */}
+        {useAppSelector(selectDebugMenu) ? <Affix position={{ bottom: 60, right: 20 }}>{<Debug />}</Affix> : <></>}
+
         <Affix position={{ bottom: 20, right: 20 }}>
-          <ActionIcon
-            variant="gradient"
-            gradient={darkMode ? { from: 'red', to: 'yellow', deg: 135 } : { from: 'blue', to: 'violet', deg: 135 }}
-            color={darkMode ? 'yellow' : 'dark'}
-            onClick={() => dispatch(toggleDarkMode())}
-            title={strings.settings?.toggle_dark_mode}
-          >
-            {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
-          </ActionIcon>
+          <Group>
+            <ActionIcon
+              variant="gradient"
+              gradient={darkMode ? { from: 'red', to: 'yellow', deg: 135 } : { from: 'blue', to: 'violet', deg: 135 }}
+              onClick={() => dispatch(toggleDarkMode())}
+              title={strings.settings?.dark_mode}
+            >
+              {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
+            </ActionIcon>
+            <ActionIcon
+              variant="filled"
+              onClick={() => dispatch(toggleDebugMenu())}
+              title={strings.settings?.debug_menu}
+            >
+              {useAppSelector(selectDebugMenu) ? <IconBugOff size={18} /> : <IconBug size={18} />}
+            </ActionIcon>
+          </Group>
         </Affix>
       </AppShell>
     </MantineProvider>
