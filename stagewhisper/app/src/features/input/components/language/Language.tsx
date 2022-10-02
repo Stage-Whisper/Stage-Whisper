@@ -56,11 +56,11 @@ function Language() {
   return (
     <Card shadow="xs" p="md" withBorder title="Language">
       <Stack>
-        <Title order={4}>{strings.transcribe?.language.title}</Title>
+        <Title order={4}>{strings.input?.language.title}</Title>
         <Select
           withinPortal
-          label={strings.transcribe?.language.prompt}
-          placeholder={strings.transcribe?.language.placeholder}
+          label={strings.input?.language.prompt}
+          placeholder={strings.input?.language.placeholder}
           searchable
           error={languageValid && highlightInvalid}
           // data={languageList.sort((a, b) => (a.label > b.label ? 1 : -1))}
@@ -78,7 +78,7 @@ function Language() {
         />
         {language !== 'English' && (
           <Text color="dimmed" italic size="sm">
-            {strings.transcribe?.language.non_english_warning}
+            {strings.input?.language.non_english_warning}
           </Text>
         )}
       </Stack>

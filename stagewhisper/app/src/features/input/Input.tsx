@@ -2,7 +2,6 @@ import { SimpleGrid, Center, Button } from '@mantine/core';
 import React from 'react';
 
 // Components
-import Directory from './components/directory/Directory';
 import Language from './components/language/Language';
 import Model from './components/model/Model';
 import Audio from './components/audio/Audio';
@@ -28,7 +27,6 @@ function Input() {
         <Audio />
         <Language />
         <Model />
-        <Directory />
       </SimpleGrid>
 
       <Center my="lg">
@@ -60,7 +58,7 @@ function Input() {
             }
           }}
         >
-          {strings.transcribe?.submit_button}
+          {strings.input?.submit_button}
         </Button>
       </Center>
     </>

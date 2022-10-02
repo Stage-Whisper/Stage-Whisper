@@ -170,7 +170,7 @@ function App() {
                 to="/"
               />
               <NavLink
-                label={<Text>{strings.transcribe?.title}</Text>}
+                label={<Text>{strings.input?.title}</Text>}
                 icon={<IconLanguage size={18} />}
                 active={location.pathname === '/transcribe'}
                 component={Link}
