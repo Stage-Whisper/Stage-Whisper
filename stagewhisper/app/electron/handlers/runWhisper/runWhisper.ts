@@ -1,6 +1,6 @@
 import { spawn } from 'child_process';
 import { ipcMain, IpcMainInvokeEvent } from 'electron';
-import { WhisperArgs } from '../whisperTypes';
+import { WhisperArgs } from '../../whisperTypes';
 
 export default ipcMain.handle('run-whisper', async (_event: IpcMainInvokeEvent, args: WhisperArgs) => {
   const { inputPath, output_dir } = args;
