@@ -132,7 +132,8 @@ export default ipcMain.handle(
               title: config.title,
               inQueue: config.inQueue,
               queueWeight: config.queueWeight,
-              created: config.created
+              created: config.created,
+              tags: config.tags
             },
             audio: {
               addedOn: audio.addedOn,
