@@ -15,6 +15,12 @@ const api = {
     ipcRenderer.invoke('run-whisper', args);
   },
 
+  getEntries: async () => {
+    const result = await ipcRenderer.invoke('get-entries');
+    console.log('result', result);
+    return result;
+  },
+
   openDirectoryDialog: async () => {
     const result = await ipcRenderer.invoke('open-directory-dialog');
     return result;
@@ -23,6 +29,7 @@ const api = {
   sendMessage: (message: string) => {
     ipcRenderer.send('message', message);
   },
+
   loadVttFromFile: async (path: string, exampleData: boolean) => {
     if (exampleData === true) {
       const result = (await ipcRenderer.invoke('load-vtt-from-file', path, exampleData)) as NodeList;
@@ -32,6 +39,7 @@ const api = {
       return result;
     }
   },
+
   on: (channel: string, callback: (data: any) => void) => {
     ipcRenderer.on(channel, (_, data) => callback(data));
   }
