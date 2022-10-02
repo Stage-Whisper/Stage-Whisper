@@ -80,13 +80,12 @@ function createWindow() {
   });
 }
 
+// Import handlers
 import './handlers/loadVtt/loadVtt';
 import './handlers/runWhisper/runWhisper';
 import './handlers/getEntries/getEntries';
 import './whisperTypes';
 import { initializeApp } from './functions/initialize/initializeApp';
-// import { spawn } from 'child_process';
-// import { WhisperArgs } from './whisperTypes';
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
