@@ -21,9 +21,9 @@ function Debug() {
   const dispatch = useAppDispatch();
   // const notifications = [] as JSX.Element[];
 
-  const addNotification = (title: string, body: string) => {
-    setNotifications((prev) => [...prev, { title, message: body, type: 'success', id: uuidv4() }]);
-  };
+  // const addNotification = (title: string, body: string) => {
+  //   setNotifications((prev) => [...prev, { title, message: body, type: 'success', id: uuidv4() }]);
+  // };
 
   return (
     <Stack>
@@ -74,6 +74,20 @@ function Debug() {
             variant="outline"
           >
             Create Debug Transcriptions
+          </Button>
+          <Button
+            onClick={() => {
+              if (window.Main) {
+                window.Main.getEntries().then((entries) => {
+                  console.log(entries);
+                });
+              } else {
+                console.log('no window.Main');
+              }
+            }}
+            variant="outline"
+          >
+            Load appData
           </Button>
           {/* <Button // TODO: Fix this by implementing a short demo file for testing
             onClick={() => {
