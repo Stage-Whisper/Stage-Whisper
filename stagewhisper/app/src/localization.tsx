@@ -100,14 +100,16 @@ export const strings = new LocalizedStrings(
       },
 
       // Text for the transcribe page which allows the user to input files and transcribe them
-      transcribe: {
+      input: {
         title: 'Transcribe',
         submit_button: 'Submit',
         // Each of the following are the labels for the input fields separated by the type of input
         audio: {
           title: 'Audio',
           prompt: 'Select audio file or drag and drop it here',
-          placeholder: 'Interview.mp3'
+          placeholder: 'Interview.mp3',
+          limits: 'MP3, WAV, FLAC, OGG, AAC, M4A, WMA, and OPUS files are recommended',
+          invalid: 'Invalid audio file'
         },
         directory: {
           title: 'Output Directory',
@@ -362,7 +364,7 @@ export const strings = new LocalizedStrings(
           confirm: 'Onayla -temp'
         }
       },
-      transcribe: {
+      input: {
         title: 'Deşifre',
         submit_button: 'Gönder',
         audio: {

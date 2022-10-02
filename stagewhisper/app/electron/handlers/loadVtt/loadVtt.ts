@@ -1,7 +1,7 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron';
 import { join } from 'path';
 import { parseSync } from 'subtitle';
-import { readFilePromise } from '..';
+import { readFilePromise } from '../..';
 
 // Get example vtt file
 export default ipcMain.handle('load-vtt-from-file', async (_event: IpcMainInvokeEvent, ...args) => {

@@ -2,11 +2,11 @@ import { Text, Card, Input, Stack, Title } from '@mantine/core';
 import React from 'react';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
-import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../inputSlice';
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../input/inputSlice';
 
 // Localization
-import strings from '../../../../localization';
+import strings from '../../../localization';
 
 function Directory() {
   // Redux
@@ -16,10 +16,10 @@ function Directory() {
   return (
     <Card shadow="xs" p="md" withBorder title="Output">
       <Stack>
-        <Title order={4}>{strings.transcribe?.directory.title}</Title>
-        <Input.Wrapper label={strings.transcribe?.directory.prompt}>
+        <Title order={4}>{strings.input?.directory.title}</Title>
+        <Input.Wrapper label={strings.input?.directory.prompt}>
           <Input
-            placeholder={strings.transcribe?.directory.placeholder}
+            placeholder={strings.input?.directory.placeholder}
             invalid={directoryValid && highlightInvalid}
             component="button"
             onClick={() => {
@@ -35,11 +35,11 @@ function Directory() {
               }
             }}
           >
-            {directory || strings.transcribe?.directory.placeholder}
+            {directory || strings.input?.directory.placeholder}
           </Input>
         </Input.Wrapper>
         <Text italic size="xs" color="dimmed" align="center">
-          {strings.transcribe?.directory.not_functional}
+          {strings.input?.directory.not_functional}
         </Text>
       </Stack>
     </Card>
