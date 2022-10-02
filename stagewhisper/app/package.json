@@ -1,5 +1,5 @@
 {
-  "name": "stage-whisper-electron",
+  "name": "stagewhisper",
   "version": "0.1",
   "license": "MIT",
   "main": "main/index.js",
