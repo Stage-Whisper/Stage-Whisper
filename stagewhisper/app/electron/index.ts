@@ -80,9 +80,11 @@ function createWindow() {
   });
 }
 
-import './handlers/loadVttFromFile';
-import './handlers/runWhisper';
+import './handlers/loadVtt/loadVtt';
+import './handlers/runWhisper/runWhisper';
+import './handlers/getEntries/getEntries';
 import './whisperTypes';
+import { initializeApp } from './functions/initialize/initializeApp';
 // import { spawn } from 'child_process';
 // import { WhisperArgs } from './whisperTypes';
 
@@ -93,8 +95,10 @@ app.whenReady().then(() => {
   installExtension(REDUX_DEVTOOLS)
     .then((name) => console.log(`Added Extension:  ${name}`))
     .catch((err) => console.log('An error occurred: ', err));
-  createWindow();
 
+  initializeApp().then(() => {
+    createWindow();
+  });
   app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
