@@ -107,7 +107,7 @@ export const initializeApp = async (): Promise<void> => {
 
       // Write the sample entry to the data folder
       console.log('init: Writing config file...');
-      writeFileSync(join(entryPath, 'config.json'), JSON.stringify(sampleEntry.config, null, 2));
+      writeFileSync(join(entryPath, 'entry_config.json'), JSON.stringify(sampleEntry.config, null, 2));
 
       // Create the audio folder
       console.log('init: Creating audio folder...');
@@ -120,12 +120,8 @@ export const initializeApp = async (): Promise<void> => {
       writeFileSync(join(audioPath, 'parameters.json'), JSON.stringify(sampleEntry.audio, null, 2));
 
       // Copy the sample audio file to the data folder
-      console.log("init: Copying sample entry's audio file into directory...");
-
-      console.log('fetching');
-      const fetched = await fetch('/assets/sample.mp3');
-      console.log(fetched);
-
+      // console.log("init: Copying sample entry's audio file into directory...");
+      // TODO: Copy the sample audio file to the data folder (This is currently not working)
       // copyFileSync(join(__dirname, 'assets', ''), join(audioPath, 'sample.mp3'));
 
       // Create the transcriptions folder
@@ -134,27 +130,7 @@ export const initializeApp = async (): Promise<void> => {
 
       // Set firstRun to false
       settings.firstRun = false;
-      writeFileSync(join(dataPath, 'app_preferences.json'), JSON.stringify(settings, null, 2));
     }
   }
   return;
 };
-
-//   // Create a sample entry
-//   const sampleEntry: entry = {
-//     uuid: '1bfb7987-da1d-4a02-87a9-e841c5dd4e29',
-//     config: {
-//       title: 'We Choose to Go to the Moon',
-//       created: new Date(),
-//       inQueue: false,
-//       queueWeight: 0
-//     },
-//     audio: {
-//       type: 'mp3',
-//       path: join(dataPath, 'entries', '1bfb7987-da1d-4a02-87a9-e841c5dd4e29', 'audio', 'fancy_twice_sample.opus'),
-//       parameters: {
-//         addedOn: new Date(),
-//         language: 'Korean',
-//         type: 'opus'
-
-// }
