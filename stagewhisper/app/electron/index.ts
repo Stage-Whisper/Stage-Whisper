@@ -81,10 +81,11 @@ function createWindow() {
 }
 
 // Import handlers
-import './handlers/loadVtt/loadVtt';
-import './handlers/runWhisper/runWhisper';
-import './handlers/getEntries/getEntries';
-import './whisperTypes';
+import './handlers/loadVtt/loadVtt'; // Testing
+import './handlers/runWhisper/runWhisper'; // Run whisper model
+import './whisperTypes'; // Types for whisper model
+import './handlers/getEntries/getEntries'; // Get all entries from database
+import './handlers/newEntry/newEntry'; // Add a new entry to the database
 import { initializeApp } from './functions/initialize/initializeApp';
 
 // This method will be called when Electron has finished

@@ -24,10 +24,8 @@ export default ipcMain.handle(
 
     try {
       console.log('NewEntry: Copying file to data folder');
-      // Move file to data folder
-      const newFilePath = join(dataPath, uuid, 'audio', 'file' + args.filePath.split('.').pop());
-      copyFileSync(args.filePath, newFilePath); // Copy file to new location
-      console.log('NewEntry: File copied to: ' + newFilePath);
+
+      const newFilePath = join(dataPath, uuid, 'audio', args.audio.name);
 
       // Create entry
       const entry: entry = {
@@ -40,6 +38,7 @@ export default ipcMain.handle(
           tags: args.config.tags
         },
         audio: {
+          name: args.audio.name,
           type: args.audio.type,
           language: args.audio.language,
           addedOn: new Date(),
@@ -57,6 +56,10 @@ export default ipcMain.handle(
       mkdirSync(join(audioPath)); // Make audio folder
       const transcriptionsPath = join(entryPath, 'transcriptions');
       mkdirSync(join(transcriptionsPath)); // Make transcriptions folder
+
+      // Move file to data folder
+      copyFileSync(args.filePath, newFilePath); // Copy file to new location
+      console.log('NewEntry: File copied to: ' + newFilePath);
 
       console.log('NewEntry: Writing entry to store');
       // Make entry_config file
