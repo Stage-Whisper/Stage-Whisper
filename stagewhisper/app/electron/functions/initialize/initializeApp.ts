@@ -1,4 +1,4 @@
-import { entry } from '../../handlers/getEntries/types';
+import { entry } from '../../handlers/loadDatabase/types';
 // Initialize the app with the data folder
 
 import {
