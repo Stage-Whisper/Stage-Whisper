@@ -108,7 +108,12 @@ export const selectAudio = (state: RootState) => ({
   audio: state.input.audio,
   audioValid: state.input.audioValid
 });
-export const selectLanguage = (state: RootState) => ({
+export const selectLanguage = (
+  state: RootState
+): {
+  language: WhisperArgs['language'];
+  languageValid: boolean;
+} => ({
   language: state.input.language,
   languageValid: state.input.languageValid
 });

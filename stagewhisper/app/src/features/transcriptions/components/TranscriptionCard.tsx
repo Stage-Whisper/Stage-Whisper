@@ -370,7 +370,7 @@ function TranscriptionCard({ transcription }: { transcription: transcription }) 
                   <Text weight={700}>
                     {strings.transcriptions?.card.file_name}:{' '}
                     <Text weight={500} transform="capitalize" span>
-                      {transcription.audioTitle}
+                      {transcription.audioName}
                     </Text>
                   </Text>
                   {/* Audio File Type  */}

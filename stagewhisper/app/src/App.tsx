@@ -108,7 +108,7 @@ function RecentTranscriptions() {
           return (
             <NavLink
               key={transcription.id}
-              label={<Text lineClamp={1}>{transcription.audioTitle}</Text>}
+              label={<Text lineClamp={1}>{transcription.audioName}</Text>}
               component={Link}
               to={`/transcriptions`}
               onClick={() => {

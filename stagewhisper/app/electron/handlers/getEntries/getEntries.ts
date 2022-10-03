@@ -136,6 +136,7 @@ export default ipcMain.handle(
               tags: config.tags
             },
             audio: {
+              name: audio.name,
               addedOn: audio.addedOn,
               language: audio.language,
               type: audio.type,

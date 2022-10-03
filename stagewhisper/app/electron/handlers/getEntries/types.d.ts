@@ -18,6 +18,7 @@ export type entryConfig = {
 export type entryAudioParams = {
   type: string; // TODO: Change to enum with whisper accepted types
   path: string; // Path to the audio file
+  name: string; // Name of the audio file
   language: WhisperArgs['language']; // Language of the audio file
   addedOn: Date; // Date the audio file was added
 };
