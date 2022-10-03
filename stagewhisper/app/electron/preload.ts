@@ -14,7 +14,7 @@ declare global {
 const api = {
   // Add a new file to the database
   newEntry: async (args: newEntryArgs) => {
-    const result = await ipcRenderer.invoke('newEntry', args);
+    const result = await ipcRenderer.invoke('new-entry', args);
 
     if (result.error) {
       throw result.error;
