@@ -80,13 +80,13 @@ function createWindow() {
   });
 }
 
-import './handlers/loadVtt/loadVtt';
-import './handlers/runWhisper/runWhisper';
-import './handlers/getEntries/getEntries';
-import './whisperTypes';
+// Import handlers
+import './handlers/loadVtt/loadVtt'; // Testing
+import './handlers/runWhisper/runWhisper'; // Run whisper model
+import './whisperTypes'; // Types for whisper model
+import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
+import './handlers/newEntry/newEntry'; // Add a new entry to the database
 import { initializeApp } from './functions/initialize/initializeApp';
-// import { spawn } from 'child_process';
-// import { WhisperArgs } from './whisperTypes';
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

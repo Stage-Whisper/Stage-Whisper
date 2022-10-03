@@ -54,7 +54,7 @@ const dataPath = join(storePath, 'data'); // Path to the data folder
 
 // Get all entries
 export default ipcMain.handle(
-  'get-entries',
+  'load-database',
   async (_event: IpcMainInvokeEvent): Promise<{ entries: entry[]; error?: string }> => {
     const entries: entry[] = [];
 
@@ -132,9 +132,11 @@ export default ipcMain.handle(
               title: config.title,
               inQueue: config.inQueue,
               queueWeight: config.queueWeight,
-              created: config.created
+              created: config.created,
+              tags: config.tags
             },
             audio: {
+              name: audio.name,
               addedOn: audio.addedOn,
               language: audio.language,
               type: audio.type,

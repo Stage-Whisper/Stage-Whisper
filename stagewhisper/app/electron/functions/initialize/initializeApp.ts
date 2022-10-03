@@ -1,4 +1,4 @@
-import { entry } from '../../handlers/getEntries/types';
+import { entry } from '../../handlers/loadDatabase/types';
 // Initialize the app with the data folder
 
 import {
@@ -85,13 +85,13 @@ export const initializeApp = async (): Promise<void> => {
           inQueue: false,
           title: 'Sample Entry',
           created: new Date(),
-          queueWeight: 0
+          queueWeight: 0,
+          tags: ['sample', 'tags']
         },
         audio: {
+          name: 'sample.mp3',
           path: join(dataPath, 'entry_1bfb7987-da1d-4a02-87a9-e841c5dd4e29', 'audio', 'sample.mp3'),
-
           type: 'mp3',
-
           addedOn: new Date(),
           language: 'English'
         },

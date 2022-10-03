@@ -42,7 +42,7 @@ export enum transcriptionStatus {
 export interface transcription {
   // File information
   audio: string; // Path to the audio file
-  audioTitle: string; // Title of the audio file
+  audioName: string; // Title of the audio file
   audioAdded: string; // Date of when the audio file was added to the system (YYYY-MM-DD)
   length: number; // Length of the audio file in seconds
   audioFormat: string; // Format of the audio file
@@ -177,7 +177,7 @@ export const transcriptionsSlice = createSlice({
           created: `2020-0${index}-0${index}`,
           tags: ['test', 'tags', `${index}`],
           audio: 'test',
-          audioTitle: lorem.generateSentences(1),
+          audioName: lorem.generateSentences(1),
           audioAdded: `2020-0${index}-0${index}`,
           language: 'English',
           model: 'base',

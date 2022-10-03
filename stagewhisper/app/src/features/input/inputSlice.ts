@@ -7,26 +7,32 @@ import { RootState } from '../../redux/store';
 // input Slice
 // This slice is used to store the state of the inputs for transcription
 
-export interface inputState {
+export type inputState = {
   // Input States
+  // These Description of new entry
   description: DescriptionType;
   descriptionValid: boolean;
 
+  // These are the audio files for the new entry
   audio: AudioType;
   audioValid: boolean;
 
+  // This is the language of the new entry audio file
   language: WhisperArgs['language'];
   languageValid: boolean;
 
-  directory: string | undefined;
-  directoryValid: boolean;
-
+  // This is the model of the new entry audio file
   model: WhisperArgs['model'];
   modelValid: boolean;
 
-  // Page States
+  // Page States (Used to highlight errors on the current page)
   highlightInvalid: boolean; // Whether to highlight invalid inputs
-}
+
+  // Submission States (Used to show the user that the app is working)
+  submitting: boolean; // Whether the form is currently submitting
+  submitted: boolean; // Whether the form has been submitted
+  error: string | null; // Error message //TODO: Add error warning
+};
 
 const initialState: inputState = {
   // Input States
@@ -48,41 +54,44 @@ const initialState: inputState = {
   language: 'English',
   languageValid: false,
 
-  directory: undefined,
-  directoryValid: false,
-
   model: 'base',
   modelValid: false,
 
   // Page States
-  highlightInvalid: false
+  highlightInvalid: false,
+
+  // Submission States
+  submitting: false,
+  submitted: false,
+  error: null
 };
 
 const inputSlice = createSlice({
   name: 'input',
   initialState,
   reducers: {
+    // Whether to highlight invalid inputs, set after user tries to trigger submission
     setHighlightInvalid: (state, action) => {
       state.highlightInvalid = action.payload;
     },
+    // Set the audio file
     setAudio: (state, action) => {
       state.audio = action.payload;
     },
+    // Set the audio file validity
     setAudioValid: (state, action) => {
       state.audioValid = action.payload;
     },
+    // Set the language
     setLanguage: (state, action: { payload: WhisperArgs['language'] }) => {
       state.language = action.payload;
     },
+    // Set the language validity
     setLanguageValid: (state, action) => {
       state.languageValid = action.payload;
     },
-    setDirectory: (state, action) => {
-      state.directory = action.payload;
-    },
-    setDirectoryValid: (state, action) => {
-      state.directoryValid = action.payload;
-    },
+
+    // Set the model selection // FIXME: This should be moved to transcription view
     setModel: (
       state,
       action: {
@@ -91,14 +100,46 @@ const inputSlice = createSlice({
     ) => {
       state.model = action.payload;
     },
+    // Set the model validity
     setModelValid: (state, action) => {
       state.modelValid = action.payload;
     },
+
+    // Set the description
     setDescription: (state, action) => {
       state.description = action.payload;
     },
+    // Set the description validity
     setDescriptionValid: (state, action) => {
       state.descriptionValid = action.payload;
+    },
+
+    // Submission Reducers
+    // Set the whether the form is currently submitting
+    setSubmitting: (state, action) => {
+      state.submitting = action.payload;
+    },
+    // Set the whether the form has been submitted (used to show success message)
+    setSubmitted: (state, action) => {
+      state.submitted = action.payload;
+    },
+    // Set the error message
+    setError: (state, action) => {
+      state.error = action.payload;
+    },
+    resetInput: (state) => {
+      state.description = initialState.description;
+      state.descriptionValid = initialState.descriptionValid;
+      state.audio = initialState.audio;
+      state.audioValid = initialState.audioValid;
+      state.language = initialState.language;
+      state.languageValid = initialState.languageValid;
+      state.model = initialState.model;
+      state.modelValid = initialState.modelValid;
+      state.highlightInvalid = initialState.highlightInvalid;
+      state.submitting = initialState.submitting;
+      state.submitted = initialState.submitted;
+      state.error = initialState.error;
     }
   }
 });
@@ -108,14 +149,16 @@ export const selectAudio = (state: RootState) => ({
   audio: state.input.audio,
   audioValid: state.input.audioValid
 });
-export const selectLanguage = (state: RootState) => ({
+export const selectLanguage = (
+  state: RootState
+): {
+  language: WhisperArgs['language'];
+  languageValid: boolean;
+} => ({
   language: state.input.language,
   languageValid: state.input.languageValid
 });
-export const selectDirectory = (state: RootState) => ({
-  directory: state.input.directory,
-  directoryValid: state.input.directoryValid
-});
+
 export const selectModel = (state: RootState) => ({
   model: state.input.model,
   modelValid: state.input.modelValid
@@ -123,6 +166,12 @@ export const selectModel = (state: RootState) => ({
 export const selectDescription = (state: RootState) => ({
   description: state.input.description,
   descriptionValid: state.input.descriptionValid
+});
+
+export const selectSubmittingState = (state: RootState) => ({
+  submitting: state.input.submitting,
+  submitted: state.input.submitted,
+  error: state.input.error
 });
 
 // Export Page States
@@ -136,13 +185,15 @@ export const {
   setAudioValid,
   setLanguage,
   setLanguageValid,
-  setDirectory,
-  setDirectoryValid,
   setModel,
   setModelValid,
   setDescription,
   setDescriptionValid,
-  setHighlightInvalid
+  setHighlightInvalid,
+  setSubmitting,
+  setSubmitted,
+  setError,
+  resetInput
 } = inputSlice.actions;
 
 // Export the reducer

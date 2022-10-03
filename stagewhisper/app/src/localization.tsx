@@ -101,7 +101,8 @@ export const strings = new LocalizedStrings(
 
       // Text for the transcribe page which allows the user to input files and transcribe them
       input: {
-        title: 'Transcribe',
+        title: 'Input',
+        prompt: 'Add a file, folder, or URL to transcribe',
         submit_button: 'Submit',
         // Each of the following are the labels for the input fields separated by the type of input
         audio: {

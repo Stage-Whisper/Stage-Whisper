@@ -1,5 +1,5 @@
 import { Button, Card, Stack, Title, Notification } from '@mantine/core';
-import { NodeList } from 'subtitle';
+
 import React, { useState } from 'react';
 import { useAppDispatch } from '../redux/hooks';
 import { createDebugTranscriptions } from '../features/transcriptions/transcriptionsSlice';
@@ -47,26 +47,27 @@ function Debug() {
             Debug Menu
           </Title>
 
-          {/* <Button // TODO: Fix this by reworking the electron code
+          <Button // TODO: Fix this by reworking the electron code
             onClick={() => {
-              if (window.Main) {
-                window.Main.loadVttFromFile('dev', true).then((vtt: NodeList) => {
-                  if (
-                    vtt.some((node) => {
-                      return node.type === 'cue';
-                    })
-                  ) {
-                    addNotification('Success!', 'VTT Loaded');
-                  } else {
-                    addNotification('Error!', 'VTT Not Loaded');
-                  }
-                });
-              }
+              // if (window.Main) {
+              //   window.Main.loadVttFromFile('dev', true).then((vtt: NodeList) => {
+              //     if (
+              //       vtt.some((node) => {
+              //         return node.type === 'cue';
+              //       })
+              //     ) {
+              //       addNotification('Success!', 'VTT Loaded');
+              //     } else {
+              //       addNotification('Error!', 'VTT Not Loaded');
+              //     }
+              //   });
+              // }
             }}
+            disabled
             variant="outline"
           >
             Test VTT Loading
-          </Button> */}
+          </Button>
           <Button
             onClick={() => {
               dispatch(createDebugTranscriptions());
@@ -78,7 +79,7 @@ function Debug() {
           <Button
             onClick={() => {
               if (window.Main) {
-                window.Main.getEntries().then((entries) => {
+                window.Main.loadDatabase().then((entries) => {
                   console.log(entries);
                 });
               } else {
@@ -89,14 +90,15 @@ function Debug() {
           >
             Load appData
           </Button>
-          {/* <Button // TODO: Fix this by implementing a short demo file for testing
+          <Button // TODO: Fix this by implementing a short demo file for testing
             onClick={() => {
               // window.Main.runWhisper({});
             }}
             variant="outline"
+            disabled
           >
             Call Whisper
-          </Button> */}
+          </Button>
         </Stack>
       </Card>
     </Stack>
