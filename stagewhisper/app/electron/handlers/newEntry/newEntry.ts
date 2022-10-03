@@ -6,7 +6,7 @@ import { join } from 'path';
 
 // Create new entry and add it to the store
 
-type newEntryArgs = {
+export type newEntryArgs = {
   filePath: string;
   audio: Omit<entryAudioParams, 'path' | 'addedOn'>;
   config: Omit<entryConfig, 'created' | 'inQueue' | 'queueWeight'>;
