@@ -29,8 +29,8 @@ const api = {
   },
 
   // Get the list of all entries stored in the app database
-  getEntries: async () => {
-    const result = await ipcRenderer.invoke('get-entries');
+  loadDatabase: async () => {
+    const result = await ipcRenderer.invoke('load-database');
     console.log('result', result);
     return result;
   },

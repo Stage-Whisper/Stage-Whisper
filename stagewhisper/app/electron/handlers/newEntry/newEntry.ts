@@ -1,4 +1,4 @@
-import { entry, entryAudioParams, entryConfig } from './../getEntries/types.d';
+import { entry, entryAudioParams, entryConfig } from '../loadDatabase/types';
 import { app, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 import { copyFileSync, mkdirSync, writeFileSync } from 'fs';

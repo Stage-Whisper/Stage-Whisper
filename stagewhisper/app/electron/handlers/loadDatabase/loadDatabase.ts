@@ -54,7 +54,7 @@ const dataPath = join(storePath, 'data'); // Path to the data folder
 
 // Get all entries
 export default ipcMain.handle(
-  'get-entries',
+  'load-database',
   async (_event: IpcMainInvokeEvent): Promise<{ entries: entry[]; error?: string }> => {
     const entries: entry[] = [];
 
