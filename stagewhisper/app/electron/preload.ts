@@ -1,3 +1,4 @@
+import { newEntryArgs } from './handlers/newEntry/newEntry';
 import { WhisperArgs } from './whisperTypes';
 import { ipcRenderer, contextBridge } from 'electron';
 
@@ -11,25 +12,36 @@ declare global {
 }
 
 const api = {
+  // Add a new file to the database
+  newEntry: async (args: newEntryArgs) => {
+    const result = await ipcRenderer.invoke('newEntry', args);
+
+    if (result.error) {
+      throw result.error;
+    } else {
+      return result.entry;
+    }
+  },
+
+  // Run the whisper model with given arguments
   runWhisper: (args: WhisperArgs) => {
     ipcRenderer.invoke('run-whisper', args);
   },
 
+  // Get the list of all entries stored in the app database
   getEntries: async () => {
     const result = await ipcRenderer.invoke('get-entries');
     console.log('result', result);
     return result;
   },
 
+  // Trigger an OS level directory picker
   openDirectoryDialog: async () => {
     const result = await ipcRenderer.invoke('open-directory-dialog');
     return result;
   },
 
-  sendMessage: (message: string) => {
-    ipcRenderer.send('message', message);
-  },
-
+  // Testing: Load a file from the app directory
   loadVttFromFile: async (path: string, exampleData: boolean) => {
     if (exampleData === true) {
       const result = (await ipcRenderer.invoke('load-vtt-from-file', path, exampleData)) as NodeList;
