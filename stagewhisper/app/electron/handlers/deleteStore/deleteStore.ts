@@ -1,11 +1,11 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron';
-import { DeleteStoreResponse } from './../../channels.d';
+import { DeleteStoreResponse } from '../../types/channels';
 // File to import all data from the data folder
 
 import { app } from 'electron';
 import { rmdir } from 'fs/promises';
 import { join } from 'path';
-import { Channels } from '../../channels';
+import { Channels } from '../../types/channels';
 
 // Paths
 

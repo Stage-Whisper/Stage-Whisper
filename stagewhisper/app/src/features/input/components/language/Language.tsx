@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
 import { selectHighlightInvalid, selectLanguage, setLanguage, setLanguageValid } from '../../inputSlice';
 
 // Localization
-import { whisperLanguages } from '../../../../../electron/whisperTypes';
+import { whisperLanguages } from '../../../../../electron/types/whisperTypes';
 import strings from '../../../../localization';
 
 function Language() {

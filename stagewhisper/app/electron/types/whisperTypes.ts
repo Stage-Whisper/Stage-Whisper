@@ -117,7 +117,7 @@ export const whisperCodes = Object.values(whisperLanguages);
 
 export interface WhisperArgs {
   // Input Path
-  inputPath: string;
+  inputPath?: string;
 
   // Model: Name of the Whisper model to use (default: small)
   model?: 'tiny.en' | 'tiny' | 'base.en' | 'base' | 'small.en' | 'small' | 'medium.en' | 'medium' | 'large';

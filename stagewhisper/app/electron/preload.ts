@@ -5,11 +5,11 @@ import {
   NewEntryResponse,
   OpenDirectoryDialogResponse,
   RunWhisperResponse
-} from './channels';
+} from './types/channels';
 // import { initializeApp } from './functions/initialize/initializeApp';
 import { newEntryArgs } from './handlers/newEntry/newEntry';
-import { entry } from './types';
-import { WhisperArgs } from './whisperTypes';
+import { entry } from './types/types';
+import { WhisperArgs } from './types/whisperTypes';
 
 // import { languages } from '../src/components/language/languages';
 
@@ -35,19 +35,12 @@ const api = {
 
   // Run the whisper model with given arguments
   runWhisper: async (args: WhisperArgs, entry: entry): Promise<RunWhisperResponse> => {
-    console.log(`invoking runWhisper, args:  ${args} | entryName: ${entry.config.name}`);
-    try {
-      const result = await ipcRenderer.invoke(Channels.runWhisper, args, entry);
-      if (result.error) {
-        throw result.error;
-      } else {
-        return result;
-      }
-    } catch (err) {
-      console.log(`Error in runWhisper: ${err}`);
+    console.log('Preload: RunWhisper: args', args);
 
-      throw err;
-    }
+    const result = (await ipcRenderer.invoke(Channels.runWhisper, args, entry)) as RunWhisperResponse;
+    console.log(`Preload: Invoked RunWhisper, result: ${result}`);
+
+    return result;
   },
 
   // Delete store file

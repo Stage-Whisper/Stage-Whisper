@@ -23,10 +23,11 @@ import {
 
 // Localization
 import { useNavigate } from 'react-router-dom';
-import { WhisperArgs } from '../../../electron/whisperTypes';
+
 import strings from '../../localization';
 import { getLocalFiles } from '../entries/entrySlice';
 import About, { AboutType } from './components/about/About';
+import { WhisperArgs } from '../../../electron/types/whisperTypes';
 
 function Input() {
   // Redux

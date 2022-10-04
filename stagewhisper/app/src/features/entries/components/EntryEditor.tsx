@@ -1,7 +1,7 @@
 import { Center, Grid, Stack } from '@mantine/core';
 // import { RichTextEditor } from '@mantine/rte';
 import React from 'react';
-import { entry } from '../../../../electron/types';
+import { entry } from '../../../../electron/types/types';
 // import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 
 // This is a component that will be used to display the transcription editor when an entry is selected

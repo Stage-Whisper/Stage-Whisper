@@ -5,15 +5,15 @@ import inputReducer from '../features/input/inputSlice';
 import settingsReducer from '../features/settings/settingsSlice';
 import appReducer from '../appSlice';
 import entriesReducer from '../features/entries/entrySlice';
+import whisperReducer from '../features/whisper/whisperSlice';
 
 // Combine reducers to create a root reducer
 const rootReducer = combineReducers({
   settings: settingsReducer,
   input: inputReducer,
   app: appReducer,
-  entries: entriesReducer
-  // register: registerReducer,
-  // dashboard: dashboardReducer
+  entries: entriesReducer,
+  whisper: whisperReducer
 });
 
 // Use the root reducer to create a store

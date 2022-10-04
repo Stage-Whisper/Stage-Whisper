@@ -1,4 +1,4 @@
-import { entry } from '../../types';
+import { entry } from '../../types/types';
 // Initialize the app with the data folder
 
 import {
@@ -111,7 +111,7 @@ export const initializeApp = async (): Promise<void> => {
 
       // Write the sample entry to the data folder
       console.log('init: Writing config file...');
-      writeFileSync(join(entryPath, 'entry_config.json'), JSON.stringify(sampleEntry.config, null, 2));
+      writeFileSync(join(entryPath, 'entry.json'), JSON.stringify(sampleEntry.config, null, 2));
 
       // Create the audio folder
       console.log('init: Creating audio folder...');
@@ -121,7 +121,7 @@ export const initializeApp = async (): Promise<void> => {
 
       // Write the sample entry's audio parameter file to the data folder
       console.log('init: Writing audio parameters file...');
-      writeFileSync(join(audioPath, 'parameters.json'), JSON.stringify(sampleEntry.audio, null, 2));
+      writeFileSync(join(audioPath, 'audio.json'), JSON.stringify(sampleEntry.audio, null, 2));
 
       // Copy the sample audio file to the data folder
       // console.log("init: Copying sample entry's audio file into directory...");

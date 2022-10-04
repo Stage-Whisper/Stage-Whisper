@@ -38,8 +38,7 @@ import {
   IconRefreshAlert,
   IconSettings,
   IconSun,
-  IconTrash,
-  TablerIcon
+  IconTrash
 } from '@tabler/icons';
 import strings from './localization';
 import { useAppDispatch, useAppSelector } from './redux/hooks';
@@ -54,7 +53,8 @@ import {
   getLocalFiles
 } from './features/entries/entrySlice';
 import Debug from './debug/Debug';
-import { entry } from '../electron/types';
+// import { ipcRenderer } from 'electron';
+// import { Channels } from '../electron/types/channels';
 
 // Recent Transcription Constructor - Shows jobs that are in progress or queued
 function RecentTranscriptions() {
@@ -161,17 +161,6 @@ function EntryList() {
             }}
             active={entry.config.uuid === activeEntry}
             icon={<IconFileDescription />}
-            // icon={
-            //
-            // transcription.status === 'error' || transcription.status === 'unknown' ? ( // If transcription is error or unknown show error icon
-            //   <IconBugOff />
-            // ) : transcription.status === '' ? ( // If transcription is in progress show loading icon
-            //   <Loader size={'xs'} variant="oval" />
-            // ) : (
-            //   // Else show nothing
-            //   <></>
-            // )
-            // }
           />
         );
       })}
