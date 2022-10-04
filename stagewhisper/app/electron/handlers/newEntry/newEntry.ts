@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { copyFileSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { getAudioDurationInSeconds } from 'get-audio-duration';
+import { Channels, NewEntryResponse } from '../../channels';
 
 // Create new entry and add it to the store
 
@@ -14,8 +15,8 @@ export type newEntryArgs = {
 };
 
 export default ipcMain.handle(
-  'new-entry',
-  async (_event: IpcMainInvokeEvent, args: newEntryArgs): Promise<{ entry: entry | null; error?: string }> => {
+  Channels.newEntry,
+  async (_event: IpcMainInvokeEvent, args: newEntryArgs): Promise<NewEntryResponse> => {
     const rootPath = app.getPath('userData'); // Path to the top level of the data folder
     const storePath = join(rootPath, 'store'); // Path to the store folder
     const dataPath = join(storePath, 'data'); // Path to the data folder
@@ -27,7 +28,7 @@ export default ipcMain.handle(
       console.log('NewEntry: Copying file to data folder');
 
       const newFilePath = join(dataPath, uuid, 'audio', args.audio.name);
-
+      console.log('NewEntry: newFilePath', newFilePath);
       // Create entry
       const entry: entry = {
         config: {
@@ -77,8 +78,8 @@ export default ipcMain.handle(
     } catch (error) {
       console.error('NewEntry: Error creating new entry: ' + error);
       if (error instanceof Error) {
-        return { entry: null, error: error.message };
-      } else return { entry: null, error: 'Unknown Error' };
+        return { error: error.message };
+      } else return { error: 'Unknown Error' };
     }
   }
 );

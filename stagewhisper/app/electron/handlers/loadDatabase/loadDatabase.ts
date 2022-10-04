@@ -1,3 +1,4 @@
+import { LoadDatabaseResponse } from '../../channels';
 import { ipcMain, IpcMainInvokeEvent } from 'electron';
 // File to import all data from the data folder
 
@@ -5,6 +6,7 @@ import { join } from 'path';
 import { readdirSync, readFileSync } from 'fs';
 import { app } from 'electron';
 import { entry, entryTranscription } from '../../types';
+import { Channels } from '../../channels';
 
 // Paths
 
@@ -54,8 +56,8 @@ const dataPath = join(storePath, 'data'); // Path to the data folder
 
 // Get all entries
 export default ipcMain.handle(
-  'load-database',
-  async (_event: IpcMainInvokeEvent): Promise<{ entries: entry[]; error?: string }> => {
+  Channels.loadDatabase,
+  async (_event: IpcMainInvokeEvent): Promise<LoadDatabaseResponse> => {
     const entries: entry[] = [];
 
     console.log('Getting entries');
@@ -70,22 +72,23 @@ export default ipcMain.handle(
       try {
         entryFolders.forEach((entryFolder) => {
           // Check if the entry folder has a config file
-          const configPath = join(dataPath, entryFolder.name, 'entry_config.json');
-          if (!readdirSync(join(dataPath, entryFolder.name)).includes('entry_config.json')) {
+          const entryPath = join(dataPath, entryFolder.name);
+          const configPath = join(entryPath, 'entry_config.json');
+          if (!readdirSync(join(entryPath)).includes('entry_config.json')) {
             // throw new Error(`Entry ${entryFolder.name} does not have a config file`);
             console.log(`Entry ${entryFolder.name} does not have a config file`);
             return;
           }
 
           // Check if the entry folder has an audio folder
-          const audioPath = join(dataPath, entryFolder.name, 'audio');
-          if (!readdirSync(join(dataPath, entryFolder.name)).includes('audio')) {
+          const audioFolderPath = join(entryPath, 'audio');
+          if (!readdirSync(join(entryPath)).includes('audio')) {
             throw new Error(`Entry ${entryFolder.name} does not have an audio folder`);
           }
 
           // Check if the entry folder has a transcriptions folder and if it has any transcriptions
-          const transcriptionsPath = join(dataPath, entryFolder.name, 'transcriptions');
-          if (!readdirSync(join(dataPath, entryFolder.name)).includes('transcriptions')) {
+          const transcriptionFolderPath = join(entryPath, 'transcriptions');
+          if (!readdirSync(join(entryPath)).includes('transcriptions')) {
             throw new Error(`Entry ${entryFolder.name} does not have a transcriptions folder`);
           }
 
@@ -93,21 +96,21 @@ export default ipcMain.handle(
           const config = JSON.parse(readFileSync(configPath, 'utf8')) as entry['config'];
 
           // Get the audio file
-          const audio = JSON.parse(readFileSync(join(audioPath, 'parameters.json'), 'utf8')) as entry['audio'];
+          const audio = JSON.parse(readFileSync(join(audioFolderPath, 'parameters.json'), 'utf8')) as entry['audio'];
 
           // Get the transcriptions
           const transcriptions: entryTranscription[] = [];
-          readdirSync(transcriptionsPath, { withFileTypes: true })
+          readdirSync(transcriptionFolderPath, { withFileTypes: true })
             .filter((dirent) => dirent.isDirectory())
             .forEach((transcriptionFolder) => {
               // Get the parameters file
               const parameters = JSON.parse(
-                readFileSync(join(transcriptionsPath, transcriptionFolder.name, 'parameters.json'), 'utf8')
+                readFileSync(join(transcriptionFolderPath, transcriptionFolder.name, 'parameters.json'), 'utf8')
               );
 
               // Get the transcript file
               const transcript = readFileSync(
-                join(transcriptionsPath, transcriptionFolder.name, 'transcript.vtt'),
+                join(transcriptionFolderPath, transcriptionFolder.name, 'transcript.vtt'),
                 'utf8'
               );
 
@@ -117,7 +120,7 @@ export default ipcMain.handle(
                 transcribedOn: parameters.transcribedOn,
                 language: parameters.language,
                 model: parameters.model,
-                path: join(transcriptionsPath, transcriptionFolder.name),
+                path: join(transcriptionFolderPath, transcriptionFolder.name),
                 vtt: transcript,
                 status: parameters.status,
                 progress: parameters.progress,
@@ -131,7 +134,7 @@ export default ipcMain.handle(
 
           // Add the entry to the entries array
           const entry: entry = {
-            path: join(dataPath, entryFolder.name),
+            path: join(entryPath),
             config: {
               name: config.name,
               description: config.description,
@@ -148,7 +151,7 @@ export default ipcMain.handle(
               fileLength: audio.fileLength,
               language: audio.language,
               type: audio.type,
-              path: join(audioPath, audio.type)
+              path: join(audioFolderPath, audio.name)
             },
             transcriptions: transcriptions
           };

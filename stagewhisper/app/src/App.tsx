@@ -115,7 +115,7 @@ function RecentTranscriptions() {
                 component={Link}
                 to={`/entries`}
                 onClick={() => {
-                  dispatch(setActiveEntry(entry.config.uuid));
+                  dispatch(setActiveEntry(entry));
                   dispatch(setBurgerOpen(false));
                 }}
                 active={entry.config.uuid === activeEntry}
@@ -156,7 +156,7 @@ function EntryList() {
             component={Link}
             to={`/entries`}
             onClick={() => {
-              dispatch(setActiveEntry(entry.config.uuid));
+              dispatch(setActiveEntry(entry));
               dispatch(setBurgerOpen(false));
             }}
             active={entry.config.uuid === activeEntry}

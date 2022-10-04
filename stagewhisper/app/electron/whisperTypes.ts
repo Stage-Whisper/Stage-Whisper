@@ -129,7 +129,7 @@ export interface WhisperArgs {
   device?: string;
 
   // OutputDir: Directory to save the outputs (default: .)
-  output_dir: string;
+  output_dir?: string;
 
   // Verbose: Whether to print out the progress and debug messages (default: True)
   verbose?: boolean;

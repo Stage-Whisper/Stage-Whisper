@@ -36,7 +36,6 @@ export const readFilePromise = (path: string): Promise<string> =>
         })
       : reject(new Error('File does not exist'));
   });
-
 //#endregion
 
 function createWindow() {
@@ -65,6 +64,11 @@ function createWindow() {
   // eslint-disable-next-line no-unused-expressions
   isDev && window?.webContents.openDevTools({ mode: 'detach' });
 
+  // Whisper
+  ipcMain.on('whisper-complete', (_event: IpcMainEvent, args: string) => {
+    console.log('whisper-complete', args);
+  });
+
   // For AppBar
   ipcMain.on('minimize', () => {
     // eslint-disable-next-line no-unused-expressions
@@ -87,6 +91,7 @@ import './whisperTypes'; // Types for whisper model
 import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
 import './handlers/newEntry/newEntry'; // Add a new entry to the database
 import { initializeApp } from './functions/initialize/initializeApp';
+import { Channels, OpenDirectoryDialogResponse } from './channels';
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -124,11 +129,13 @@ ipcMain.on('message', (event: IpcMainEvent, message: unknown) => {
   setTimeout(() => event.sender.send('message', 'hi from electron'), 500);
 });
 
-ipcMain.handle('open-directory-dialog', async () => {
+ipcMain.handle(Channels.openDirectoryDialog, async (): Promise<OpenDirectoryDialogResponse> => {
   // Trigger electron directory picker and return the selected directory
   const directory = await dialog.showOpenDialog({
     properties: ['openDirectory']
   });
 
-  return directory.canceled ? null : directory.filePaths[0];
+  return {
+    path: directory.canceled ? null : directory.filePaths[0]
+  };
 });

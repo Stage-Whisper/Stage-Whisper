@@ -1,21 +1,25 @@
+import { RunWhisperResponse } from '../../../electron/channels';
+import { WhisperArgs } from './../../../electron/whisperTypes';
 import { RootState } from '../../redux/store';
 // Transcription Slice
 // This holds the state of the transcriptions and will be updated by electron/node processes
 
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { entry } from '../../../electron/types';
 
 export interface entryState {
   entries: entry[];
   activeEntry: string | null;
-  thunk_status: 'idle' | 'loading' | 'succeeded' | 'failed' | 'not_found';
+  get_files_status: 'idle' | 'loading' | 'succeeded' | 'failed' | 'not_found';
+  trigger_whisper_status: 'idle' | 'loading' | 'succeeded' | 'failed';
 }
 
 const initialState: entryState = {
   entries: [],
   activeEntry: null,
   // Thunk State for accessing local files via electron
-  thunk_status: 'idle'
+  get_files_status: 'idle',
+  trigger_whisper_status: 'idle'
 };
 
 // Thunk for loading the transcriptions from the database
@@ -34,33 +38,73 @@ export const getLocalFiles = createAsyncThunk(
   }
 );
 
+export const whisperTranscribe = createAsyncThunk(
+  'entries/whisperTranscribe',
+  async (entry: entry): Promise<{ result?: RunWhisperResponse; error?: string }> => {
+    const args: WhisperArgs = {
+      inputPath: entry.audio.path
+    };
+
+    const result = await window.Main.runWhisper(args, entry);
+
+    console.log('whisperTranscribe result', result);
+
+    if (result) {
+      return { result };
+    } else {
+      throw { error: 'Error running whisper' };
+    }
+  }
+);
+
+//       inputPath: action.payload.path
+//     };
+//     // Set Input State to loading
+//     const result = await window.Main.runWhisper(args, action.payload);
+//     console.log('whisperTranscribe result', result);
+
+//     if (result) {
+//       return { entry: result.entry, outputDir: result.outputDir, transcription_uuid: result.transcription_uuid };
+//     } else {
+//       throw new Error('Error running whisper');
+//     }
+//     // return { error: 'Error running whisper' };
+//     // }
+//   }
+// );
+
 export const entrySlice = createSlice({
   name: 'entries',
   initialState,
   reducers: {
-    setActiveEntry: (state, action) => {
-      // This action is called when a transcription is opened by the user
-      state.activeEntry = action.payload;
+    setActiveEntry: (state, action: PayloadAction<entry | null>) => {
+      // This action is called when a entry is opened by the user
+
+      if (action.payload) {
+        state.activeEntry = action.payload.config.uuid;
+      } else {
+        state.activeEntry = null;
+      }
     },
 
-    addEntry: (state, action) => {
-      // This action is called when a transcription is added
+    addEntry: (state, action: PayloadAction<entry>) => {
+      // This action is called when a entry is added
       state.entries.push(action.payload);
     },
 
-    updateEntry: (state, action) => {
+    updateEntry: (state, action: PayloadAction<entry>) => {
       // FIXME: Convert to use electron
-      // This action is called when a transcription is updated
-      const index = state.entries.findIndex((entry) => entry.config.uuid === action.payload.id);
+      // This action is called when a entry is updated
+      const index = state.entries.findIndex((entry) => entry.config.uuid === action.payload.config.uuid);
       if (index !== -1) {
         state.entries[index] = action.payload;
       }
     },
 
-    removeEntry: (state, action) => {
+    removeEntry: (state, action: PayloadAction<entry>) => {
       // FIXME: Convert to use electron to remove from database
-      // This action is called when a transcription is removed
-      const index = state.entries.findIndex((entry) => entry.config.uuid === action.payload);
+      // This action is called when a entry is removed
+      const index = state.entries.findIndex((entry) => entry.config.uuid === action.payload.config.uuid);
       if (index !== -1) {
         state.entries.splice(index, 1);
       }
@@ -72,10 +116,10 @@ export const entrySlice = createSlice({
     }
   },
   extraReducers(builder) {
-    // Update the transcription thunk_status when a thunk is called
+    // Thunk for loading the transcriptions from the database
     builder.addCase(getLocalFiles.pending, (state) => {
       console.log('Getting Local Files: Pending');
-      state.thunk_status = 'loading';
+      state.get_files_status = 'loading';
     });
     builder.addCase(getLocalFiles.fulfilled, (state, action) => {
       console.log('Getting Local Files: Fulfilled');
@@ -84,18 +128,41 @@ export const entrySlice = createSlice({
         state.entries = action.payload.entries;
         console.log('state.entries', state.entries);
       }
-      state.thunk_status = 'succeeded';
+      state.get_files_status = 'succeeded';
     });
     builder.addCase(getLocalFiles.rejected, (state) => {
       console.log('Getting Local Files: Rejected');
-      state.thunk_status = 'idle';
+      state.get_files_status = 'idle';
+    });
+
+    // Thunk for running the whisper transcribe
+    builder.addCase(whisperTranscribe.pending, (state) => {
+      console.log('whisperTranscribe: Pending');
+      state.trigger_whisper_status = 'loading';
+    });
+    builder.addCase(whisperTranscribe.fulfilled, (state, action) => {
+      console.log('whisperTranscribe: Fulfilled');
+      console.log('action.payload', action.payload);
+      if (action.payload.result && action.payload.result.entry) {
+        const index = state.entries.findIndex(
+          (entry) => entry.config.uuid === action?.payload?.result?.entry.config.uuid
+        );
+        if (index !== -1) {
+          // Set the entries 'active_transcription' to the new transcription id
+          state.entries[index].config.activeTranscription = action.payload.result.transcription_uuid;
+        }
+      } else {
+        console.log('whisperTranscribe: Fulfilled: No entry returned');
+      }
+
+      state.trigger_whisper_status = 'succeeded';
     });
   }
 });
 
 export const { addEntry, updateEntry, removeEntry, test, setActiveEntry } = entrySlice.actions;
 
-// Export Transcription States
+// Export Entry States
 export const selectEntries = (state: RootState) => state.entries.entries;
 export const selectActiveEntry = (state: RootState) => state.entries.activeEntry;
 export const selectNumberOfEntries = (state: RootState) => state.entries.entries.length;
