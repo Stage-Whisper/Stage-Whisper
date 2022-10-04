@@ -16,11 +16,13 @@ import React, { useState } from 'react';
 
 // Redux
 
-import { entry, transcriptionStatus } from '../../../../electron/types';
+import { entry, transcriptionStatus } from '../../../../electron/types/types';
 
 // Localization
 import { useDispatch } from 'react-redux';
 import strings from '../../../localization';
+import { useAppDispatch } from '../../../redux/hooks';
+import { passToWhisper } from '../../whisper/whisperSlice';
 
 //#region Component Helpers
 const progressIndicator = (active_transcript: entry['transcriptions'][0]) => {
@@ -303,10 +305,12 @@ const buttonBlock = (active_transcript: entry['transcriptions'][0]) => {
 function TranscriptionCard({ entry }: { entry: entry }) {
   // Local state for the entry card - used to show/hide the file/entry details
   const [expanded, setExpanded] = useState<string[]>([]);
+  const dispatch = useAppDispatch();
   const activeTranscription = entry.transcriptions.find(
     (transcription) => transcription.uuid === entry.config.activeTranscription // TODO: Implement a way to view all transcriptions not just active
   );
-  return (
+
+  const CardWithTranscription = (
     <Card withBorder>
       <Group>
         <Title order={2} lineClamp={2}>
@@ -431,6 +435,34 @@ function TranscriptionCard({ entry }: { entry: entry }) {
       <Divider mt="xs" mb="xs" />
     </Card>
   );
-}
 
+  const CardWithoutTranscription = (
+    <Card withBorder>
+      <Group>
+        <Title order={2} lineClamp={2}>
+          {entry.config.name}
+        </Title>
+      </Group>
+
+      <Title italic order={6} lineClamp={1}>
+        {entry.config.description}
+      </Title>
+      <Divider mt="xs" mb="xs" />
+      <Button
+        onClick={() => {
+          dispatch(passToWhisper({ entry })); // TODO: Replace with add to queue
+          //TODO: Add a way to select a model to use / other options
+        }}
+      >
+        {strings.entries?.buttons.add_to_queue}
+      </Button>
+    </Card>
+  );
+
+  if (entry.transcriptions.length > 0) {
+    return CardWithTranscription;
+  } else {
+    return CardWithoutTranscription;
+  }
+}
 export default TranscriptionCard;

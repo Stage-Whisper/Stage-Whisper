@@ -1,9 +1,10 @@
-import { entry, entryAudioParams, entryConfig } from '../../types';
+import { entry, entryAudioParams, entryConfig } from '../../types/types';
 import { app, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 import { copyFileSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { getAudioDurationInSeconds } from 'get-audio-duration';
+import { Channels, NewEntryResponse } from '../../types/channels';
 
 // Create new entry and add it to the store
 
@@ -14,8 +15,8 @@ export type newEntryArgs = {
 };
 
 export default ipcMain.handle(
-  'new-entry',
-  async (_event: IpcMainInvokeEvent, args: newEntryArgs): Promise<{ entry: entry | null; error?: string }> => {
+  Channels.newEntry,
+  async (_event: IpcMainInvokeEvent, args: newEntryArgs): Promise<NewEntryResponse> => {
     const rootPath = app.getPath('userData'); // Path to the top level of the data folder
     const storePath = join(rootPath, 'store'); // Path to the store folder
     const dataPath = join(storePath, 'data'); // Path to the data folder
@@ -27,7 +28,7 @@ export default ipcMain.handle(
       console.log('NewEntry: Copying file to data folder');
 
       const newFilePath = join(dataPath, uuid, 'audio', args.audio.name);
-
+      console.log('NewEntry: newFilePath', newFilePath);
       // Create entry
       const entry: entry = {
         config: {
@@ -66,19 +67,17 @@ export default ipcMain.handle(
       console.log('NewEntry: File copied to: ' + newFilePath);
 
       console.log('NewEntry: Writing entry to store');
-      // Make entry_config file
-      writeFileSync(join(entryPath, 'entry_config.json'), JSON.stringify(entry.config, null, 2));
+      // Make entry config file
+      writeFileSync(join(entryPath, 'entry.json'), JSON.stringify(entry.config, null, 2));
       // Make Audio Parameters file
-      writeFileSync(join(audioPath, 'parameters.json'), JSON.stringify(entry.audio, null, 2));
+      writeFileSync(join(audioPath, 'audio.json'), JSON.stringify(entry.audio, null, 2));
 
       console.log('NewEntry: Entry created successfully');
 
       return { entry };
     } catch (error) {
       console.error('NewEntry: Error creating new entry: ' + error);
-      if (error instanceof Error) {
-        return { entry: null, error: error.message };
-      } else return { entry: null, error: 'Unknown Error' };
+      throw error;
     }
   }
 );

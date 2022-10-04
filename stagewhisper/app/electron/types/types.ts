@@ -20,7 +20,7 @@ export type entryConfig = {
 // Entry Audio Object
 // Represents the information about the audio file for an entry
 export type entryAudioParams = {
-  type: string; // TODO: Change to enum with whisper accepted types
+  type: string; // TODO: #50 Change to enum of supported audio types from whisper
   path: string; // Path to the audio file
   name: string; // Name of the audio file
   language: WhisperArgs['language']; // Language of the audio file
@@ -32,16 +32,16 @@ export type entryAudioParams = {
 // Represents a completed transcription for an entry
 export type entryTranscription = {
   uuid: string; // UUID of the transcription
-  transcribedOn: Date; // Date the transcription was completed
+  transcribedOn: string; // Date the transcription was started
   path: string; // Path to the transcription folder
   model: WhisperArgs['model']; // Model used to transcribe the audio
   language: WhisperArgs['language']; // Language of the audio file
-  vtt: string; // The transcript in vtt format
+  vtt?: string; // The transcript in vtt format
   status: transcriptionStatus; // Status of the transcription -- also used to determine if the transcription is complete
   progress: number; // Progress of the transcription
   translated: boolean; // Whether the transcription has been translated
   error: string | undefined; // Error message if the transcription failed
-  completedOn: Date | undefined; // Date the transcription was completed
+  completedOn: string; // Date the transcription was completed
 };
 
 // An entry object - represents

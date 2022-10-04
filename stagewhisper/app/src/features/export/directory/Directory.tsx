@@ -2,17 +2,18 @@ import { Text, Card, Input, Stack, Title } from '@mantine/core';
 import React from 'react';
 
 // Redux
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
-import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../input/inputSlice';
+// import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+// import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../input/inputSlice';
 
 // Localization
 import strings from '../../../localization';
+// import { OpenDirectoryDialogResponse } from '../../../../electron/handlers/channels';
 
 function Directory() {
   // Redux
-  const dispatch = useAppDispatch();
-  const { directory, directoryValid } = useAppSelector(selectDirectory);
-  const highlightInvalid = useAppSelector(selectHighlightInvalid);
+  // const dispatch = useAppDispatch();
+  // const { directory, directoryValid } = useAppSelector(selectDirectory);
+  // const highlightInvalid = useAppSelector(selectHighlightInvalid);
   return (
     <Card shadow="xs" p="md" withBorder title="Output">
       <Stack>
@@ -20,13 +21,13 @@ function Directory() {
         <Input.Wrapper label={strings.input?.directory.prompt}>
           <Input
             placeholder={strings.input?.directory.placeholder}
-            invalid={directoryValid && highlightInvalid}
+            // invalid={directoryValid && highlightInvalid}
             component="button"
             onClick={() => {
               if (window.Main) {
-                window.Main.openDirectoryDialog().then((result: string) => {
-                  dispatch(setDirectory(result));
-                });
+                // window.Main.openDirectoryDialog().then((result: OpenDirectoryDialogResponse) => {
+                // dispatch(setDirectory(result.path));
+                // });
               } else {
                 // eslint-disable-next-line no-alert
                 alert(
@@ -35,7 +36,7 @@ function Directory() {
               }
             }}
           >
-            {directory || strings.input?.directory.placeholder}
+            {/* {directory || strings.input?.directory.placeholder} */}
           </Input>
         </Input.Wrapper>
         <Text italic size="xs" color="dimmed" align="center">

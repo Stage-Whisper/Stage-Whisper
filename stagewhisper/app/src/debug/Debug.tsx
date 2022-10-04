@@ -1,4 +1,4 @@
-import { Button, Card, Stack, Title, Notification } from '@mantine/core';
+import { Button, Card, Stack, Title, Notification, Alert } from '@mantine/core';
 
 import React, { useState } from 'react';
 import { useAppDispatch } from '../redux/hooks';
@@ -22,9 +22,9 @@ function Debug() {
   const dispatch = useAppDispatch();
   // const notifications = [] as JSX.Element[];
 
-  // const addNotification = (title: string, body: string) => {
-  //   setNotifications((prev) => [...prev, { title, message: body, type: 'success', id: uuidv4() }]);
-  // };
+  const handleDeleteStore = async () => {
+    window.Main.deleteStore();
+  };
 
   return (
     <Stack>
@@ -48,35 +48,7 @@ function Debug() {
             Debug Menu
           </Title>
 
-          <Button // TODO: Fix this by reworking the electron code
-            onClick={() => {
-              // if (window.Main) {
-              //   window.Main.loadVttFromFile('dev', true).then((vtt: NodeList) => {
-              //     if (
-              //       vtt.some((node) => {
-              //         return node.type === 'cue';
-              //       })
-              //     ) {
-              //       addNotification('Success!', 'VTT Loaded');
-              //     } else {
-              //       addNotification('Error!', 'VTT Not Loaded');
-              //     }
-              //   });
-              // }
-            }}
-            disabled
-            variant="outline"
-          >
-            Test VTT Loading
-          </Button>
-          <Button
-            onClick={() => {
-              // dispatch(createDebugEntries());
-            }}
-            variant="outline"
-          >
-            Create Debug Transcriptions
-          </Button>
+          {/* Load Data Into Redux */}
           <Button
             onClick={() => {
               if (window.Main) {
@@ -90,16 +62,23 @@ function Debug() {
             }}
             variant="outline"
           >
-            Load appData
+            Load Data Into Redux
           </Button>
-          <Button // TODO: Fix this by implementing a short demo file for testing
-            onClick={() => {
-              // window.Main.runWhisper({});
-            }}
+
+          {/* Reset App */}
+          <Button
             variant="outline"
-            disabled
+            disabled={true}
+            onClick={() => {
+              if (window.Main) {
+                handleDeleteStore(); // To delete store go to /Users/{username}/Library/Application Support/stagewhisper/store on mac or %appdata%/stagewhisper/store on windows
+                // The Store directory should also be logged to the console when the app starts
+              } else {
+                console.log('no window.Main');
+              }
+            }}
           >
-            Call Whisper
+            Reset App
           </Button>
         </Stack>
       </Card>

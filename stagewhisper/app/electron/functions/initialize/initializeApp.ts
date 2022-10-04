@@ -1,4 +1,4 @@
-import { entry } from '../../types';
+import { entry } from '../../types/types';
 // Initialize the app with the data folder
 
 import {
@@ -27,10 +27,11 @@ const defaultSettings: appConfigType = {
 
 export const initializeApp = async (): Promise<void> => {
   // Get the data path
+  console.log('Initializing app');
+
   const rootPath = app.getPath('userData'); // Path to the top level the electron app - Also includes other files like localStorage, Cache, extensions, etc
   const storePath = join(rootPath, 'store'); // Path to the store folder - Where our data is stored
   const dataPath = join(storePath, 'data'); // Path to the data folder
-  console.log('Initializing app');
   console.log('Store is at: ' + storePath);
 
   // Check if the top level store folder exists
@@ -73,6 +74,7 @@ export const initializeApp = async (): Promise<void> => {
 
   // Check if the data folder contains any entries
   if (readdirSync(join(dataPath)).length == 0 && settings.firstRun) {
+    // FIXME: #47 This creates an entry without an audio file, this will cause issues as the app will try to load the audio file
     {
       console.warn('init: No entries found, is first run, creating sample...');
 
@@ -109,7 +111,7 @@ export const initializeApp = async (): Promise<void> => {
 
       // Write the sample entry to the data folder
       console.log('init: Writing config file...');
-      writeFileSync(join(entryPath, 'entry_config.json'), JSON.stringify(sampleEntry.config, null, 2));
+      writeFileSync(join(entryPath, 'entry.json'), JSON.stringify(sampleEntry.config, null, 2));
 
       // Create the audio folder
       console.log('init: Creating audio folder...');
@@ -119,11 +121,10 @@ export const initializeApp = async (): Promise<void> => {
 
       // Write the sample entry's audio parameter file to the data folder
       console.log('init: Writing audio parameters file...');
-      writeFileSync(join(audioPath, 'parameters.json'), JSON.stringify(sampleEntry.audio, null, 2));
+      writeFileSync(join(audioPath, 'audio.json'), JSON.stringify(sampleEntry.audio, null, 2));
 
       // Copy the sample audio file to the data folder
       // console.log("init: Copying sample entry's audio file into directory...");
-      // TODO: Copy the sample audio file to the data folder (This is currently not working)
       // copyFileSync(join(__dirname, 'assets', ''), join(audioPath, 'sample.mp3'));
 
       // Create the transcriptions folder

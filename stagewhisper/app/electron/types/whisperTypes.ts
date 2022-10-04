@@ -1,6 +1,6 @@
-// Create an indexed array of langauges and their codes
+// Create an indexed array of languages and their codes
 export enum whisperLanguages {
-  // TODO: Check the country codes
+  // TODO: Create a separate list of interface languages, right now app is limited to only use languages that are accepted by the whisper model
   Afrikaans = 'af',
   Albanian = 'sq',
   Amharic = 'am',
@@ -117,7 +117,7 @@ export const whisperCodes = Object.values(whisperLanguages);
 
 export interface WhisperArgs {
   // Input Path
-  inputPath: string;
+  inputPath?: string;
 
   // Model: Name of the Whisper model to use (default: small)
   model?: 'tiny.en' | 'tiny' | 'base.en' | 'base' | 'small.en' | 'small' | 'medium.en' | 'medium' | 'large';
@@ -129,7 +129,7 @@ export interface WhisperArgs {
   device?: string;
 
   // OutputDir: Directory to save the outputs (default: .)
-  output_dir: string;
+  output_dir?: string;
 
   // Verbose: Whether to print out the progress and debug messages (default: True)
   verbose?: boolean;

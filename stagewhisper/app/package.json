@@ -17,7 +17,7 @@
     "url": "https://github.com/Stage-Whisper/Stage-Whisper"
   },
   "scripts": {
-    "dev": "concurrently \"yarn dev:vite\" \" yarn dev:electron\"",
+    "dev": "concurrently --names \"VITE,ELECTRON\" -c \"bgBlue.bold,bgGreen.bold\" \"yarn dev:vite\" \" yarn dev:electron\"",
     "dev:vite": "vite",
     "dev:electron": "npm run build:electron && electron .",
     "build": "npm run build:vite && npm run build:electron",

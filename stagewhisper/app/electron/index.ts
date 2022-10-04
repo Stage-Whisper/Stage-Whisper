@@ -8,8 +8,17 @@ import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 // Packages
 import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent } from 'electron';
 import isDev from 'electron-is-dev';
-
+import { Channels, OpenDirectoryDialogResponse } from './types/channels';
 import { existsSync, readFile } from 'fs';
+
+// Import handlers
+import './types/whisperTypes'; // Types for whisper model
+import './handlers/loadVtt/loadVtt'; // Testing
+import './handlers/runWhisper/runWhisper'; // Run whisper model
+import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
+import './handlers/newEntry/newEntry'; // Add a new entry to the database
+import './handlers/deleteStore/deleteStore'; // Non functional
+import { initializeApp } from './functions/initialize/initializeApp';
 
 // Electron Defaults
 const height = 600;
@@ -36,7 +45,6 @@ export const readFilePromise = (path: string): Promise<string> =>
         })
       : reject(new Error('File does not exist'));
   });
-
 //#endregion
 
 function createWindow() {
@@ -65,6 +73,11 @@ function createWindow() {
   // eslint-disable-next-line no-unused-expressions
   isDev && window?.webContents.openDevTools({ mode: 'detach' });
 
+  // // Whisper
+  // ipcMain.on('whisper-complete', (_event: IpcMainEvent, args: string) => {
+  //   console.log('whisper-complete', args);
+  // });
+
   // For AppBar
   ipcMain.on('minimize', () => {
     // eslint-disable-next-line no-unused-expressions
@@ -75,18 +88,15 @@ function createWindow() {
     window.isMaximized() ? window.restore() : window.maximize();
   });
 
+  // Listen for Whisper model to complete
+  ipcMain.on(Channels.transcriptionComplete, (_event: IpcMainEvent, args: string) => {
+    window.webContents.send(Channels.transcriptionComplete, args);
+  });
+
   ipcMain.on('close', () => {
     window.close();
   });
 }
-
-// Import handlers
-import './handlers/loadVtt/loadVtt'; // Testing
-import './handlers/runWhisper/runWhisper'; // Run whisper model
-import './whisperTypes'; // Types for whisper model
-import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
-import './handlers/newEntry/newEntry'; // Add a new entry to the database
-import { initializeApp } from './functions/initialize/initializeApp';
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -124,11 +134,13 @@ ipcMain.on('message', (event: IpcMainEvent, message: unknown) => {
   setTimeout(() => event.sender.send('message', 'hi from electron'), 500);
 });
 
-ipcMain.handle('open-directory-dialog', async () => {
+ipcMain.handle(Channels.openDirectoryDialog, async (): Promise<OpenDirectoryDialogResponse> => {
   // Trigger electron directory picker and return the selected directory
   const directory = await dialog.showOpenDialog({
     properties: ['openDirectory']
   });
 
-  return directory.canceled ? null : directory.filePaths[0];
+  return {
+    path: directory.canceled ? null : directory.filePaths[0]
+  };
 });

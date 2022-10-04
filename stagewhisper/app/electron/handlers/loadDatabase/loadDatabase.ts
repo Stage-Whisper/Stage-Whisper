@@ -1,10 +1,12 @@
+import { LoadDatabaseResponse } from '../../types/channels';
 import { ipcMain, IpcMainInvokeEvent } from 'electron';
 // File to import all data from the data folder
 
 import { join } from 'path';
 import { readdirSync, readFileSync } from 'fs';
 import { app } from 'electron';
-import { entry, entryTranscription } from '../../types';
+import { entry, entryTranscription } from '../../types/types';
+import { Channels } from '../../types/channels';
 
 // Paths
 
@@ -18,31 +20,31 @@ const dataPath = join(storePath, 'data'); // Path to the data folder
 // ├── app_config.json { version, repo, ... }
 // └── data/
 //     ├── entry_{uuidv4}/
-//     │   ├── entry_config.json { inQueue, title, model, etc }
+//     │   ├── entry.json { inQueue, title, model, etc }
 //     │   ├── audio/
 //     │   │   ├── file.mp3 | file.opus | file.wav
-//     │   │   └── parameters.json { addedOn, language, type }
+//     │   │   └── entry.json { addedOn, language, type }
 //     │   └── transcriptions/
 //     │       └── {uuid}/
-//     │           ├── parameters.json { language, transcribedOn, model, ... }
+//     │           ├── transcription.json { language, transcribedOn, model, ... }
 //     │           ├── transcript.vtt (Use VTT as source of truth and compile to txt)
 //     │           └── transcript.txt
 //     └── entry_1bfb7987-da1d-4a02-87a9-e841c5dd4e29/
-//         ├── entry_config.json
+//         ├── entry.json
 //         ├── audio/
 //         │   ├── fancy_twice_sample.opus
-//         │   └── parameters.json {addedOn: 30-12-9999, language: Korean, tpye: Opus
+//         │   └── entry.json {addedOn: 30-12-9999, language: Korean, tpye: Opus
 //         └── transcriptions/
 //             ├── 3a8b37f4-3a41-4522-b3cc-1c6e28a3ab75/
-//             │   ├── parameters.json { langauge: English, transcribedOn: 30-12-9999, model: baseEn, ... }
+//             │   ├── transcription.json { langauge: English, transcribedOn: 30-12-9999, model: baseEn, ... }
 //             │   ├── transcript.vtt
 //             │   └── transcript.txt
 //             └── 7fcf511c-f9d5-4bdc-a427-19a28f6e8ca1/
-//                 ├── parameters.json { langauge: Korean, transcribedOn: 30-12-9999, model: large, ... }
+//                 ├── transcription.json { langauge: Korean, transcribedOn: 30-12-9999, model: large, ... }
 //                 ├── transcript.vtt
 //                 └── transcript.txt
 
-// Error handling
+// Error handling // TODO: #52 Implement enum for error codes and error handling
 // enum getEntriesErrors {
 //   NO_DATA_FOLDER = 'NO_DATA_FOLDER',
 //   NO_CONFIG_FILE = 'NO_CONFIG_FILE',
@@ -54,8 +56,8 @@ const dataPath = join(storePath, 'data'); // Path to the data folder
 
 // Get all entries
 export default ipcMain.handle(
-  'load-database',
-  async (_event: IpcMainInvokeEvent): Promise<{ entries: entry[]; error?: string }> => {
+  Channels.loadDatabase,
+  async (_event: IpcMainInvokeEvent): Promise<LoadDatabaseResponse> => {
     const entries: entry[] = [];
 
     console.log('Getting entries');
@@ -70,46 +72,73 @@ export default ipcMain.handle(
       try {
         entryFolders.forEach((entryFolder) => {
           // Check if the entry folder has a config file
-          const configPath = join(dataPath, entryFolder.name, 'entry_config.json');
-          if (!readdirSync(join(dataPath, entryFolder.name)).includes('entry_config.json')) {
+          const entryPath = join(dataPath, entryFolder.name);
+          const configPath = join(entryPath, 'entry.json');
+          if (!readdirSync(join(entryPath)).includes('entry.json')) {
             // throw new Error(`Entry ${entryFolder.name} does not have a config file`);
-            console.log(`Entry ${entryFolder.name} does not have a config file`);
+            console.warn(`LoadDatabase: Entry ${entryFolder.name} does not have a config file`);
             return;
           }
 
           // Check if the entry folder has an audio folder
-          const audioPath = join(dataPath, entryFolder.name, 'audio');
-          if (!readdirSync(join(dataPath, entryFolder.name)).includes('audio')) {
-            throw new Error(`Entry ${entryFolder.name} does not have an audio folder`);
+          const audioFolderPath = join(entryPath, 'audio');
+          try {
+            readdirSync(join(entryPath)).includes('audio');
+          } catch (error) {
+            console.warn(`LoadDatabase: Entry ${entryFolder.name} does not have an audio folder`);
+            return;
+            // throw new Error(`Entry ${entryFolder.name} does not have an audio folder`);
           }
 
           // Check if the entry folder has a transcriptions folder and if it has any transcriptions
-          const transcriptionsPath = join(dataPath, entryFolder.name, 'transcriptions');
-          if (!readdirSync(join(dataPath, entryFolder.name)).includes('transcriptions')) {
-            throw new Error(`Entry ${entryFolder.name} does not have a transcriptions folder`);
+          const transcriptionFolderPath = join(entryPath, 'transcriptions');
+          try {
+            readdirSync(join(entryPath)).includes('transcriptions');
+          } catch (error) {
+            console.warn(`LoadDatabase: Entry ${entryFolder.name} does not have a transcriptions folder`);
+            return;
+            // throw new Error(`Entry ${entryFolder.name} does not have a transcriptions folder`);
           }
 
           // Get the config file
           const config = JSON.parse(readFileSync(configPath, 'utf8')) as entry['config'];
 
           // Get the audio file
-          const audio = JSON.parse(readFileSync(join(audioPath, 'parameters.json'), 'utf8')) as entry['audio'];
+          const audio = JSON.parse(readFileSync(join(audioFolderPath, 'audio.json'), 'utf8')) as entry['audio'];
 
           // Get the transcriptions
           const transcriptions: entryTranscription[] = [];
-          readdirSync(transcriptionsPath, { withFileTypes: true })
+          readdirSync(transcriptionFolderPath, { withFileTypes: true })
             .filter((dirent) => dirent.isDirectory())
             .forEach((transcriptionFolder) => {
-              // Get the parameters file
-              const parameters = JSON.parse(
-                readFileSync(join(transcriptionsPath, transcriptionFolder.name, 'parameters.json'), 'utf8')
-              );
+              // Check if the transcription folder has a transcription.json file
+              console.log('Transcription folder: ', transcriptionFolder);
+              const transcriptionPath = join(transcriptionFolderPath, transcriptionFolder.name);
+              const transcriptionConfigPath = join(transcriptionPath, 'transcription.json');
 
-              // Get the transcript file
-              const transcript = readFileSync(
-                join(transcriptionsPath, transcriptionFolder.name, 'transcript.vtt'),
-                'utf8'
-              );
+              try {
+                readdirSync(transcriptionConfigPath);
+              } catch {
+                console.warn(`LoadDatabase: Transcription ${transcriptionFolder.name} does not have a config file`);
+                return; // TODO: #54 Implement a way to handle this error ( Transcription was not handled and has no config file )
+              }
+
+              // If it exists get the transcription.json file
+              const parameters = JSON.parse(readFileSync(join(transcriptionConfigPath), 'utf8'));
+
+              // Check if the transcription folder has a transcript.vtt file
+              try {
+                readdirSync(transcriptionPath).includes(`${audio.name}.vtt`);
+              } catch {
+                console.warn(
+                  `LoadDatabase: Transcription ${transcriptionFolder.name} does not have a transcript.vtt file`
+                );
+                return; // TODO: #55 Implement a way to handle this error ( Transcription was not handled and has no transcript file )
+              }
+
+              // If it exists get the transcript.vtt file
+              const vttPath = join(transcriptionPath, `${audio.name}.vtt`);
+              const transcript = readFileSync(join(vttPath), 'utf8');
 
               // Add the transcription to the transcriptions array
               const transcription: entryTranscription = {
@@ -117,7 +146,7 @@ export default ipcMain.handle(
                 transcribedOn: parameters.transcribedOn,
                 language: parameters.language,
                 model: parameters.model,
-                path: join(transcriptionsPath, transcriptionFolder.name),
+                path: join(transcriptionFolderPath, transcriptionFolder.name),
                 vtt: transcript,
                 status: parameters.status,
                 progress: parameters.progress,
@@ -131,7 +160,7 @@ export default ipcMain.handle(
 
           // Add the entry to the entries array
           const entry: entry = {
-            path: join(dataPath, entryFolder.name),
+            path: join(entryPath),
             config: {
               name: config.name,
               description: config.description,
@@ -148,7 +177,7 @@ export default ipcMain.handle(
               fileLength: audio.fileLength,
               language: audio.language,
               type: audio.type,
-              path: join(audioPath, audio.type)
+              path: join(audioFolderPath, audio.name)
             },
             transcriptions: transcriptions
           };

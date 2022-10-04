@@ -23,10 +23,11 @@ import {
 
 // Localization
 import { useNavigate } from 'react-router-dom';
-import { WhisperArgs } from '../../../electron/whisperTypes';
+
 import strings from '../../localization';
 import { getLocalFiles } from '../entries/entrySlice';
 import About, { AboutType } from './components/about/About';
+import { WhisperArgs } from '../../../electron/types/whisperTypes';
 
 function Input() {
   // Redux
@@ -59,6 +60,7 @@ function Input() {
       dispatch(setHighlightInvalid(false));
       dispatch(setSubmitting(true));
       await window.Main.newEntry({
+        // TODO: #51 Convert to redux action
         filePath: audio.path,
         audio: {
           name: audio.name,
