@@ -1,3 +1,4 @@
+import { ResetAppResponse } from './channels.d';
 import { NewEntryResponse, RunWhisperResponse, LoadDatabaseResponse, OpenDirectoryDialogResponse } from './channels';
 import { newEntryArgs } from './handlers/newEntry/newEntry';
 import { WhisperArgs } from './whisperTypes';
@@ -34,6 +35,18 @@ const api = {
 
     if (result.error) {
       throw result.error;
+    } else {
+      return result;
+    }
+  },
+
+  // Reset the app
+  resetApp: async (): Promise<ResetAppResponse> => {
+    console.log('Invoking resetApp');
+    const result = await ipcRenderer.invoke(Channels.resetApp);
+
+    if (result.success) {
+      return result;
     } else {
       return result;
     }
