@@ -1,4 +1,4 @@
-import { Button, Card, Stack, Title, Notification } from '@mantine/core';
+import { Button, Card, Stack, Title, Notification, Alert } from '@mantine/core';
 
 import React, { useState } from 'react';
 import { useAppDispatch } from '../redux/hooks';
@@ -22,9 +22,9 @@ function Debug() {
   const dispatch = useAppDispatch();
   // const notifications = [] as JSX.Element[];
 
-  // const addNotification = (title: string, body: string) => {
-  //   setNotifications((prev) => [...prev, { title, message: body, type: 'success', id: uuidv4() }]);
-  // };
+  const handleDeleteStore = async () => {
+    window.Main.deleteStore();
+  };
 
   return (
     <Stack>
@@ -69,10 +69,8 @@ function Debug() {
           <Button
             variant="outline"
             onClick={() => {
-              const tester = 'test';
-              console.log('window.Main', window.Main);
               if (window.Main) {
-                window.Main.clearAppDb(tester);
+                handleDeleteStore();
               } else {
                 console.log('no window.Main');
               }

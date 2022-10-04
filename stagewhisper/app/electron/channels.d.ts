@@ -3,12 +3,11 @@ import { entry } from './types';
 
 export enum Channels {
   // Utility channels
-
+  deleteStore = 'delete-store',
   openDirectoryDialog = 'open-directory-dialog', // Trigger a directory picker
 
   // Database channels
   loadDatabase = 'load-database', // Loads all entries from the database and returns them
-  clearAppDb = 'clear-appDB', // Resets the app and calls initializeApp
   newEntry = 'new-entry', // Creates a new entry in the database and returns it
 
   // Whisper channels
@@ -18,6 +17,12 @@ export enum Channels {
 }
 
 // Channel Response Types
+
+// Delete Store Response
+export interface DeleteStoreResponse {
+  success?: boolean;
+  message?: string;
+}
 
 // Response type for the openDirectoryDialog channel
 export interface OpenDirectoryDialogResponse {

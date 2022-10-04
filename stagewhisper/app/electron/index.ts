@@ -12,12 +12,12 @@ import { Channels, OpenDirectoryDialogResponse } from './channels';
 import { existsSync, readFile } from 'fs';
 
 // Import handlers
+import './whisperTypes'; // Types for whisper model
 import './handlers/loadVtt/loadVtt'; // Testing
 import './handlers/runWhisper/runWhisper'; // Run whisper model
-import './whisperTypes'; // Types for whisper model
 import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
 import './handlers/newEntry/newEntry'; // Add a new entry to the database
-import './handlers/clearAppDB/clearAppDB'; // Reset the app
+import './handlers/deleteStore/deleteStore';
 import { initializeApp } from './functions/initialize/initializeApp';
 
 // Electron Defaults

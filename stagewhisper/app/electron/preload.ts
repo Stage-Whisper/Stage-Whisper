@@ -50,8 +50,16 @@ const api = {
     }
   },
 
-  // Reset the app
-  // Get the list of all entries stored in the app database
+  // Delete store file
+  deleteStore: async (): Promise<void> => {
+    try {
+      await ipcRenderer.invoke(Channels.deleteStore);
+    } catch (error) {
+      console.log(`Error in deleteStore: ${error}`);
+
+      throw error;
+    }
+  },
 
   // Get the list of all entries stored in the app database
   loadDatabase: async (): Promise<LoadDatabaseResponse> => {
