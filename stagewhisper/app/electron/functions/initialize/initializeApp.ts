@@ -73,6 +73,7 @@ export const initializeApp = async (): Promise<void> => {
 
   // Check if the data folder contains any entries
   if (readdirSync(join(dataPath)).length == 0 && settings.firstRun) {
+    // FIXME: #47 This creates an entry without an audio file, this will cause issues as the app will try to load the audio file
     {
       console.warn('init: No entries found, is first run, creating sample...');
 
@@ -123,7 +124,6 @@ export const initializeApp = async (): Promise<void> => {
 
       // Copy the sample audio file to the data folder
       // console.log("init: Copying sample entry's audio file into directory...");
-      // TODO: Copy the sample audio file to the data folder (This is currently not working)
       // copyFileSync(join(__dirname, 'assets', ''), join(audioPath, 'sample.mp3'));
 
       // Create the transcriptions folder

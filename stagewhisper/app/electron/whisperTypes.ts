@@ -1,6 +1,6 @@
-// Create an indexed array of langauges and their codes
+// Create an indexed array of languages and their codes
 export enum whisperLanguages {
-  // TODO: Check the country codes
+  // TODO: Create a separate list of interface languages, right now app is limited to only use languages that are accepted by the whisper model
   Afrikaans = 'af',
   Albanian = 'sq',
   Amharic = 'am',

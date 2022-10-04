@@ -31,6 +31,7 @@ export default ipcMain.handle(
 
     // Synchronously run the script
     const out = spawn('whisper', [
+      // TODO: #48 Make this async
       '--model',
       'base.en',
       '--output_dir',
@@ -55,7 +56,7 @@ export default ipcMain.handle(
     });
 
     out.on('close', (code) => {
-      console.log(`child process exited with code ${code}`);
+      console.log(`child process exited with code ${code}`); // TODO: #49 Handle the output of the script
       ipcMain.emit(Channels.whisperComplete, code, outputDir, uuid);
     });
 
