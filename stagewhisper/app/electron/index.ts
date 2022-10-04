@@ -64,10 +64,10 @@ function createWindow() {
   // eslint-disable-next-line no-unused-expressions
   isDev && window?.webContents.openDevTools({ mode: 'detach' });
 
-  // Whisper
-  ipcMain.on('whisper-complete', (_event: IpcMainEvent, args: string) => {
-    console.log('whisper-complete', args);
-  });
+  // // Whisper
+  // ipcMain.on('whisper-complete', (_event: IpcMainEvent, args: string) => {
+  //   console.log('whisper-complete', args);
+  // });
 
   // For AppBar
   ipcMain.on('minimize', () => {
@@ -90,6 +90,7 @@ import './handlers/runWhisper/runWhisper'; // Run whisper model
 import './whisperTypes'; // Types for whisper model
 import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
 import './handlers/newEntry/newEntry'; // Add a new entry to the database
+import './handlers/clearAppDB/clearAppDB'; // Reset the app
 import { initializeApp } from './functions/initialize/initializeApp';
 import { Channels, OpenDirectoryDialogResponse } from './channels';
 

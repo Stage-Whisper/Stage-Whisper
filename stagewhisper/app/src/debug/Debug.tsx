@@ -48,14 +48,7 @@ function Debug() {
             Debug Menu
           </Title>
 
-          <Button
-            onClick={() => {
-              // dispatch(createDebugEntries());
-            }}
-            variant="outline"
-          >
-            Create Debug Transcriptions
-          </Button>
+          {/* Load Data Into Redux */}
           <Button
             onClick={() => {
               if (window.Main) {
@@ -69,17 +62,16 @@ function Debug() {
             }}
             variant="outline"
           >
-            Load appData
+            Load Data Into Redux
           </Button>
 
+          {/* Reset App */}
           <Button
             variant="outline"
             onClick={async () => {
               console.log('window.Main', window.Main);
               if (window.Main) {
-                window.Main.resetApp().then(() => {
-                  console.log('reset');
-                });
+                await window.Main.clearAppDB();
               } else {
                 console.log('no window.Main');
               }

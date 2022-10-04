@@ -59,6 +59,7 @@ function Input() {
       dispatch(setHighlightInvalid(false));
       dispatch(setSubmitting(true));
       await window.Main.newEntry({
+        // TODO: #51 Convert to redux action
         filePath: audio.path,
         audio: {
           name: audio.name,

@@ -8,7 +8,7 @@ export enum Channels {
 
   // Database channels
   loadDatabase = 'load-database', // Loads all entries from the database and returns them
-  resetApp = 'reset-app', // Resets the app and calls initializeApp
+  clearAppDB = 'clear-app-db', // Resets the app and calls initializeApp
   newEntry = 'new-entry', // Creates a new entry in the database and returns it
 
   // Whisper channels
@@ -24,12 +24,6 @@ export interface OpenDirectoryDialogResponse {
   path: string | null;
 }
 
-// Response type for resetApp channel
-export interface ResetAppResponse {
-  success: boolean;
-  error?: string;
-}
-
 // Response type for the load-database channel
 export type LoadDatabaseResponse = {
   entries: entry[];
@@ -38,8 +32,7 @@ export type LoadDatabaseResponse = {
 
 // Response type for the new-entry channel
 export type NewEntryResponse = {
-  entry?: entry;
-  error?: string;
+  entry: entry;
 };
 
 // Response type for the run-whisper channel

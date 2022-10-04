@@ -1,10 +1,15 @@
-import { ResetAppResponse } from './channels.d';
-import { NewEntryResponse, RunWhisperResponse, LoadDatabaseResponse, OpenDirectoryDialogResponse } from './channels';
+import { contextBridge, ipcRenderer } from 'electron';
+import {
+  Channels,
+  LoadDatabaseResponse,
+  NewEntryResponse,
+  OpenDirectoryDialogResponse,
+  RunWhisperResponse
+} from './channels';
+import { initializeApp } from './functions/initialize/initializeApp';
 import { newEntryArgs } from './handlers/newEntry/newEntry';
-import { WhisperArgs } from './whisperTypes';
-import { ipcRenderer, contextBridge } from 'electron';
 import { entry } from './types';
-import { Channels } from './channels';
+import { WhisperArgs } from './whisperTypes';
 
 // import { languages } from '../src/components/language/languages';
 
@@ -18,50 +23,69 @@ declare global {
 const api = {
   // Add a new file to the database
   newEntry: async (args: newEntryArgs): Promise<NewEntryResponse> => {
-    const result = await ipcRenderer.invoke(Channels.newEntry, args);
+    try {
+      const response = await ipcRenderer.invoke(Channels.newEntry, args);
+      return response;
+    } catch (error) {
+      console.log(`Error in newEntry: ${error}`);
 
-    if (result.error) {
-      throw result.error;
-    } else {
-      return result.entry;
+      throw error;
     }
   },
 
   // Run the whisper model with given arguments
   runWhisper: async (args: WhisperArgs, entry: entry): Promise<RunWhisperResponse> => {
-    console.log('runWhisper args', args);
+    console.log(`invoking runWhisper, args:  ${args} | entryName: ${entry.config.name}`);
+    try {
+      const result = await ipcRenderer.invoke(Channels.runWhisper, args, entry);
+      if (result.error) {
+        throw result.error;
+      } else {
+        return result;
+      }
+    } catch (err) {
+      console.log(`Error in runWhisper: ${err}`);
 
-    const result = await ipcRenderer.invoke(Channels.runWhisper, args, entry);
-
-    if (result.error) {
-      throw result.error;
-    } else {
-      return result;
+      throw err;
     }
   },
 
   // Reset the app
-  resetApp: async (): Promise<ResetAppResponse> => {
-    console.log('Invoking resetApp');
-    const result = await ipcRenderer.invoke(Channels.resetApp);
-
-    if (result.success) {
-      return result;
-    } else {
-      return result;
+  clearAppDB: async () => {
+    console.log('Invoking clearAppDB');
+    try {
+      await ipcRenderer.invoke(Channels.clearAppDB);
+    } catch (error) {
+      console.log(`Error in clearAppDB: ${error}`);
+      throw error;
+    } finally {
+      await initializeApp();
     }
+    return;
   },
 
   // Get the list of all entries stored in the app database
   loadDatabase: async (): Promise<LoadDatabaseResponse> => {
-    const result = await ipcRenderer.invoke(Channels.loadDatabase);
-    return result;
+    console.log('Invoking loadDatabase');
+    try {
+      const result = await ipcRenderer.invoke(Channels.loadDatabase);
+      return result;
+    } catch (error) {
+      console.log(`Error in loadDatabase: ${error}`);
+      throw error;
+    }
   },
 
   // Trigger an OS level directory picker
   openDirectoryDialog: async (): Promise<OpenDirectoryDialogResponse> => {
-    const result = await ipcRenderer.invoke(Channels.openDirectoryDialog);
-    return result;
+    console.log('Invoking openDirectoryDialog');
+    try {
+      const result = await ipcRenderer.invoke(Channels.openDirectoryDialog);
+      return result;
+    } catch (error) {
+      console.log(`Error in openDirectoryDialog: ${error}`);
+      throw error;
+    }
   },
 
   // Testing: Load a file from the app directory

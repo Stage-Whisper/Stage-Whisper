@@ -44,7 +44,7 @@ const dataPath = join(storePath, 'data'); // Path to the data folder
 //                 ├── transcript.vtt
 //                 └── transcript.txt
 
-// Error handling
+// Error handling // TODO: #52 Implement enum for error codes and error handling
 // enum getEntriesErrors {
 //   NO_DATA_FOLDER = 'NO_DATA_FOLDER',
 //   NO_CONFIG_FILE = 'NO_CONFIG_FILE',

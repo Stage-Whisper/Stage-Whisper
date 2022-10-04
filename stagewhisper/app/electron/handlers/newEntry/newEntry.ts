@@ -77,9 +77,7 @@ export default ipcMain.handle(
       return { entry };
     } catch (error) {
       console.error('NewEntry: Error creating new entry: ' + error);
-      if (error instanceof Error) {
-        return { error: error.message };
-      } else return { error: 'Unknown Error' };
+      throw error;
     }
   }
 );
