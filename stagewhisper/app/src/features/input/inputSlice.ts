@@ -1,5 +1,5 @@
 import { WhisperArgs } from '../../../electron/whisperTypes';
-import { DescriptionType } from './components/description/Description';
+import { AboutType } from './components/about/About';
 import { createSlice } from '@reduxjs/toolkit';
 import { AudioType } from './components/audio/Audio';
 import { RootState } from '../../redux/store';
@@ -10,8 +10,8 @@ import { RootState } from '../../redux/store';
 export type inputState = {
   // Input States
   // These Description of new entry
-  description: DescriptionType;
-  descriptionValid: boolean;
+  about: AboutType;
+  aboutValid: boolean;
 
   // These are the audio files for the new entry
   audio: AudioType;
@@ -36,13 +36,12 @@ export type inputState = {
 
 const initialState: inputState = {
   // Input States
-  description: {
-    title: undefined,
-    description: undefined,
-    date: undefined,
+  about: {
+    name: '',
+    description: '',
     tags: []
   },
-  descriptionValid: false,
+  aboutValid: false,
 
   audio: {
     name: undefined,
@@ -74,6 +73,15 @@ const inputSlice = createSlice({
     setHighlightInvalid: (state, action) => {
       state.highlightInvalid = action.payload;
     },
+    // Set the about input
+    setAbout: (state, action) => {
+      state.about = action.payload;
+    },
+    // Set the about input validity
+    setAboutValid: (state, action) => {
+      state.aboutValid = action.payload;
+    },
+
     // Set the audio file
     setAudio: (state, action) => {
       state.audio = action.payload;
@@ -82,6 +90,7 @@ const inputSlice = createSlice({
     setAudioValid: (state, action) => {
       state.audioValid = action.payload;
     },
+
     // Set the language
     setLanguage: (state, action: { payload: WhisperArgs['language'] }) => {
       state.language = action.payload;
@@ -91,27 +100,13 @@ const inputSlice = createSlice({
       state.languageValid = action.payload;
     },
 
-    // Set the model selection // FIXME: This should be moved to transcription view
-    setModel: (
-      state,
-      action: {
-        payload: WhisperArgs['model'];
-      }
-    ) => {
-      state.model = action.payload;
-    },
-    // Set the model validity
-    setModelValid: (state, action) => {
-      state.modelValid = action.payload;
-    },
-
     // Set the description
     setDescription: (state, action) => {
-      state.description = action.payload;
+      state.about = action.payload;
     },
     // Set the description validity
     setDescriptionValid: (state, action) => {
-      state.descriptionValid = action.payload;
+      state.aboutValid = action.payload;
     },
 
     // Submission Reducers
@@ -128,8 +123,8 @@ const inputSlice = createSlice({
       state.error = action.payload;
     },
     resetInput: (state) => {
-      state.description = initialState.description;
-      state.descriptionValid = initialState.descriptionValid;
+      state.about = initialState.about;
+      state.aboutValid = initialState.aboutValid;
       state.audio = initialState.audio;
       state.audioValid = initialState.audioValid;
       state.language = initialState.language;
@@ -159,13 +154,14 @@ export const selectLanguage = (
   languageValid: state.input.languageValid
 });
 
-export const selectModel = (state: RootState) => ({
-  model: state.input.model,
-  modelValid: state.input.modelValid
+export const selectAbout = (state: RootState) => ({
+  about: state.input.about,
+  aboutValid: state.input.aboutValid
 });
+
 export const selectDescription = (state: RootState) => ({
-  description: state.input.description,
-  descriptionValid: state.input.descriptionValid
+  description: state.input.about,
+  descriptionValid: state.input.aboutValid
 });
 
 export const selectSubmittingState = (state: RootState) => ({
@@ -183,10 +179,10 @@ export const selectHighlightInvalid = (state: RootState) => state.input.highligh
 export const {
   setAudio,
   setAudioValid,
+  setAbout,
+  setAboutValid,
   setLanguage,
   setLanguageValid,
-  setModel,
-  setModelValid,
   setDescription,
   setDescriptionValid,
   setHighlightInvalid,

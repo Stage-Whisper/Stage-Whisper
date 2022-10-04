@@ -1,6 +1,7 @@
 import { newEntryArgs } from './handlers/newEntry/newEntry';
 import { WhisperArgs } from './whisperTypes';
 import { ipcRenderer, contextBridge } from 'electron';
+import { entry } from './types';
 
 // import { languages } from '../src/components/language/languages';
 
@@ -29,9 +30,8 @@ const api = {
   },
 
   // Get the list of all entries stored in the app database
-  loadDatabase: async () => {
+  loadDatabase: async (): Promise<{ entries: entry[]; error?: string }> => {
     const result = await ipcRenderer.invoke('load-database');
-    console.log('result', result);
     return result;
   },
 

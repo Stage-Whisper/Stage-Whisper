@@ -1,4 +1,5 @@
-import { SimpleGrid, Center, Button, Alert, Stack, Title } from '@mantine/core';
+import { Alert, Button, Center, LoadingOverlay, Modal, SimpleGrid, Stack, Title } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import React from 'react';
 
 // Components
@@ -10,26 +11,33 @@ import Audio, { AudioType } from './components/audio/Audio';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import {
   resetInput,
+  selectAbout,
   selectAudio,
   selectLanguage,
   // selectModel,
   selectSubmittingState,
-  setHighlightInvalid
+  setHighlightInvalid,
+  setSubmitted,
+  setSubmitting
 } from './inputSlice';
 
 // Localization
-import strings from '../../localization';
-import { WhisperArgs } from '../../../electron/whisperTypes';
 import { useNavigate } from 'react-router-dom';
+import { WhisperArgs } from '../../../electron/whisperTypes';
+import strings from '../../localization';
+import { getLocalFiles } from '../entries/entrySlice';
+import About, { AboutType } from './components/about/About';
 
 function Input() {
   // Redux
   const dispatch = useAppDispatch();
   const { audio } = useAppSelector(selectAudio);
   const { language } = useAppSelector(selectLanguage);
+  const { about } = useAppSelector(selectAbout);
   const navigate = useNavigate();
-  // const { model } = useAppSelector(selectModel);
+  const isMobile = useMediaQuery('(max-width: 600px)');
 
+  // Modal
   const { submitting, error, submitted } = useAppSelector(selectSubmittingState);
 
   // On page load reset inputs to default
@@ -38,19 +46,18 @@ function Input() {
   }, []);
 
   const handleNewEntry = async ({
+    about,
     audio,
-    language,
-    title,
-    tags
+    language
   }: {
+    about: AboutType;
     audio: AudioType;
     language: WhisperArgs['language'];
-    title: string;
-    tags: string[];
   }) => {
-    if (audio.path && audio.name && language && title && tags) {
+    if (audio.path && audio.name && language && about.name) {
       console.log('Input: All selections made');
       dispatch(setHighlightInvalid(false));
+      dispatch(setSubmitting(true));
       await window.Main.newEntry({
         filePath: audio.path,
         audio: {
@@ -59,18 +66,19 @@ function Input() {
           language: language
         },
         config: {
-          title: 'Placeholder title', // FIXME: Get title from user
-          tags: ['Placeholder', 'tags'] // FIXME: Get tags from user
+          name: about.name,
+          description: about.description || '',
+          tags: about.tags || []
         }
       })
         .then((result) => {
           // If the submission was successful
           if (result) {
-            console.log('New entry created', result);
-            // Reset form
-            dispatch(resetInput);
-            dispatch();
-            navigate('/transcriptions');
+            console.log('New entry created', result, 'Showing modal');
+            dispatch(setSubmitting(false));
+            dispatch(setSubmitted(true));
+            console.log('Getting local files');
+            dispatch(getLocalFiles());
           }
         })
         .catch((error) => {
@@ -84,17 +92,65 @@ function Input() {
 
   return (
     <Center>
-      {/* <SimpleGrid cols={2} breakpoints={[{ maxWidth: 900, cols: 1, spacing: 'sm' }]}> */}
+      {/* Modal that reports whether an entry was successfully added and prompts the user to add another file, add the file to the queue or go to the list of entries */}
+      {submitted && (
+        <Modal
+          title="This is fullscreen modal!"
+          size="lg"
+          withCloseButton={false}
+          centered
+          opened={submitted}
+          fullScreen={isMobile}
+          onClose={() => dispatch(resetInput())}
+        >
+          <Stack>
+            <Alert color="green" title="Entry successfully added!">
+              <SimpleGrid cols={2} spacing={10}>
+                {/* Add another file  */}
+                <Button onClick={() => dispatch(resetInput())} variant="default">
+                  {strings.input?.modal?.add_another}
+                </Button>
+                {/* View Queue */}
+                <Button
+                  disabled
+                  onClick={() => {
+                    dispatch(setSubmitted(false));
+                    navigate('/queue');
+                  }}
+                  variant="default"
+                >
+                  {strings.input?.modal?.view_queue}
+                </Button>
+                {/* View entries */}
+                <Button
+                  onClick={() => {
+                    dispatch(setSubmitted(false));
+                    navigate('/entries');
+                  }}
+                  variant="default"
+                >
+                  {strings.input?.modal?.view_entries}
+                </Button>
+                {/* Add to queue */}
+                {/* Button that goes green when the job is added, keeps modal open, user can then choose to add another file or go to entries */}
+                <Button variant="default" disabled>
+                  {strings.input?.modal?.add_queue}
+                </Button>
+              </SimpleGrid>
+            </Alert>
+          </Stack>
+        </Modal>
+      )}
       <Stack style={{ maxWidth: 1000 }}>
+        <LoadingOverlay visible={submitting} />
+
         <Title order={3}>{strings.input?.title}</Title>
         <Title italic order={5}>
           {strings.input?.prompt}
         </Title>
-
+        <About />
         <Audio />
         <Language />
-        {/* <Model /> */}
-        {/* </SimpleGrid> */}
 
         <Center my="lg">
           {/* Error Alert */}
@@ -110,8 +166,7 @@ function Input() {
                   handleNewEntry({
                     language,
                     audio,
-                    title: 'placeholder title', // FIXME: #42 Create entry title input component
-                    tags: ['placeholder', 'tags'] // FIXME: #44 Create tag input component
+                    about
                   });
                 } else {
                   // eslint-disable-next-line no-alert

@@ -2,8 +2,9 @@ import { Button, Card, Stack, Title, Notification } from '@mantine/core';
 
 import React, { useState } from 'react';
 import { useAppDispatch } from '../redux/hooks';
-import { createDebugTranscriptions } from '../features/transcriptions/transcriptionsSlice';
+// import { createDebugEntries } from '../features/entries/entrySlice';
 import { v4 as uuidv4 } from 'uuid';
+import { getLocalFiles } from '../features/entries/entrySlice';
 
 function Debug() {
   //#region Testing area
@@ -70,7 +71,7 @@ function Debug() {
           </Button>
           <Button
             onClick={() => {
-              dispatch(createDebugTranscriptions());
+              // dispatch(createDebugEntries());
             }}
             variant="outline"
           >
@@ -79,9 +80,10 @@ function Debug() {
           <Button
             onClick={() => {
               if (window.Main) {
-                window.Main.loadDatabase().then((entries) => {
-                  console.log(entries);
-                });
+                // window.Main.loadDatabase().then((entries) => {
+                //   console.log(entries);
+                // });
+                dispatch(getLocalFiles());
               } else {
                 console.log('no window.Main');
               }

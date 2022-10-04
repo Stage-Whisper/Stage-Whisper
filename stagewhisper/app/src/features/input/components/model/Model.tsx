@@ -1,12 +1,17 @@
 import { Card, Stack, Title, SegmentedControl, Alert } from '@mantine/core';
 import React from 'react';
 
+// Types
+import { WhisperArgs } from '../../../../../electron/whisperTypes';
+
 // Redux
 import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
 import { selectModel, setModel } from '../../inputSlice';
 
 // Localization
 import strings from '../../../../localization';
+
+// Settings
 import { selectAllowLargeModels } from '../../../settings/settingsSlice';
 
 function model() {
@@ -54,9 +59,7 @@ function model() {
           onChange={(value) => {
             if (value && (allowLargeModels || value !== 'large')) {
               console.log(value);
-              dispatch(setModel(value));
-            } else {
-              dispatch(setModel(value === 'large' ? 'medium' : value));
+              dispatch(setModel(value as WhisperArgs['model']));
             }
           }}
           data={options.map((option) => ({

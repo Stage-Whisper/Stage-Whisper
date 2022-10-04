@@ -1,15 +1,16 @@
-import { entry, entryAudioParams, entryConfig } from '../loadDatabase/types';
+import { entry, entryAudioParams, entryConfig } from '../../types';
 import { app, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { v4 as uuidv4 } from 'uuid';
 import { copyFileSync, mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { getAudioDurationInSeconds } from 'get-audio-duration';
 
 // Create new entry and add it to the store
 
 export type newEntryArgs = {
   filePath: string;
-  audio: Omit<entryAudioParams, 'path' | 'addedOn'>;
-  config: Omit<entryConfig, 'created' | 'inQueue' | 'queueWeight'>;
+  audio: Omit<entryAudioParams, 'path' | 'addedOn' | 'fileLength'>;
+  config: Omit<entryConfig, 'created' | 'inQueue' | 'queueWeight' | 'activeTranscription' | 'uuid'>;
 };
 
 export default ipcMain.handle(
@@ -29,17 +30,20 @@ export default ipcMain.handle(
 
       // Create entry
       const entry: entry = {
-        uuid: uuidv4(),
         config: {
+          uuid: uuidv4(),
           inQueue: false,
-          title: args.config.title,
+          name: args.config.name,
           created: new Date(),
           queueWeight: 0,
-          tags: args.config.tags
+          tags: args.config.tags,
+          description: args.config.description,
+          activeTranscription: null
         },
         audio: {
           name: args.audio.name,
           type: args.audio.type,
+          fileLength: await getAudioDurationInSeconds(args.filePath),
           language: args.audio.language,
           addedOn: new Date(),
           path: newFilePath

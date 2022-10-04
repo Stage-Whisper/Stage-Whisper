@@ -1,4 +1,4 @@
-import { entry } from '../../handlers/loadDatabase/types';
+import { entry } from '../../types';
 // Initialize the app with the data folder
 
 import {
@@ -80,30 +80,32 @@ export const initializeApp = async (): Promise<void> => {
       // fs.copyFileSync(join(__dirname, 'sample'), join(dataPath, 'sample'));
 
       const sampleEntry: entry = {
-        uuid: '1bfb7987-da1d-4a02-87a9-e841c5dd4e29',
         config: {
+          uuid: '1bfb7987-da1d-4a02-87a9-e841c5dd4e29',
           inQueue: false,
-          title: 'Sample Entry',
+          name: 'Sample Entry',
           created: new Date(),
           queueWeight: 0,
-          tags: ['sample', 'tags']
+          tags: ['sample', 'tags'],
+          description: 'sample description',
+          activeTranscription: null
         },
         audio: {
           name: 'sample.mp3',
           path: join(dataPath, 'entry_1bfb7987-da1d-4a02-87a9-e841c5dd4e29', 'audio', 'sample.mp3'),
+          fileLength: 200,
           type: 'mp3',
           addedOn: new Date(),
           language: 'English'
         },
         path: join(dataPath, 'entry_1bfb7987-da1d-4a02-87a9-e841c5dd4e29'),
-
         transcriptions: []
       };
       // Create the entry folder
       console.log('init: Creating entry folder...');
-      mkdirSync(join(dataPath, sampleEntry.uuid));
+      mkdirSync(join(dataPath, sampleEntry.config.uuid));
 
-      const entryPath = join(dataPath, sampleEntry.uuid);
+      const entryPath = join(dataPath, sampleEntry.config.uuid);
 
       // Write the sample entry to the data folder
       console.log('init: Writing config file...');
