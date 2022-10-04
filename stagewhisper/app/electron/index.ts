@@ -1,13 +1,23 @@
 // Native
 import { join } from 'path';
-
 // Python-Shell
-import { PythonShell } from 'python-shell';
+
+// Dev Tools
+import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
 // Packages
-import { BrowserWindow, app, ipcMain, IpcMainEvent, dialog, IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent } from 'electron';
 import isDev from 'electron-is-dev';
-import { whisperArgs } from './preload';
+import { Channels, OpenDirectoryDialogResponse } from './types/channels';
+import { existsSync, readFile } from 'fs';
+
+// Import handlers
+import './types/whisperTypes'; // Types for whisper model
+import './handlers/runWhisper/runWhisper'; // Run whisper model
+import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
+import './handlers/newEntry/newEntry'; // Add a new entry to the database
+import './handlers/deleteStore/deleteStore'; // Non functional
+import { initializeApp } from './functions/initialize/initializeApp';
 
 // Electron Defaults
 const height = 600;
@@ -19,6 +29,22 @@ declare global {
     api: any;
   }
 }
+
+//#region Utility Functions
+// Promise wrapper for readFile
+export const readFilePromise = (path: string): Promise<string> =>
+  new Promise((resolve, reject) => {
+    existsSync(path)
+      ? readFile(path, 'utf8', (err, data) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        })
+      : reject(new Error('File does not exist'));
+  });
+//#endregion
 
 function createWindow() {
   // Create the browser window.
@@ -46,6 +72,11 @@ function createWindow() {
   // eslint-disable-next-line no-unused-expressions
   isDev && window?.webContents.openDevTools({ mode: 'detach' });
 
+  // // Whisper
+  // ipcMain.on('whisper-complete', (_event: IpcMainEvent, args: string) => {
+  //   console.log('whisper-complete', args);
+  // });
+
   // For AppBar
   ipcMain.on('minimize', () => {
     // eslint-disable-next-line no-unused-expressions
@@ -54,6 +85,11 @@ function createWindow() {
   ipcMain.on('maximize', () => {
     // eslint-disable-next-line no-unused-expressions
     window.isMaximized() ? window.restore() : window.maximize();
+  });
+
+  // Listen for Whisper model to complete
+  ipcMain.on(Channels.transcriptionComplete, (_event: IpcMainEvent, args: string) => {
+    window.webContents.send(Channels.transcriptionComplete, args);
   });
 
   ipcMain.on('close', () => {
@@ -65,8 +101,14 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  createWindow();
+  installExtension(REDUX_DEVTOOLS)
+    .then((name) => console.log(`Added Extension:  ${name}`))
+    .catch((err) => console.log('An error occurred: ', err));
 
+  // Check if file structure exists and create if not
+  initializeApp().then(() => {
+    createWindow();
+  });
   app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -91,41 +133,13 @@ ipcMain.on('message', (event: IpcMainEvent, message: unknown) => {
   setTimeout(() => event.sender.send('message', 'hi from electron'), 500);
 });
 
-ipcMain.handle('open-directory-dialog', async () => {
+ipcMain.handle(Channels.openDirectoryDialog, async (): Promise<OpenDirectoryDialogResponse> => {
   // Trigger electron directory picker and return the selected directory
   const directory = await dialog.showOpenDialog({
     properties: ['openDirectory']
   });
 
-  return directory.canceled ? null : directory.filePaths[0];
-});
-
-ipcMain.handle('run-whisper', (event: IpcMainInvokeEvent, args: whisperArgs) => {
-  // eslint-disable-next-line no-console
-
-  // Format model name
-  const model = args.language === 'english' ? `${args.model}.en` : args.model || 'base';
-
-  const options = {
-    scriptPath: join(__dirname, '../src/python'),
-    args: [
-      args.file,
-      `--model ${model}`,
-      args.language || 'en',
-      args.translate ? '--task translate' : '',
-      args.output_dir ? `--output_dir ${args.output_dir}` : ''
-    ]
-    // TODO: Add this option to the frontend to allow for automatic language detection
-    // args.detect_language
+  return {
+    path: directory.canceled ? null : directory.filePaths[0]
   };
-
-  // eslint-disable-next-line no-console
-  console.log('Running python script with options: ', options);
-  PythonShell.run('whisper.py', options, (err, results) => {
-    if (err) throw err;
-    // results is an array consisting of messages collected during execution
-    // eslint-disable-next-line no-console
-    console.log('results: %j', results);
-    event.sender.send('whisper-complete', results);
-  });
 });

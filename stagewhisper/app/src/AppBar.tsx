@@ -12,7 +12,7 @@ function AppBar() {
     } else {
       setMaximize(true);
     }
-    window.Main.Maximize();
+    // window.Main.Maximize();
   };
 
   return (
