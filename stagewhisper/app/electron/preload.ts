@@ -78,17 +78,6 @@ const api = {
     }
   },
 
-  // Testing: Load a file from the app directory
-  // loadVttFromFile: async (path: string, exampleData: boolean) => {
-  //   if (exampleData === true) {
-  //     const result = (await ipcRenderer.invoke('load-vtt-from-file', path, exampleData)) as NodeList;
-  //     return result;
-  //   } else {
-  //     const result = (await ipcRenderer.invoke('load-vtt-from-file', path)) as NodeList;
-  //     return result;
-  //   }
-  // },
-
   on: (channel: string, callback: (data: any) => void) => {
     ipcRenderer.on(channel, (_, data) => callback(data));
   }

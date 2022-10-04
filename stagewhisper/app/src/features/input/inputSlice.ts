@@ -1,8 +1,8 @@
-import { WhisperArgs } from '../../../electron/whisperTypes';
 import { AboutType } from './components/about/About';
 import { createSlice } from '@reduxjs/toolkit';
 import { AudioType } from './components/audio/Audio';
 import { RootState } from '../../redux/store';
+import { WhisperArgs } from '../../../electron/types/whisperTypes';
 
 // input Slice
 // This slice is used to store the state of the inputs for transcription

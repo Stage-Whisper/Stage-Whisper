@@ -16,7 +16,7 @@ function Language() {
   const highlightInvalid = useAppSelector(selectHighlightInvalid);
 
   // Get a list of all the app languages that have been translated
-  const transcribedLanguageCodes = strings.getAvailableLanguages();
+  // const transcribedLanguageCodes = strings.getAvailableLanguages();
 
   // Generate a list of languages to display in the dropdown
   // const languages = generateLanguageList();

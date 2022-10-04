@@ -13,7 +13,6 @@ import { existsSync, readFile } from 'fs';
 
 // Import handlers
 import './types/whisperTypes'; // Types for whisper model
-import './handlers/loadVtt/loadVtt'; // Testing
 import './handlers/runWhisper/runWhisper'; // Run whisper model
 import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
 import './handlers/newEntry/newEntry'; // Add a new entry to the database
