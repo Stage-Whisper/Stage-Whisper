@@ -68,10 +68,11 @@ function Debug() {
           {/* Reset App */}
           <Button
             variant="outline"
-            onClick={async () => {
+            onClick={() => {
+              const tester = 'test';
               console.log('window.Main', window.Main);
               if (window.Main) {
-                await window.Main.clearAppDB();
+                window.Main.clearAppDb(tester);
               } else {
                 console.log('no window.Main');
               }

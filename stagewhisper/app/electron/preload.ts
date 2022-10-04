@@ -6,7 +6,7 @@ import {
   OpenDirectoryDialogResponse,
   RunWhisperResponse
 } from './channels';
-import { initializeApp } from './functions/initialize/initializeApp';
+// import { initializeApp } from './functions/initialize/initializeApp';
 import { newEntryArgs } from './handlers/newEntry/newEntry';
 import { entry } from './types';
 import { WhisperArgs } from './whisperTypes';
@@ -51,18 +51,7 @@ const api = {
   },
 
   // Reset the app
-  clearAppDB: async () => {
-    console.log('Invoking clearAppDB');
-    try {
-      await ipcRenderer.invoke(Channels.clearAppDB);
-    } catch (error) {
-      console.log(`Error in clearAppDB: ${error}`);
-      throw error;
-    } finally {
-      await initializeApp();
-    }
-    return;
-  },
+  // Get the list of all entries stored in the app database
 
   // Get the list of all entries stored in the app database
   loadDatabase: async (): Promise<LoadDatabaseResponse> => {

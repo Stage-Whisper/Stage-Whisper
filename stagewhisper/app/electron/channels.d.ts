@@ -8,7 +8,7 @@ export enum Channels {
 
   // Database channels
   loadDatabase = 'load-database', // Loads all entries from the database and returns them
-  clearAppDB = 'clear-app-db', // Resets the app and calls initializeApp
+  clearAppDb = 'clear-appDB', // Resets the app and calls initializeApp
   newEntry = 'new-entry', // Creates a new entry in the database and returns it
 
   // Whisper channels

@@ -8,8 +8,17 @@ import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 // Packages
 import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent } from 'electron';
 import isDev from 'electron-is-dev';
-
+import { Channels, OpenDirectoryDialogResponse } from './channels';
 import { existsSync, readFile } from 'fs';
+
+// Import handlers
+import './handlers/loadVtt/loadVtt'; // Testing
+import './handlers/runWhisper/runWhisper'; // Run whisper model
+import './whisperTypes'; // Types for whisper model
+import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
+import './handlers/newEntry/newEntry'; // Add a new entry to the database
+import './handlers/clearAppDB/clearAppDB'; // Reset the app
+import { initializeApp } from './functions/initialize/initializeApp';
 
 // Electron Defaults
 const height = 600;
@@ -83,16 +92,6 @@ function createWindow() {
     window.close();
   });
 }
-
-// Import handlers
-import './handlers/loadVtt/loadVtt'; // Testing
-import './handlers/runWhisper/runWhisper'; // Run whisper model
-import './whisperTypes'; // Types for whisper model
-import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
-import './handlers/newEntry/newEntry'; // Add a new entry to the database
-import './handlers/clearAppDB/clearAppDB'; // Reset the app
-import { initializeApp } from './functions/initialize/initializeApp';
-import { Channels, OpenDirectoryDialogResponse } from './channels';
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
