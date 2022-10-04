@@ -68,9 +68,11 @@ function Debug() {
           {/* Reset App */}
           <Button
             variant="outline"
+            disabled={true}
             onClick={() => {
               if (window.Main) {
-                handleDeleteStore();
+                handleDeleteStore(); // To delete store go to /Users/{username}/Library/Application Support/stagewhisper/store on mac or %appdata%/stagewhisper/store on windows
+                // The Store directory should also be logged to the console when the app starts
               } else {
                 console.log('no window.Main');
               }
