@@ -1,9 +1,10 @@
 import { Button, Card, Stack, Title, Notification } from '@mantine/core';
-import { NodeList } from 'subtitle';
+
 import React, { useState } from 'react';
 import { useAppDispatch } from '../redux/hooks';
-import { createDebugTranscriptions } from '../features/transcriptions/transcriptionsSlice';
+// import { createDebugEntries } from '../features/entries/entrySlice';
 import { v4 as uuidv4 } from 'uuid';
+import { getLocalFiles } from '../features/entries/entrySlice';
 
 function Debug() {
   //#region Testing area
@@ -21,9 +22,9 @@ function Debug() {
   const dispatch = useAppDispatch();
   // const notifications = [] as JSX.Element[];
 
-  const addNotification = (title: string, body: string) => {
-    setNotifications((prev) => [...prev, { title, message: body, type: 'success', id: uuidv4() }]);
-  };
+  // const addNotification = (title: string, body: string) => {
+  //   setNotifications((prev) => [...prev, { title, message: body, type: 'success', id: uuidv4() }]);
+  // };
 
   return (
     <Stack>
@@ -47,42 +48,59 @@ function Debug() {
             Debug Menu
           </Title>
 
-          {/* <Button // TODO: Fix this by reworking the electron code
+          <Button // TODO: Fix this by reworking the electron code
             onClick={() => {
-              if (window.Main) {
-                window.Main.loadVttFromFile('dev', true).then((vtt: NodeList) => {
-                  if (
-                    vtt.some((node) => {
-                      return node.type === 'cue';
-                    })
-                  ) {
-                    addNotification('Success!', 'VTT Loaded');
-                  } else {
-                    addNotification('Error!', 'VTT Not Loaded');
-                  }
-                });
-              }
+              // if (window.Main) {
+              //   window.Main.loadVttFromFile('dev', true).then((vtt: NodeList) => {
+              //     if (
+              //       vtt.some((node) => {
+              //         return node.type === 'cue';
+              //       })
+              //     ) {
+              //       addNotification('Success!', 'VTT Loaded');
+              //     } else {
+              //       addNotification('Error!', 'VTT Not Loaded');
+              //     }
+              //   });
+              // }
             }}
+            disabled
             variant="outline"
           >
             Test VTT Loading
-          </Button> */}
+          </Button>
           <Button
             onClick={() => {
-              dispatch(createDebugTranscriptions());
+              // dispatch(createDebugEntries());
             }}
             variant="outline"
           >
             Create Debug Transcriptions
           </Button>
-          {/* <Button // TODO: Fix this by implementing a short demo file for testing
+          <Button
+            onClick={() => {
+              if (window.Main) {
+                // window.Main.loadDatabase().then((entries) => {
+                //   console.log(entries);
+                // });
+                dispatch(getLocalFiles());
+              } else {
+                console.log('no window.Main');
+              }
+            }}
+            variant="outline"
+          >
+            Load appData
+          </Button>
+          <Button // TODO: Fix this by implementing a short demo file for testing
             onClick={() => {
               // window.Main.runWhisper({});
             }}
             variant="outline"
+            disabled
           >
             Call Whisper
-          </Button> */}
+          </Button>
         </Stack>
       </Card>
     </Stack>

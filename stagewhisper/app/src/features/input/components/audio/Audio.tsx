@@ -25,11 +25,11 @@ function Audio() {
   return (
     <Card shadow="xs" p="md" withBorder title="Audio">
       <Stack>
-        <Title order={4}>{strings.transcribe?.audio.title}</Title>
+        <Title order={4}>{strings.input?.audio.title}</Title>
         <FileInput
           error={audioValid && highlightInvalid}
-          placeholder={strings.transcribe?.audio.placeholder}
-          label={strings.transcribe?.audio.prompt}
+          placeholder={strings.input?.audio.placeholder}
+          label={strings.input?.audio.prompt}
           accept="audio/*"
           onChange={(file) => {
             if (file) {

@@ -100,14 +100,17 @@ export const strings = new LocalizedStrings(
       },
 
       // Text for the transcribe page which allows the user to input files and transcribe them
-      transcribe: {
-        title: 'Transcribe',
+      input: {
+        title: 'Input',
+        prompt: 'Add a file, folder, or URL to transcribe',
         submit_button: 'Submit',
         // Each of the following are the labels for the input fields separated by the type of input
         audio: {
           title: 'Audio',
-          prompt: 'Select audio file or drag and drop it here',
-          placeholder: 'Interview.mp3'
+          prompt: 'Select audio file from your computer',
+          placeholder: 'Interview.mp3',
+          limits: 'MP3, WAV, FLAC, OGG, AAC, M4A, WMA, and OPUS files are recommended',
+          invalid: 'Invalid audio file'
         },
         directory: {
           title: 'Output Directory',
@@ -121,6 +124,37 @@ export const strings = new LocalizedStrings(
           placeholder: 'Select a language',
           non_english_warning: 'Note: Languages other than english may have an increased error rate'
         },
+        about: {
+          title: 'About',
+          prompt: 'About this file',
+          tags: {
+            title: 'Tags',
+            prompt: 'Tags to associate with this file, comma separated',
+            placeholder: 'interview, 2021, pulitzer...'
+          },
+          description: {
+            title: 'Description',
+            prompt: 'Description of this file, what is it about?',
+            placeholder: 'The interview with the president of the moon'
+          },
+          name: {
+            title: 'Name',
+            prompt: 'Name of this file',
+            placeholder: 'Moon-ter-view'
+          }
+        },
+        modal: {
+          title: 'Input',
+          success_queue: 'Successfully added entry to queue',
+          success_add: 'Entry successfully added!',
+          error: 'Error adding entry',
+          error_queue: 'Error adding entry to queue',
+          add_another: 'Add another file',
+          add_queue: 'Add to queue',
+          view_queue: 'View queue',
+          view_entries: 'View entries'
+        },
+
         // The following are the labels for the models that can be used for transcription, each has a title and a description of the model.
         // These descriptions are used in the tooltip and inform the user of the model's accuracy and speed. This is not final and will be updated as we get more information on the models.
         models: {
@@ -154,14 +188,14 @@ export const strings = new LocalizedStrings(
         }
       },
       // Text for the transcriptions page which shows the user a list of all their transcriptions
-      transcriptions: {
-        title: 'Transcriptions', // Title of the page
-        recent_transcriptions: 'Recent Transcriptions', // Title of the recent transcriptions section
+      entries: {
+        title: 'Entries', // Title of the page
+        recent_transcriptions: 'Recent entries', // Title of the recent entries section
         buttons: {
           re_transcribe: 'Re-Transcribe',
           add_to_queue: 'Add to Queue'
         },
-        // Text for the table that shows the user a list of all their transcriptions and their status
+        // Text for the table that shows the user a list of all their entries and their status
         card: {
           // Audio
           audio_section_title: 'Audio File', // Label for the audio file card
@@ -176,7 +210,8 @@ export const strings = new LocalizedStrings(
           completed_on: 'Completed', // What time the transcription was completed
           never_completed: 'Never', // If the transcription has never been completed
           model_used: 'Model', // Which model was used to transcribe the file
-          transcript_length: 'Transcript Length' // How long the transcript is in words
+          transcript_length: 'Transcript Length', // How long the transcript is in words
+          no_transcription: 'No transcription' // If there is no transcription for the file
         }
       },
       // Text for the dashboard home page
@@ -362,7 +397,7 @@ export const strings = new LocalizedStrings(
           confirm: 'Onayla -temp'
         }
       },
-      transcribe: {
+      input: {
         title: 'Deşifre',
         submit_button: 'Gönder',
         audio: {

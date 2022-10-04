@@ -1,12 +1,11 @@
 import { Center, Grid, Stack } from '@mantine/core';
-import { RichTextEditor } from '@mantine/rte';
+// import { RichTextEditor } from '@mantine/rte';
 import React from 'react';
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+import { entry } from '../../../../electron/types';
+// import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 
-import { transcription } from '../transcriptionsSlice';
-
-// This is a component that will be used to display the transcription editor when a transcription is selected
-function TranscriptionEditor({ active: transcription }: { active: transcription }) {
+// This is a component that will be used to display the transcription editor when an entry is selected
+function EntryEditor({ active: entry }: { active: entry }) {
   // Get the dispatch function
 
   // Page with a card containing the transcription metadata
@@ -16,7 +15,7 @@ function TranscriptionEditor({ active: transcription }: { active: transcription 
 
   // This is the value of the transcription editor
 
-  if (!transcription) {
+  if (!entry) {
     return (
       <Center>
         <Stack>
@@ -30,18 +29,17 @@ function TranscriptionEditor({ active: transcription }: { active: transcription 
         <Grid>
           <Grid.Col md={4} sm={12}>
             {/* Metadata 1 */}
+            Selected Entry ID: {entry.config.uuid}
           </Grid.Col>
           <Grid.Col md={8} sm={12}>
             {/* Metadata 2 */}
           </Grid.Col>
         </Grid>
         <Center>
-          <Grid>
-            <RichTextEditor formats={[]} controls={[]} value={transcription.transcriptText} id="rte" />
-          </Grid>
+          <Grid>{/* <RichTextEditor formats={[]} controls={[]} value={entry.transcriptions[0]} id="rte" /> */}</Grid>
         </Center>
       </Stack>
     );
   }
 }
-export default TranscriptionEditor;
+export default EntryEditor;

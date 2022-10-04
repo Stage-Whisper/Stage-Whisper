@@ -1,12 +1,17 @@
 import { Card, Stack, Title, SegmentedControl, Alert } from '@mantine/core';
 import React from 'react';
 
+// Types
+import { WhisperArgs } from '../../../../../electron/whisperTypes';
+
 // Redux
 import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
 import { selectModel, setModel } from '../../inputSlice';
 
 // Localization
 import strings from '../../../../localization';
+
+// Settings
 import { selectAllowLargeModels } from '../../../settings/settingsSlice';
 
 function model() {
@@ -17,29 +22,29 @@ function model() {
 
   const options = [
     {
-      label: strings.transcribe?.models.options.tiny.title,
+      label: strings.input?.models.options.tiny.title,
       value: 'tiny',
-      description: strings.transcribe?.models.options.tiny.description
+      description: strings.input?.models.options.tiny.description
     },
     {
-      label: strings.transcribe?.models.options.base.title,
+      label: strings.input?.models.options.base.title,
       value: 'base',
-      description: strings.transcribe?.models.options.base.description
+      description: strings.input?.models.options.base.description
     },
     {
-      label: strings.transcribe?.models.options.small.title,
+      label: strings.input?.models.options.small.title,
       value: 'small',
-      description: strings.transcribe?.models.options.small.description
+      description: strings.input?.models.options.small.description
     },
     {
-      label: strings.transcribe?.models.options.medium.title,
+      label: strings.input?.models.options.medium.title,
       value: 'medium',
-      description: strings.transcribe?.models.options.medium.description
+      description: strings.input?.models.options.medium.description
     },
     {
-      label: strings.transcribe?.models.options.large.title,
+      label: strings.input?.models.options.large.title,
       value: 'large',
-      description: strings.transcribe?.models.options.large.description,
+      description: strings.input?.models.options.large.description,
       disabled: !allowLargeModels // FIXME: This is not working
     }
   ];
@@ -47,16 +52,14 @@ function model() {
   return (
     <Card shadow="xs" p="md" withBorder title="Model">
       <Stack>
-        <Title order={4}>{strings.transcribe?.models.title}</Title>
+        <Title order={4}>{strings.input?.models.title}</Title>
         <SegmentedControl
           value={model}
           fullWidth
           onChange={(value) => {
             if (value && (allowLargeModels || value !== 'large')) {
               console.log(value);
-              dispatch(setModel(value));
-            } else {
-              dispatch(setModel(value === 'large' ? 'medium' : value));
+              dispatch(setModel(value as WhisperArgs['model']));
             }
           }}
           data={options.map((option) => ({

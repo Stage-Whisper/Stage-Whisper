@@ -6,7 +6,7 @@ import { join } from 'path';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
 // Packages
-import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent, IpcMainInvokeEvent } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent } from 'electron';
 import isDev from 'electron-is-dev';
 
 import { existsSync, readFile } from 'fs';
@@ -80,10 +80,13 @@ function createWindow() {
   });
 }
 
-import './handlers/loadVttFromFile';
-import './whisperTypes';
-import { spawn } from 'child_process';
-import { WhisperArgs } from './whisperTypes';
+// Import handlers
+import './handlers/loadVtt/loadVtt'; // Testing
+import './handlers/runWhisper/runWhisper'; // Run whisper model
+import './whisperTypes'; // Types for whisper model
+import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
+import './handlers/newEntry/newEntry'; // Add a new entry to the database
+import { initializeApp } from './functions/initialize/initializeApp';
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -92,8 +95,11 @@ app.whenReady().then(() => {
   installExtension(REDUX_DEVTOOLS)
     .then((name) => console.log(`Added Extension:  ${name}`))
     .catch((err) => console.log('An error occurred: ', err));
-  createWindow();
 
+  // Check if file structure exists and create if not
+  initializeApp().then(() => {
+    createWindow();
+  });
   app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -125,27 +131,4 @@ ipcMain.handle('open-directory-dialog', async () => {
   });
 
   return directory.canceled ? null : directory.filePaths[0];
-});
-
-ipcMain.handle('run-whisper', async (_event: IpcMainInvokeEvent, args: WhisperArgs) => {
-  const { inputPath, output_dir } = args;
-  console.log('Running whisper script');
-  console.log('args: ', args);
-
-  // const out = spawn('whisper', ['--model', 'base.en', '--output_dir', join(__dirname, '../src/debug/data')]);
-  const out = spawn('whisper', [inputPath, '--model', 'base.en', '--output_dir', output_dir]);
-
-  out.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-  });
-  out.stderr.on('data', (err) => {
-    console.log(`stderr: ${err}`);
-  });
-  out.on('message', (message) => {
-    console.log(`message: ${message}`);
-  });
-
-  out.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
-  });
 });
