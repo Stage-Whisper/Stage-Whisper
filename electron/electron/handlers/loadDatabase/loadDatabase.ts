@@ -8,8 +8,10 @@ import { app } from 'electron';
 import { entry, entryTranscription } from '../../types/types';
 import { Channels } from '../../types/channels';
 
-// Paths
+// Subtitle Parser
+import { parseSync } from 'subtitle';
 
+// Paths
 const rootPath = app.getPath('userData'); // Path to the top level of the data folder
 const storePath = join(rootPath, 'store'); // Path to the store folder
 const dataPath = join(storePath, 'data'); // Path to the data folder
@@ -90,7 +92,6 @@ export default ipcMain.handle(
           const audioFolderPath = join(entryPath, 'audio');
           try {
             readdirSync(join(entryPath)).includes('audio');
-            console.log('Found audio folder');
           } catch (error) {
             console.warn(`LoadDatabase: Entry ${entryFolder.name} does not have an audio folder`);
             return;
@@ -101,7 +102,6 @@ export default ipcMain.handle(
           const transcriptionFolderPath = join(entryPath, 'transcriptions');
           try {
             readdirSync(join(entryPath)).includes('transcriptions');
-            console.log('Found transcriptions folder');
           } catch (error) {
             console.warn(`LoadDatabase: Entry ${entryFolder.name} does not have a transcriptions folder`);
             return;
@@ -124,14 +124,11 @@ export default ipcMain.handle(
             )
             .forEach(async (transcriptionFolder) => {
               // Check if the transcription folder has a transcription.json file
-              console.log('Transcription folder: ', transcriptionFolder);
-              console.log('Transcription folder path: ', join(transcriptionFolderPath, transcriptionFolder.name));
               const transcriptionPath = join(transcriptionFolderPath, transcriptionFolder.name);
               const transcriptionConfigPath = join(transcriptionPath, 'transcription.json');
 
               try {
-                readdirSync(transcriptionConfigPath);
-                console.log('Found transcription config file');
+                readFileSync(transcriptionConfigPath);
               } catch {
                 console.warn(`LoadDatabase: Transcription ${transcriptionFolder.name} does not have a config file`);
                 return; // TODO: #54 Implement a way to handle this error ( Transcription was not handled and has no config file )
@@ -143,7 +140,6 @@ export default ipcMain.handle(
               // Check if the transcription folder has a transcript.vtt file
               try {
                 readdirSync(transcriptionPath).includes(`${audio.name}.vtt`);
-                console.log('Found transcript.vtt file');
               } catch {
                 console.warn(
                   `LoadDatabase: Transcription ${transcriptionFolder.name} does not have a transcript.vtt file`
@@ -152,8 +148,11 @@ export default ipcMain.handle(
               }
 
               // If it exists get the transcript.vtt file
+
               const vttPath = join(transcriptionPath, `${audio.name}.vtt`);
-              const transcript = readFileSync(join(vttPath), 'utf8');
+              // const transcript = readFileSync(join(vttPath), 'utf8');
+              const vttFile = readFileSync(join(vttPath), 'utf8');
+              const vtt = parseSync(vttFile);
 
               // Add the transcription to the transcriptions array
               const transcription: entryTranscription = {
@@ -162,7 +161,7 @@ export default ipcMain.handle(
                 language: parameters.language,
                 model: parameters.model,
                 path: join(transcriptionFolderPath, transcriptionFolder.name),
-                vtt: transcript,
+                vtt,
                 status: parameters.status,
                 progress: parameters.progress,
                 translated: parameters.translated,
@@ -199,6 +198,13 @@ export default ipcMain.handle(
           console.log('LoadDatabase: Entry Added: ', entry.config.name);
           entries.push(entry);
         });
+
+        // Log to table
+        console.table(
+          entries.map((entry) => {
+            return { name: entry.config.name, numTranscripts: entry.transcriptions.length, lang: entry.audio.language };
+          })
+        );
 
         return { entries: entries };
       } catch (error) {

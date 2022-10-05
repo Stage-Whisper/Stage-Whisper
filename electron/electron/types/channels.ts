@@ -5,6 +5,7 @@ export enum Channels {
   // Utility channels
   deleteStore = 'delete-store',
   openDirectoryDialog = 'open-directory-dialog', // Trigger a directory picker
+  audioPlayback = 'audio-playback', // Control audio playback
 
   // Database channels
   loadDatabase = 'load-database', // Loads all entries from the database and returns them
@@ -18,6 +19,11 @@ export enum Channels {
 }
 
 // Channel Response Types
+// Audio Playback Response
+export type audioPlaybackResponse = {
+  success: boolean;
+  state: 'playing' | 'paused' | 'stopped';
+};
 
 // Delete Store Response
 export interface DeleteStoreResponse {

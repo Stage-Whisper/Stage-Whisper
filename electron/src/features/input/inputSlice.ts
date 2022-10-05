@@ -53,7 +53,7 @@ const initialState: inputState = {
   },
   audioValid: false,
 
-  language: 'English',
+  language: 'unknown',
   languageValid: false,
 
   model: 'base',

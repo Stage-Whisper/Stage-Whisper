@@ -1,3 +1,4 @@
+import { NodeList } from 'subtitle';
 import { WhisperArgs } from './whisperTypes';
 // Response to a request for the app data from "get-entries"
 
@@ -54,7 +55,7 @@ export type entryTranscription = {
   path: string; // Path to the transcription folder
   model: WhisperArgs['model']; // Model used to transcribe the audio
   language: WhisperArgs['language']; // Language of the audio file
-  vtt?: string; // The transcript in vtt format
+  vtt?: NodeList; // The transcript in vtt format
   status: transcriptionStatus; // Status of the transcription -- also used to determine if the transcription is complete
   progress: number; // Progress of the transcription
   translated: boolean; // Whether the transcription has been translated

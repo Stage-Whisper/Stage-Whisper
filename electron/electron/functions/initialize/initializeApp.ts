@@ -1,12 +1,12 @@
-import { entry } from '../../types/types';
+// import { entry } from '../../types/types';
 // Initialize the app with the data folder
 
 import {
   // copyFileSync,
   existsSync,
   mkdirSync,
-  readdirSync,
-  readFileSync,
+  // readdirSync,
+  // readFileSync,
   writeFileSync
 } from 'fs';
 import { join } from 'path';
@@ -69,71 +69,71 @@ export const initializeApp = async (): Promise<void> => {
   // Get settings from preferences file for first run
   // const settings: appConfigType = JSON.parse(readFileSync(join(storePath, 'app_preferences.json')).toString());
   console.debug('init: Getting settings from preferences file');
-  const settingsRaw = readFileSync(join(storePath, 'app_preferences.json'));
-  const settings = (await JSON.parse(settingsRaw.toString())) as appConfigType;
+  // const settingsRaw = readFileSync(join(storePath, 'app_preferences.json'));
+  // const settings = (await JSON.parse(settingsRaw.toString())) as appConfigType;
 
   // Check if the data folder contains any entries
-  if (readdirSync(join(dataPath)).length == 0 && settings.firstRun) {
-    // FIXME: #47 This creates an entry without an audio file, this will cause issues as the app will try to load the audio file
-    {
-      console.warn('init: No entries found, is first run, creating sample...');
+  // if (readdirSync(join(dataPath)).length == 0 && settings.firstRun) {
+  //   // FIXME: #47 This creates an entry without an audio file, this will cause issues as the app will try to load the audio file
+  //   {
+  //     console.warn('init: No entries found, is first run, creating sample...');
 
-      // Copy the sample entry to the data folder
-      // fs.copyFileSync(join(__dirname, 'sample'), join(dataPath, 'sample'));
+  //     // Copy the sample entry to the data folder
+  //     // fs.copyFileSync(join(__dirname, 'sample'), join(dataPath, 'sample'));
 
-      const sampleEntry: entry = {
-        config: {
-          uuid: '1bfb7987-da1d-4a02-87a9-e841c5dd4e29',
-          inQueue: false,
-          name: 'Sample Entry',
-          created: new Date(),
-          queueWeight: 0,
-          tags: ['sample', 'tags'],
-          description: 'sample description',
-          activeTranscription: null
-        },
-        audio: {
-          name: 'sample.mp3',
-          path: join(dataPath, 'entry_1bfb7987-da1d-4a02-87a9-e841c5dd4e29', 'audio', 'sample.mp3'),
-          fileLength: 200,
-          type: 'mp3',
-          addedOn: new Date(),
-          language: 'English'
-        },
-        path: join(dataPath, 'entry_1bfb7987-da1d-4a02-87a9-e841c5dd4e29'),
-        transcriptions: []
-      };
-      // Create the entry folder
-      console.log('init: Creating entry folder...');
-      mkdirSync(join(dataPath, sampleEntry.config.uuid));
+  //     const sampleEntry: entry = {
+  //       config: {
+  //         uuid: '1bfb7987-da1d-4a02-87a9-e841c5dd4e29',
+  //         inQueue: false,
+  //         name: 'Sample Entry',
+  //         created: new Date(),
+  //         queueWeight: 0,
+  //         tags: ['sample', 'tags'],
+  //         description: 'sample description',
+  //         activeTranscription: null
+  //       },
+  //       audio: {
+  //         name: 'sample.mp3',
+  //         path: join(dataPath, 'entry_1bfb7987-da1d-4a02-87a9-e841c5dd4e29', 'audio', 'sample.mp3'),
+  //         fileLength: 200,
+  //         type: 'mp3',
+  //         addedOn: new Date(),
+  //         language: 'English'
+  //       },
+  //       path: join(dataPath, 'entry_1bfb7987-da1d-4a02-87a9-e841c5dd4e29'),
+  //       transcriptions: []
+  //     };
+  //     // Create the entry folder
+  //     console.log('init: Creating entry folder...');
+  //     mkdirSync(join(dataPath, sampleEntry.config.uuid));
 
-      const entryPath = join(dataPath, sampleEntry.config.uuid);
+  //     const entryPath = join(dataPath, sampleEntry.config.uuid);
 
-      // Write the sample entry to the data folder
-      console.log('init: Writing config file...');
-      writeFileSync(join(entryPath, 'entry.json'), JSON.stringify(sampleEntry.config, null, 2));
+  //     // Write the sample entry to the data folder
+  //     console.log('init: Writing config file...');
+  //     writeFileSync(join(entryPath, 'entry.json'), JSON.stringify(sampleEntry.config, null, 2));
 
-      // Create the audio folder
-      console.log('init: Creating audio folder...');
-      mkdirSync(join(entryPath, 'audio'));
+  //     // Create the audio folder
+  //     console.log('init: Creating audio folder...');
+  //     mkdirSync(join(entryPath, 'audio'));
 
-      const audioPath = join(entryPath, 'audio');
+  //     const audioPath = join(entryPath, 'audio');
 
-      // Write the sample entry's audio parameter file to the data folder
-      console.log('init: Writing audio parameters file...');
-      writeFileSync(join(audioPath, 'audio.json'), JSON.stringify(sampleEntry.audio, null, 2));
+  //     // Write the sample entry's audio parameter file to the data folder
+  //     console.log('init: Writing audio parameters file...');
+  //     writeFileSync(join(audioPath, 'audio.json'), JSON.stringify(sampleEntry.audio, null, 2));
 
-      // Copy the sample audio file to the data folder
-      // console.log("init: Copying sample entry's audio file into directory...");
-      // copyFileSync(join(__dirname, 'assets', ''), join(audioPath, 'sample.mp3'));
+  //     // Copy the sample audio file to the data folder
+  //     // console.log("init: Copying sample entry's audio file into directory...");
+  //     // copyFileSync(join(__dirname, 'assets', ''), join(audioPath, 'sample.mp3'));
 
-      // Create the transcriptions folder
-      console.log("init: Creating sample entry's transcriptions folder...");
-      mkdirSync(join(entryPath, 'transcriptions'));
+  //     // Create the transcriptions folder
+  //     console.log("init: Creating sample entry's transcriptions folder...");
+  //     mkdirSync(join(entryPath, 'transcriptions'));
 
-      // Set firstRun to false
-      settings.firstRun = false;
-    }
-  }
+  //     // Set firstRun to false
+  //     settings.firstRun = false;
+  //   }
+  // }
   return;
 };

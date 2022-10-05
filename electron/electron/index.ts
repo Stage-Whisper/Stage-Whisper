@@ -73,9 +73,6 @@ function createWindow() {
   isDev && window?.webContents.openDevTools({ mode: 'detach' });
 
   // // Whisper
-  // ipcMain.on('whisper-complete', (_event: IpcMainEvent, args: string) => {
-  //   console.log('whisper-complete', args);
-  // });
 
   // For AppBar
   ipcMain.on('minimize', () => {
@@ -87,10 +84,10 @@ function createWindow() {
     window.isMaximized() ? window.restore() : window.maximize();
   });
 
-  // Listen for Whisper model to complete
-  ipcMain.on(Channels.transcriptionComplete, (_event: IpcMainEvent, args: string) => {
-    window.webContents.send(Channels.transcriptionComplete, args);
-  });
+  // // Listen for Whisper model to complete
+  // ipcMain.on(Channels.transcriptionComplete, (_event: IpcMainEvent, args: string) => {
+  //   window.webContents.send(Channels.transcriptionComplete, args);
+  // });
 
   ipcMain.on('close', () => {
     window.close();
