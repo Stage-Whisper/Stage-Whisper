@@ -27,7 +27,7 @@ function Audio() {
       <Stack>
         <Title order={4}>{strings.input?.audio.title}</Title>
         <FileInput
-          error={audioValid && highlightInvalid}
+          error={!audioValid && highlightInvalid}
           placeholder={strings.input?.audio.placeholder}
           label={strings.input?.audio.prompt}
           accept="audio/*"
