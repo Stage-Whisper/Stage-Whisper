@@ -19,7 +19,7 @@ import React, { useState } from 'react';
 import { entry, transcriptionStatus } from '../../../../electron/types/types';
 
 // Localization
-import { useDispatch } from 'react-redux';
+
 import strings from '../../../localization';
 import { useAppDispatch } from '../../../redux/hooks';
 import { passToWhisper } from '../../whisper/whisperSlice';
@@ -146,7 +146,7 @@ type buttonTypes =
   | 'stop'; // Stop the entry original audio
 
 const buttonConstructor = (buttonType: buttonTypes, buttonId: string) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const buttonStrings = strings.util.buttons;
 
@@ -160,79 +160,79 @@ const buttonConstructor = (buttonType: buttonTypes, buttonId: string) => {
     };
   } = {
     edit: {
-      dispatchAction: 'entries/editTranscription',
+      dispatchAction: '', // TODO: Add an action for this
       label: buttonStrings?.edit || 'Edit',
       color: 'red',
       style: 'default'
     },
     delete: {
-      dispatchAction: 'entries/deleteTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.delete || 'Delete',
       color: 'red',
       style: 'default'
     },
     cancel: {
-      dispatchAction: 'entries/cancelTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.cancel || 'Cancel',
       color: 'red',
       style: 'default'
     },
     pause: {
-      dispatchAction: 'entries/pauseTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.pause || 'Pause',
       color: 'red',
       style: 'default'
     },
     resume: {
-      dispatchAction: 'entries/resumeTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.resume || 'Resume',
       color: 'red',
       style: 'default'
     },
     download: {
-      dispatchAction: 'entries/downloadTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.download || 'Download',
       color: 'red',
       style: 'default'
     },
     retry: {
-      dispatchAction: 'entries/retryTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.retry || 'Retry',
       color: 'red',
       style: 'default'
     },
     restore: {
-      dispatchAction: 'entries/restoreTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.restore || 'Restore',
       color: 'red',
       style: 'default'
     },
     queue: {
-      dispatchAction: 'entries/queueTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.queue || 'Queue',
       color: 'red',
       style: 'default'
     },
     open: {
-      dispatchAction: 'entries/openTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.open || 'Open',
       color: 'red',
       style: 'default'
     },
     close: {
-      dispatchAction: 'entries/closeTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.close || 'Close',
       color: 'red',
       style: 'default'
     },
     play: {
-      dispatchAction: 'entries/playTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.play || 'Play',
       color: 'red',
       style: 'default'
     },
     stop: {
-      dispatchAction: 'entries/stopTranscription',
+      dispatchAction: '', // TODO: Add an action for this in the style reduxstore/dispatchAction
       label: buttonStrings?.stop || 'Stop',
       color: 'red',
       style: 'default'
@@ -243,12 +243,16 @@ const buttonConstructor = (buttonType: buttonTypes, buttonId: string) => {
     <Button
       key={buttonType}
       onClick={() => {
-        dispatch({ type: buttons[buttonType].dispatchAction, payload: { id: buttonId } });
+        if (buttons[buttonType].dispatchAction) {
+          dispatch({ type: buttons[buttonType].dispatchAction, payload: { id: buttonId } });
+        } else {
+          console.log('No dispatch action for this button: ', buttonType);
+        }
       }}
       size="sm"
       color={buttons[buttonType].color}
       variant={buttons[buttonType].style}
-      disabled // TODO: Add logic to these buttons, then remove this
+      // disabled // TODO: Add logic to these buttons, then remove this
     >
       {buttons[buttonType].label}
     </Button>
@@ -448,14 +452,19 @@ function TranscriptionCard({ entry }: { entry: entry }) {
         {entry.config.description}
       </Title>
       <Divider mt="xs" mb="xs" />
-      <Button
-        onClick={() => {
-          dispatch(passToWhisper({ entry })); // TODO: Replace with add to queue
-          //TODO: Add a way to select a model to use / other options
-        }}
-      >
-        {strings.entries?.buttons.add_to_queue}
-      </Button>
+      <Group>
+        <Button
+          variant="default"
+          onClick={() => {
+            dispatch(passToWhisper({ entry })); // TODO: Replace with add to queue
+            //TODO: Add a way to select a model to use / other options
+          }}
+        >
+          {strings.entries?.buttons.add_to_queue}
+        </Button>
+
+        {buttonConstructor('delete', entry.config.uuid)}
+      </Group>
     </Card>
   );
 

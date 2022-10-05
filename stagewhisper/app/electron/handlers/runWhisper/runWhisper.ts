@@ -12,6 +12,7 @@ import { WhisperArgs } from '../../types/whisperTypes';
 
 // Node
 import { spawn } from 'child_process';
+import { writeFileSync } from 'fs';
 
 export default ipcMain.handle(
   Channels.runWhisper,
@@ -98,6 +99,18 @@ export default ipcMain.handle(
             error: undefined, // Error message
             path: outputDir // Path to the transcription folder
           };
+
+          // Create the transcription.json file
+          const transcriptionPath = join(outputDir, 'transcription.json');
+          console.log('RunWhisper: Creating transcription.json file at', transcriptionPath);
+          console.log('RunWhisper: parameters', parameters);
+          try {
+            writeFileSync(transcriptionPath, JSON.stringify(parameters));
+          } catch (error) {
+            console.log('RunWhisper: Error writing transcription.json file', error);
+            reject(error);
+          }
+
           resolve(parameters);
         } else {
           reject(new Error(`Child process exited with code ${code}`));

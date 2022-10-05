@@ -16,6 +16,7 @@ import {
   selectLanguage,
   // selectModel,
   selectSubmittingState,
+  selectUseSimpleInput,
   setHighlightInvalid,
   setSubmitted,
   setSubmitting
@@ -28,6 +29,7 @@ import strings from '../../localization';
 import { getLocalFiles } from '../entries/entrySlice';
 import About, { AboutType } from './components/about/About';
 import { WhisperArgs } from '../../../electron/types/whisperTypes';
+import SimpleInput from './components/audio/SimpleInput';
 
 function Input() {
   // Redux
@@ -35,6 +37,7 @@ function Input() {
   const { audio } = useAppSelector(selectAudio);
   const { language } = useAppSelector(selectLanguage);
   const { about } = useAppSelector(selectAbout);
+  const useSimpleInput = useAppSelector(selectUseSimpleInput);
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 600px)');
 
@@ -97,7 +100,6 @@ function Input() {
       {/* Modal that reports whether an entry was successfully added and prompts the user to add another file, add the file to the queue or go to the list of entries */}
       {submitted && (
         <Modal
-          title="This is fullscreen modal!"
           size="lg"
           withCloseButton={false}
           centered
@@ -106,7 +108,7 @@ function Input() {
           onClose={() => dispatch(resetInput())}
         >
           <Stack>
-            <Alert color="green" title="Entry successfully added!">
+            <Alert color="green" title={`${strings.input?.modal?.success_add}`}>
               <SimpleGrid cols={2} spacing={10}>
                 {/* Add another file  */}
                 <Button onClick={() => dispatch(resetInput())} variant="default">
@@ -117,6 +119,7 @@ function Input() {
                   disabled
                   onClick={() => {
                     dispatch(setSubmitted(false));
+                    dispatch(resetInput());
                     navigate('/queue');
                   }}
                   variant="default"
@@ -127,6 +130,7 @@ function Input() {
                 <Button
                   onClick={() => {
                     dispatch(setSubmitted(false));
+                    dispatch(resetInput());
                     navigate('/entries');
                   }}
                   variant="default"
@@ -147,12 +151,19 @@ function Input() {
         <LoadingOverlay visible={submitting} />
 
         <Title order={3}>{strings.input?.title}</Title>
-        <Title italic order={5}>
-          {strings.input?.prompt}
-        </Title>
-        <About />
-        <Audio />
-        <Language />
+
+        {useSimpleInput ? (
+          <SimpleInput />
+        ) : (
+          <>
+            <Title italic order={5}>
+              {strings.input?.prompt}
+            </Title>
+            <About />
+            <Audio />
+            <Language />
+          </>
+        )}
 
         <Center my="lg">
           {/* Error Alert */}
