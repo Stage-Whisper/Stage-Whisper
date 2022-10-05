@@ -19,7 +19,7 @@ import React, { useState } from 'react';
 import { entry, transcriptionStatus } from '../../../../electron/types/types';
 
 // Localization
-import { useDispatch } from 'react-redux';
+
 import strings from '../../../localization';
 import { useAppDispatch } from '../../../redux/hooks';
 import { passToWhisper } from '../../whisper/whisperSlice';
@@ -146,7 +146,7 @@ type buttonTypes =
   | 'stop'; // Stop the entry original audio
 
 const buttonConstructor = (buttonType: buttonTypes, buttonId: string) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const buttonStrings = strings.util.buttons;
 
