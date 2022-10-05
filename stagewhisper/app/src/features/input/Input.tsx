@@ -16,6 +16,7 @@ import {
   selectLanguage,
   // selectModel,
   selectSubmittingState,
+  selectUseSimpleInput,
   setHighlightInvalid,
   setSubmitted,
   setSubmitting
@@ -36,6 +37,7 @@ function Input() {
   const { audio } = useAppSelector(selectAudio);
   const { language } = useAppSelector(selectLanguage);
   const { about } = useAppSelector(selectAbout);
+  const useSimpleInput = useAppSelector(selectUseSimpleInput);
   const navigate = useNavigate();
   const isMobile = useMediaQuery('(max-width: 600px)');
 
@@ -149,13 +151,19 @@ function Input() {
         <LoadingOverlay visible={submitting} />
 
         <Title order={3}>{strings.input?.title}</Title>
-        <Title italic order={5}>
-          {strings.input?.prompt}
-        </Title>
-        <About />
-        <Audio />
-        <Language />
-        <SimpleInput />
+
+        {useSimpleInput ? (
+          <SimpleInput />
+        ) : (
+          <>
+            <Title italic order={5}>
+              {strings.input?.prompt}
+            </Title>
+            <About />
+            <Audio />
+            <Language />
+          </>
+        )}
 
         <Center my="lg">
           {/* Error Alert */}

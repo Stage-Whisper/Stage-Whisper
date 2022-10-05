@@ -8,6 +8,8 @@ import { WhisperArgs } from '../../../electron/types/whisperTypes';
 // This slice is used to store the state of the inputs for transcription
 
 export type inputState = {
+  useSimpleInput: boolean;
+
   // Input States
   // These Description of new entry
   about: AboutType;
@@ -35,6 +37,7 @@ export type inputState = {
 };
 
 const initialState: inputState = {
+  useSimpleInput: true,
   // Input States
   about: {
     name: '',
@@ -193,11 +196,13 @@ export const selectSubmittingState = (state: RootState) => ({
 
 // Export Page States
 export const selectHighlightInvalid = (state: RootState) => state.input.highlightInvalid;
+export const selectUseSimpleInput = (state: RootState) => state.input.useSimpleInput;
 
 // export const selectBurgerMenuOpen = (state: RootState) => state.input.burgerMenuOpen;
 
 // Export Input Action
 export const {
+  setSimpleAudioInput,
   setAudio,
   setAudioValid,
   setAbout,
