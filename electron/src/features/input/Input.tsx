@@ -97,7 +97,6 @@ function Input() {
       {/* Modal that reports whether an entry was successfully added and prompts the user to add another file, add the file to the queue or go to the list of entries */}
       {submitted && (
         <Modal
-          title="This is fullscreen modal!"
           size="lg"
           withCloseButton={false}
           centered
@@ -106,7 +105,7 @@ function Input() {
           onClose={() => dispatch(resetInput())}
         >
           <Stack>
-            <Alert color="green" title="Entry successfully added!">
+            <Alert color="green" title={`${strings.input?.modal?.success_add}`}>
               <SimpleGrid cols={2} spacing={10}>
                 {/* Add another file  */}
                 <Button onClick={() => dispatch(resetInput())} variant="default">
@@ -117,6 +116,7 @@ function Input() {
                   disabled
                   onClick={() => {
                     dispatch(setSubmitted(false));
+                    dispatch(resetInput());
                     navigate('/queue');
                   }}
                   variant="default"
@@ -127,6 +127,7 @@ function Input() {
                 <Button
                   onClick={() => {
                     dispatch(setSubmitted(false));
+                    dispatch(resetInput());
                     navigate('/entries');
                   }}
                   variant="default"

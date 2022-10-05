@@ -1,4 +1,4 @@
-import { Stack } from '@mantine/core';
+import { Center, Stack } from '@mantine/core';
 import React from 'react';
 
 // Redux
@@ -27,7 +27,9 @@ function Entries() {
   if (activeId === null) {
     return (
       <Stack>
-        <Stack spacing="md">{transcriptionCards}</Stack>
+        <Center>
+          <Stack spacing="md">{transcriptionCards}</Stack>
+        </Center>
       </Stack>
     );
   } else {
