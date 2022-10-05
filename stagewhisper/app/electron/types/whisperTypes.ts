@@ -110,7 +110,8 @@ export enum whisperLanguages {
   Vietnamese = 'vi',
   Welsh = 'cy',
   Yiddish = 'yi',
-  Yoruba = 'yo'
+  Yoruba = 'yo',
+  unknown = 'unknown'
 }
 
 export const whisperCodes = Object.values(whisperLanguages);
