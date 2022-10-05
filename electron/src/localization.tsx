@@ -187,6 +187,13 @@ export const strings = new LocalizedStrings(
           }
         }
       },
+
+      // Text for the simple file input page
+      simpleInput: {
+        title: 'Input',
+        drag_drop: 'Drag and drop your audio file here, or click to select a file from your computer',
+        tip: 'MP3, WAV, FLAC, OGG, AAC, M4A, WMA, and OPUS files are recommended'
+      },
       // Text for the transcriptions page which shows the user a list of all their transcriptions
       entries: {
         title: 'Entries', // Title of the page
