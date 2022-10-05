@@ -1,13 +1,16 @@
 # Stage-Whisper
+
 The main repo for Stage Whisper, our easy to use AI transcriber, powered by OpenAI's Whisper
 
 ## Quickstart
 
-Install [Poetry](https://python-poetry.org/). Then, from inside this repository:
+To get started, run the following commands inside the repo:
 
 ```sh
-poetry install  # Required for first run only
-poetry run stagewhisper
+cd stagewhisper
+cd app
+yarn
+yarn dev
 ```
 
 ## Goal
@@ -16,7 +19,7 @@ poetry run stagewhisper
 
 As Dan Nguyen [noted on Twitter](https://twitter.com/dancow/status/1572749731704573957), this could be a "godsend for newsrooms."
 
-The only problem, as [@PeterSterne](https://github.com/petersterne) pointed out, is that not all journalists (or others who could benefit from this type of transcription tool) are comfortable with the command line and installing the dependecies requried to run Whisper.
+The only problem, as [@PeterSterne](https://github.com/petersterne) pointed out, is that not all journalists (or others who could benefit from this type of transcription tool) are comfortable with the command line and installing the dependencies required to run Whisper.
 
 Our goal is to package Whisper in an easier to use way so that less technical users can take advantage of this neural net.
 
@@ -24,15 +27,17 @@ Peter came up with the project name, Stage Whisper.
 
 ## Who is involved
 
-[@PeterSterne](https://github.com/petersterne) and [@filmgirl](https://github.com/filmgirl) (Christina Warren) created the project, and [@HarrisLapiroff](https://github.com/harrislapiroff) and [@Crazy4Pi314](https://github.com/crazy4pi314) (Sarah Kaiser) are leading the development. We'd love to collaborate with anyone who has ideas about how we could more easily package Whisper and make it easy to use for non-technical users.
+[@PeterSterne](https://github.com/petersterne) and [@filmgirl](https://github.com/filmgirl) (Christina Warren) created the project, and [@HarrisLapiroff](https://github.com/harrislapiroff) and [@Crazy4Pi314](https://github.com/crazy4pi314) (Sarah Kaiser) are leading the development with [@oenu](https://github.com/oenu) (Adam Newton-Blows) leading frontend development.
+
+We'd love to collaborate with anyone who has ideas about how we could more easily package Whisper and make it easy to use for non-technical users.
 
 ## Project Status
 
-The project is still in the planning stages (again, contributors are welcome), but we hope to move quickly to getting some sort of MVP available. For the first version of Stage Whisper, we are working to create a simple GUI interface with [Gooey](https://github.com/chriskiehl/Gooey/) and then package it into binaries that can be downloaded on Windows and MacOS. For subsequent versions of Stage Whisper, though, we are considering alternatives to Gooey, including an Electron app.     
+The project is currently in the early stages of development. We have a working prototype that uses the [Electron](https://www.electronjs.org/) and [Mantine](https://mantine.dev/) frameworks to create an app that allows users to upload audio files, transcribe them using Whisper, and then manage the transcriptions. The app will be available for MacOS, Windows, and Linux. We are currently working on implementing major improvements and will be releasing a beta version soon.
 
 - [Request features or ask questions](https://github.com/Stage-Whisper/Stage-Whisper/discussions) on the project discussions on GitHub.
 - Find a bug? [Open an issue](https://github.com/Stage-Whisper/Stage-Whisper/issues/choose) so that we can see how we can fix it.
-- Want to contribute? Check out our good first issues and check out our [contributing guide](https://github.com/Stage-Whisper/Stage-Whisper/contribute).
+- Want to contribute? Check out our [good first issues](https://github.com/Stage-Whisper/Stage-Whisper/contribute) and our [contributing guide](CONTRIBUTING).
 - [Join our Discord server](https://discord.gg/rcKtzTsA) to discuss the project's planning and development.
 
 ## License
