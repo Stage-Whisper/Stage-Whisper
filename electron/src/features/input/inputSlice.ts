@@ -69,6 +69,27 @@ const inputSlice = createSlice({
   name: 'input',
   initialState,
   reducers: {
+    // Simple Input Reducers -- These override other checks and assign default values
+    setSimpleAudioInput: (state, action: { payload: AudioType }) => {
+      // Takes audio file and extracts name, path, and type, then assigns to state
+      const { name, path, type } = action.payload;
+      state.audio = { name, path, type };
+      if (name && path && type) {
+        state.audioValid = true;
+
+        // Set Entry Name to Audio Name
+        state.about.name = name;
+
+        // Override other checks
+        state.audioValid = true;
+        state.aboutValid = true;
+        state.languageValid = true;
+        state.modelValid = true;
+      } else {
+        state.audioValid = false;
+      }
+    },
+
     // Whether to highlight invalid inputs, set after user tries to trigger submission
     setHighlightInvalid: (state, action) => {
       state.highlightInvalid = action.payload;
