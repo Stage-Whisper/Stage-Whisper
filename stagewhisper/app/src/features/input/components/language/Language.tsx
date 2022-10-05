@@ -62,7 +62,7 @@ function Language() {
           label={strings.input?.language.prompt}
           placeholder={strings.input?.language.placeholder}
           searchable
-          error={languageValid && highlightInvalid}
+          error={!languageValid && highlightInvalid}
           // data={languageList.sort((a, b) => (a.label > b.label ? 1 : -1))}
           data={languages.sort((a, b) => {
             return a.label > b.label ? 1 : -1;

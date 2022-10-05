@@ -20,7 +20,25 @@ export type entryConfig = {
 // Entry Audio Object
 // Represents the information about the audio file for an entry
 export type entryAudioParams = {
-  type: string; // TODO: #50 Change to enum of supported audio types from whisper
+  type: //Audio files supported by Whisper in the form of an enum
+  | 'mp3'
+    | 'wav'
+    | 'ogg'
+    | 'flac'
+    | 'aac'
+    | 'm4a'
+    | 'wma'
+    | 'ac3'
+    | 'mp2'
+    | 'amr'
+    | 'aiff'
+    | 'au'
+    | 'mpc'
+    | 'opus'
+    | 'tta'
+    | 'voc'
+    | 'wv'
+    | 'webm';
   path: string; // Path to the audio file
   name: string; // Name of the audio file
   language: WhisperArgs['language']; // Language of the audio file
