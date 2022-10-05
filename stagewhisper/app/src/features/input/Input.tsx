@@ -28,6 +28,7 @@ import strings from '../../localization';
 import { getLocalFiles } from '../entries/entrySlice';
 import About, { AboutType } from './components/about/About';
 import { WhisperArgs } from '../../../electron/types/whisperTypes';
+import SimpleInput from './components/audio/SimpleInput';
 
 function Input() {
   // Redux
@@ -154,6 +155,7 @@ function Input() {
         <About />
         <Audio />
         <Language />
+        <SimpleInput />
 
         <Center my="lg">
           {/* Error Alert */}
