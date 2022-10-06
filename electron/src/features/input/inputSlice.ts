@@ -8,6 +8,8 @@ import { WhisperArgs } from '../../../electron/types/whisperTypes';
 // This slice is used to store the state of the inputs for transcription
 
 export type inputState = {
+  useSimpleInput: boolean;
+
   // Input States
   // These Description of new entry
   about: AboutType;
@@ -35,6 +37,7 @@ export type inputState = {
 };
 
 const initialState: inputState = {
+  useSimpleInput: true,
   // Input States
   about: {
     name: '',
@@ -50,7 +53,7 @@ const initialState: inputState = {
   },
   audioValid: false,
 
-  language: 'English',
+  language: 'unknown',
   languageValid: false,
 
   model: 'base',
@@ -69,6 +72,27 @@ const inputSlice = createSlice({
   name: 'input',
   initialState,
   reducers: {
+    // Simple Input Reducers -- These override other checks and assign default values
+    setSimpleAudioInput: (state, action: { payload: AudioType }) => {
+      // Takes audio file and extracts name, path, and type, then assigns to state
+      const { name, path, type } = action.payload;
+      state.audio = { name, path, type };
+      if (name && path && type) {
+        state.audioValid = true;
+
+        // Set Entry Name to Audio Name
+        state.about.name = name;
+
+        // Override other checks
+        state.audioValid = true;
+        state.aboutValid = true;
+        state.languageValid = true;
+        state.modelValid = true;
+      } else {
+        state.audioValid = false;
+      }
+    },
+
     // Whether to highlight invalid inputs, set after user tries to trigger submission
     setHighlightInvalid: (state, action) => {
       state.highlightInvalid = action.payload;
@@ -172,11 +196,13 @@ export const selectSubmittingState = (state: RootState) => ({
 
 // Export Page States
 export const selectHighlightInvalid = (state: RootState) => state.input.highlightInvalid;
+export const selectUseSimpleInput = (state: RootState) => state.input.useSimpleInput;
 
 // export const selectBurgerMenuOpen = (state: RootState) => state.input.burgerMenuOpen;
 
 // Export Input Action
 export const {
+  setSimpleAudioInput,
   setAudio,
   setAudioValid,
   setAbout,

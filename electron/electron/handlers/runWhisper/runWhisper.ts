@@ -12,68 +12,70 @@ import { WhisperArgs } from '../../types/whisperTypes';
 
 // Node
 import { spawn } from 'child_process';
+import { writeFileSync } from 'fs';
 
 export default ipcMain.handle(
   Channels.runWhisper,
   async (_event: IpcMainInvokeEvent, args: WhisperArgs, entry: entry): Promise<RunWhisperResponse> => {
-    const { inputPath } = args;
-    let { model, language, device, task } = args;
+    const { inputPath, language } = args;
+    let { model, device, task } = args;
 
-    // Set Defaults
-    // Default to Base multilingual model
-    if (!model) model = 'base';
+    // ------------------  Set defaults for the whisper model ------------------ //
 
-    // If no language is specified, use the language of the audio file, if it is not specified, use English
-    if (!language) {
-      if (entry.audio.language) language = entry.audio.language;
-      else language = 'English';
+    if (!model) model = 'base'; // Default to Base multilingual model
+
+    if (!device) device = 'cpu'; // If no device is specified, use the cpu
+
+    if (language !== 'unknown') {
+      // If the language is unknown, let whisper decide which task to use
+      if (!task) {
+        // If no task is specified, check if the audio file's language is English
+        // If = english, use transcribe, if not, use translate
+        if (language === 'English') task = 'transcribe';
+        else task = 'translate';
+      }
     }
 
-    // If no device is specified, use the cpu
-    if (!device) device = 'cpu';
-
-    // If no task is specified, check if the audio file's language is English, if it is, use transcribe, if not, use translate
-    if (!task) {
-      if (language === 'English') task = 'transcribe';
-      else task = 'translate';
-    }
-
-    // If no input path is specified, throw
     if (!inputPath) {
+      // If no input path is specified, throw -- This should never happen
       throw new Error('No input path provided');
     }
+    const uuid = uuidv4(); // Generate UUID for the transcription
 
-    // Generate UUID for the entry
-    const uuid = uuidv4();
-
-    const transcribedOn = new Date().toISOString();
+    const transcribedOn = new Date().getTime(); // Get the current date and time for when the transcription was started
 
     // Generate output path
     const outputDir = join(entry.path, 'transcriptions', uuid);
     console.log('RunWhisper: outputDir', outputDir);
 
-    // Run Whisper
-    console.log('Running whisper script');
+    // ------------------  Construct the input array for the whisper script ------------------ //
+    const inputArray = []; // Array to hold the input arguments for the whisper script
 
-    const inputs = [
-      '--output_dir',
-      `${outputDir}`,
-      '--model',
-      `${model}`,
-      `--task`,
-      `${task}`,
-      '--device',
-      `${device}`,
-      '--language',
-      `${language}`,
-      `${inputPath}`
-    ];
+    inputArray.push('--output_dir', outputDir); // Add the output directory
 
-    console.log('RunWhisper: Running model with args', inputs);
+    // If the task is transcribe, add the transcribe flag
+    if (task === 'transcribe') inputArray.push('--task', 'transcribe');
+    // If the task is translate, add the translate flag
+    else if (task === 'translate') inputArray.push('--task', 'translate');
 
-    // Synchronously run the script
-    // TODO: #48 Make this async
-    const childProcess = spawn('whisper', inputs, { stdio: 'inherit' });
+    // If the language is defined, add the language flag
+    if (language && language !== 'unknown') inputArray.push('--language', language);
+
+    // If the model is defined, add the model flag
+    if (model) inputArray.push('--model', model);
+
+    // If the device is defined, add the device flag
+    if (device) inputArray.push('--device', device);
+
+    // Add the input path
+    inputArray.push(inputPath);
+
+    // ---------------------------------  Run the whisper script --------------------------------- //
+
+    console.log('RunWhisper: Running model with args', inputArray);
+
+    // Spawn the whisper script
+    const childProcess = spawn('whisper', inputArray, { stdio: 'inherit' });
 
     const transcription = await new Promise((resolve, reject): void => {
       childProcess.on('data', (data: string) => {
@@ -83,13 +85,14 @@ export default ipcMain.handle(
         console.log(`stderr: ${error.message}`);
       });
 
+      // ------------------  Listen for the child process to exit and generate a transcription.json file ------------------ //
       childProcess.on('close', (code: number) => {
         console.log(`RunWhisper: Child process closed with code ${code}`);
         if (code === 0) {
           const parameters: entryTranscription = {
             uuid,
             transcribedOn,
-            completedOn: new Date().toISOString(),
+            completedOn: new Date().getTime(),
             model, // Model used to transcribe
             language, // Language of the audio file
             status: transcriptionStatus.COMPLETE, // Status of the transcription
@@ -98,6 +101,18 @@ export default ipcMain.handle(
             error: undefined, // Error message
             path: outputDir // Path to the transcription folder
           };
+
+          // Create the transcription.json file
+          const transcriptionPath = join(outputDir, 'transcription.json');
+          console.log('RunWhisper: Creating transcription.json file at', transcriptionPath);
+          console.log('RunWhisper: parameters', parameters);
+          try {
+            writeFileSync(transcriptionPath, JSON.stringify(parameters));
+          } catch (error) {
+            console.log('RunWhisper: Error writing transcription.json file', error);
+            reject(error);
+          }
+
           resolve(parameters);
         } else {
           reject(new Error(`Child process exited with code ${code}`));
@@ -105,6 +120,7 @@ export default ipcMain.handle(
       });
     });
 
+    // ------------------  Return the transcription Information ------------------ //
     if (transcription) {
       const parameters: RunWhisperResponse = {
         transcription_uuid: uuid,

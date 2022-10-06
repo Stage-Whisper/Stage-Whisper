@@ -25,6 +25,7 @@ export const strings = new LocalizedStrings(
           edit: 'Edit',
           save: 'Save',
           upload: 'Upload',
+          export: 'Export',
           uploadFile: 'Upload File',
           uploadFiles: 'Upload Files',
           uploadFolder: 'Upload Folder',
@@ -43,7 +44,8 @@ export const strings = new LocalizedStrings(
 
           // Queue Actions
           queue: 'Queue',
-          download: 'Download'
+          download: 'Download',
+          transcribe: 'Transcribe'
         },
         time: {
           seconds: 'seconds',
@@ -187,11 +189,19 @@ export const strings = new LocalizedStrings(
           }
         }
       },
+
+      // Text for the simple file input page
+      simpleInput: {
+        title: 'Input',
+        drag_drop: 'Drag and drop your audio file here, or click to select a file from your computer',
+        tip: 'MP3, WAV, FLAC, OGG, AAC, M4A, WMA, and OPUS files are recommended'
+      },
       // Text for the transcriptions page which shows the user a list of all their transcriptions
       entries: {
         title: 'Entries', // Title of the page
         recent_transcriptions: 'Recent entries', // Title of the recent entries section
         buttons: {
+          transcribe: 'Transcribe', // Button to transcribe a new file
           re_transcribe: 'Re-Transcribe',
           add_to_queue: 'Add to Queue'
         },
@@ -203,6 +213,7 @@ export const strings = new LocalizedStrings(
           file_type: 'Type', // This is the type of file, ie mp3, wav, etc
           file_length: 'Length', // Length of the file in seconds
           file_language: 'Language', // The language of the input audio file
+          added: 'Added', // The date the file was added to the system
 
           // Transcription
           transcription_section_title: 'Transcription', // Title of the card that shows information about the transcription

@@ -7,7 +7,6 @@ import React from 'react';
 
 // Localization
 import strings from '../../../localization';
-// import { OpenDirectoryDialogResponse } from '../../../../electron/handlers/channels';
 
 function Directory() {
   // Redux

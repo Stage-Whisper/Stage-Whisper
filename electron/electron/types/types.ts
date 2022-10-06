@@ -1,3 +1,4 @@
+import { NodeList } from 'subtitle';
 import { WhisperArgs } from './whisperTypes';
 // Response to a request for the app data from "get-entries"
 
@@ -6,7 +7,7 @@ export type entryConfig = {
   uuid: string; // UUID of the entry
   name: string; // Title of the entry
   description: string; // Description of the entry
-  created: Date; // Date the entry was created
+  created: number; // Date the entry was created (in milliseconds since 1970)
   inQueue: boolean; // If the entry is in the queue
   queueWeight: number; // Absolute value of the queue weight, 0 is the highest priority
   tags: string[]; // Tags associated with the entry
@@ -43,23 +44,23 @@ export type entryAudioParams = {
   name: string; // Name of the audio file
   language: WhisperArgs['language']; // Language of the audio file
   fileLength: number; // Length of the audio file in seconds
-  addedOn: Date; // Date the audio file was added
+  addedOn: number; // Date the audio file was added to the entry (in milliseconds since 1970)
 };
 
 // Entry Transcription Object
 // Represents a completed transcription for an entry
 export type entryTranscription = {
   uuid: string; // UUID of the transcription
-  transcribedOn: string; // Date the transcription was started
+  transcribedOn: number; // Date the transcription was started (in milliseconds since 1970)
   path: string; // Path to the transcription folder
   model: WhisperArgs['model']; // Model used to transcribe the audio
   language: WhisperArgs['language']; // Language of the audio file
-  vtt?: string; // The transcript in vtt format
+  vtt?: NodeList; // The transcript in vtt format
   status: transcriptionStatus; // Status of the transcription -- also used to determine if the transcription is complete
   progress: number; // Progress of the transcription
   translated: boolean; // Whether the transcription has been translated
   error: string | undefined; // Error message if the transcription failed
-  completedOn: string; // Date the transcription was completed
+  completedOn: number; // Date the transcription was completed (in milliseconds since 1970)
 };
 
 // An entry object - represents

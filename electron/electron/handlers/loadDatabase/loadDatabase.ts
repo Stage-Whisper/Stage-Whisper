@@ -8,41 +8,43 @@ import { app } from 'electron';
 import { entry, entryTranscription } from '../../types/types';
 import { Channels } from '../../types/channels';
 
-// Paths
+// Subtitle Parser
+import { parseSync } from 'subtitle';
 
+// Paths
 const rootPath = app.getPath('userData'); // Path to the top level of the data folder
 const storePath = join(rootPath, 'store'); // Path to the store folder
 const dataPath = join(storePath, 'data'); // Path to the data folder
 
 // Layout of the app data
-// store/
-// ├── app_preferences.json { darkmode, langauge, ... }
-// ├── app_config.json { version, repo, ... }
-// └── data/
-//     ├── entry_{uuidv4}/
-//     │   ├── entry.json { inQueue, title, model, etc }
-//     │   ├── audio/
-//     │   │   ├── file.mp3 | file.opus | file.wav
-//     │   │   └── entry.json { addedOn, language, type }
-//     │   └── transcriptions/
-//     │       └── {uuid}/
-//     │           ├── transcription.json { language, transcribedOn, model, ... }
-//     │           ├── transcript.vtt (Use VTT as source of truth and compile to txt)
-//     │           └── transcript.txt
-//     └── entry_1bfb7987-da1d-4a02-87a9-e841c5dd4e29/
-//         ├── entry.json
-//         ├── audio/
-//         │   ├── fancy_twice_sample.opus
-//         │   └── entry.json {addedOn: 30-12-9999, language: Korean, tpye: Opus
-//         └── transcriptions/
-//             ├── 3a8b37f4-3a41-4522-b3cc-1c6e28a3ab75/
-//             │   ├── transcription.json { langauge: English, transcribedOn: 30-12-9999, model: baseEn, ... }
-//             │   ├── transcript.vtt
-//             │   └── transcript.txt
-//             └── 7fcf511c-f9d5-4bdc-a427-19a28f6e8ca1/
-//                 ├── transcription.json { langauge: Korean, transcribedOn: 30-12-9999, model: large, ... }
-//                 ├── transcript.vtt
-//                 └── transcript.txt
+//  store/
+//     ├── app_preferences.json { darkmode, langauge, ... }
+//     ├── app_config.json { version, repo, ... }
+//     └── data/
+//         ├── {uuidv4}/
+//         │   ├── entry.json { inQueue, title, model, etc }
+//         │   ├── audio/
+//         │   │   ├── file.mp3 | file.opus | file.wav
+//         │   │   └── audio.json { addedOn, language, type }
+//         │   └── transcriptions/
+//         │       └── {uuid}/
+//         │           ├── transcription.json { language, transcribedOn, model, ... }
+//         │           ├── transcript.vtt (Use VTT as source of truth and compile to txt)
+//         │           └── transcript.txt
+//         └── 1bfb7987-da1d-4a02-87a9-e841c5dd4e29/
+//             ├── entry.json
+//             ├── audio/
+//             │   ├── fancy_twice_sample.opus
+//             │   └── audio.json {addedOn: 30-12-9999, language: Korean, tpye: Opus
+//             └── transcriptions/
+//                 ├── 3a8b37f4-3a41-4522-b3cc-1c6e28a3ab75/
+//                 │   ├── transcription.json { langauge: English, transcribedOn: 30-12-9999, model: baseEn, ... }
+//                 │   ├── transcript.vtt
+//                 │   └── transcript.txt
+//                 └── 7fcf511c-f9d5-4bdc-a427-19a28f6e8ca1/
+//                     ├── transcription.json { langauge: Korean, transcribedOn: 30-12-9999, model: large, ... }
+//                     ├── transcript.vtt
+//                     └── transcript.txt
 
 // Error handling // TODO: #52 Implement enum for error codes and error handling
 // enum getEntriesErrors {
@@ -65,15 +67,21 @@ export default ipcMain.handle(
 
     // Get all entries
     try {
-      const entryFolders = readdirSync(dataPath, { withFileTypes: true }).filter((dirent) => dirent.isDirectory());
+      const entryFolders = readdirSync(dataPath, { withFileTypes: true }).filter(
+        // filter out directories that aren't in the format uuidv4
+        (dirent) =>
+          dirent.isDirectory() &&
+          dirent.name.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+      );
       console.log('Found %s Entry Folders', entryFolders.length);
 
       // For each entry folder get the config and audio files and add them to the entries array
       try {
-        entryFolders.forEach((entryFolder) => {
+        entryFolders.forEach(async (entryFolder) => {
           // Check if the entry folder has a config file
           const entryPath = join(dataPath, entryFolder.name);
           const configPath = join(entryPath, 'entry.json');
+
           if (!readdirSync(join(entryPath)).includes('entry.json')) {
             // throw new Error(`Entry ${entryFolder.name} does not have a config file`);
             console.warn(`LoadDatabase: Entry ${entryFolder.name} does not have a config file`);
@@ -109,15 +117,18 @@ export default ipcMain.handle(
           // Get the transcriptions
           const transcriptions: entryTranscription[] = [];
           readdirSync(transcriptionFolderPath, { withFileTypes: true })
-            .filter((dirent) => dirent.isDirectory())
-            .forEach((transcriptionFolder) => {
+            .filter(
+              async (dirent) =>
+                dirent.isDirectory() &&
+                dirent.name.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i)
+            )
+            .forEach(async (transcriptionFolder) => {
               // Check if the transcription folder has a transcription.json file
-              console.log('Transcription folder: ', transcriptionFolder);
               const transcriptionPath = join(transcriptionFolderPath, transcriptionFolder.name);
               const transcriptionConfigPath = join(transcriptionPath, 'transcription.json');
 
               try {
-                readdirSync(transcriptionConfigPath);
+                readFileSync(transcriptionConfigPath);
               } catch {
                 console.warn(`LoadDatabase: Transcription ${transcriptionFolder.name} does not have a config file`);
                 return; // TODO: #54 Implement a way to handle this error ( Transcription was not handled and has no config file )
@@ -137,8 +148,11 @@ export default ipcMain.handle(
               }
 
               // If it exists get the transcript.vtt file
+
               const vttPath = join(transcriptionPath, `${audio.name}.vtt`);
-              const transcript = readFileSync(join(vttPath), 'utf8');
+              // const transcript = readFileSync(join(vttPath), 'utf8');
+              const vttFile = readFileSync(join(vttPath), 'utf8');
+              const vtt = parseSync(vttFile);
 
               // Add the transcription to the transcriptions array
               const transcription: entryTranscription = {
@@ -147,14 +161,14 @@ export default ipcMain.handle(
                 language: parameters.language,
                 model: parameters.model,
                 path: join(transcriptionFolderPath, transcriptionFolder.name),
-                vtt: transcript,
+                vtt,
                 status: parameters.status,
                 progress: parameters.progress,
                 translated: parameters.translated,
                 completedOn: parameters.completedOn,
                 error: parameters.error
               };
-
+              console.log('LoadDatabase: Transcription Added: ', transcription.uuid);
               transcriptions.push(transcription);
             });
 
@@ -181,9 +195,16 @@ export default ipcMain.handle(
             },
             transcriptions: transcriptions
           };
-
+          console.log('LoadDatabase: Entry Added: ', entry.config.name);
           entries.push(entry);
         });
+
+        // Log to table
+        console.table(
+          entries.map((entry) => {
+            return { name: entry.config.name, numTranscripts: entry.transcriptions.length, lang: entry.audio.language };
+          })
+        );
 
         return { entries: entries };
       } catch (error) {

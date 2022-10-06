@@ -11,8 +11,6 @@ import { newEntryArgs } from './handlers/newEntry/newEntry';
 import { entry } from './types/types';
 import { WhisperArgs } from './types/whisperTypes';
 
-// import { languages } from '../src/components/language/languages';
-
 declare global {
   interface Window {
     Main: typeof api;
@@ -21,6 +19,17 @@ declare global {
 }
 
 const api = {
+  // Audio file fetcher
+  fetchAudioFile: async (audioPath: string): Promise<Uint8Array> => {
+    // Send the audio file path to the main process
+    try {
+      const audioUint8Array = await ipcRenderer.invoke(Channels.fetchAudioFile, audioPath);
+      return audioUint8Array;
+    } catch (error) {
+      throw new Error(`Preload: Error reading audio file: ${error}`);
+    }
+  },
+
   // Add a new file to the database
   newEntry: async (args: newEntryArgs): Promise<NewEntryResponse> => {
     try {
