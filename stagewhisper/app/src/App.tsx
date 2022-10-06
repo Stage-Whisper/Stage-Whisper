@@ -18,7 +18,7 @@ import {
   useMantineTheme
 } from '@mantine/core';
 import React, { useEffect } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
 
 import {
   IconAlertTriangle,
@@ -145,6 +145,7 @@ function EntryList() {
   const entries = useAppSelector(selectEntries);
   const activeEntry = useAppSelector(selectActiveEntry);
   const dispatch = useAppDispatch();
+  const { entryId } = useParams();
   return (
     <>
       <Divider mt={'sm'} />
@@ -155,12 +156,11 @@ function EntryList() {
             key={entry.config.uuid}
             label={<Text lineClamp={1}>{entry.config.name}</Text>}
             component={Link}
-            to={`/entries`}
+            to={`/entries/${entry.config.uuid}`}
             onClick={() => {
-              dispatch(setActiveEntry(entry));
               dispatch(setBurgerOpen(false));
             }}
-            active={entry.config.uuid === activeEntry}
+            active={entry.config.uuid === entryId}
             icon={<IconFileDescription />}
           />
         );
