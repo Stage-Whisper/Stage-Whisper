@@ -61,7 +61,7 @@ The project is currently in the early stages of development. We have a working p
 - [Request features or ask questions](https://github.com/Stage-Whisper/Stage-Whisper/discussions) on the project discussions on GitHub.
 - Find a bug? [Open an issue](https://github.com/Stage-Whisper/Stage-Whisper/issues/choose) so that we can see how we can fix it.
 - Want to contribute? Check out our [good first issues](https://github.com/Stage-Whisper/Stage-Whisper/contribute) and our [contributing guide](CONTRIBUTING).
-- [Join our Discord server](https://discord.gg/rcKtzTsA) to discuss the project's planning and development.
+- [Join our Discord server](https://discord.gg/dKp7zpWKVK) to discuss the project's planning and development.
 
 ## License
 
