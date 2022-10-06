@@ -1,8 +1,9 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RunWhisperResponse } from '../../../electron/types/channels';
 // import { RunWhisperResponse } from '../../../electron/types/channels';
 import { entry } from '../../../electron/types/types';
 import { WhisperArgs } from '../../../electron/types/whisperTypes';
+import { RootState } from '../../redux/store';
 
 // WhisperSlice
 // Slice for managing requests to whisper and the queue of requests
@@ -38,6 +39,7 @@ export const passToWhisper = createAsyncThunk(
         inputPath: entry.audio.path
       };
     }
+    // Update the status with the entry that is being processed
 
     // Send the request to the electron handler
     const result = await window.Main.runWhisper(args, entry); // Resolves when the transcription is complete
@@ -65,16 +67,31 @@ export const whisperSlice = createSlice({
   },
   extraReducers: (builder) => {
     // Thunk for running the whisper transcribe
-    builder.addCase(passToWhisper.pending, (state) => {
-      // Whisper is running the transcription for the active entry
-      console.log('Redux: passToWhisper: Pending');
+    builder.addCase(passToWhisper.pending, (state, action) => {
+      // Set the status to loading
       state.status = 'loading';
+
+      // Set the entry to the current entry
+      state.entry = action.meta.arg.entry;
     });
-    builder.addCase(passToWhisper.fulfilled, (state, action) => {
+
+    builder.addCase(passToWhisper.fulfilled, (state) => {
       // Whisper has finished running the transcription for the active entry
+
+      // Reset the entry
+      state.entry = undefined;
+
+      // Set the status to succeeded
+      state.status = 'succeeded';
     });
   }
 });
+export const selectTranscribingStatus = (state: RootState) => {
+  return {
+    status: state.whisper.status,
+    entry: state.whisper.entry
+  };
+};
 
 export const { resetWhisper } = whisperSlice.actions;
 

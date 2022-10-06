@@ -26,11 +26,14 @@ export default ipcMain.handle(
 
     if (!device) device = 'cpu'; // If no device is specified, use the cpu
 
-    // If no task is specified, check if the audio file's language is English
-    // If = english, use transcribe, if not, use translate
-    if (!task) {
-      if (language === 'English') task = 'transcribe';
-      else task = 'translate';
+    if (language !== 'unknown') {
+      // If the language is unknown, let whisper decide which task to use
+      if (!task) {
+        // If no task is specified, check if the audio file's language is English
+        // If = english, use transcribe, if not, use translate
+        if (language === 'English') task = 'transcribe';
+        else task = 'translate';
+      }
     }
 
     if (!inputPath) {
@@ -39,7 +42,7 @@ export default ipcMain.handle(
     }
     const uuid = uuidv4(); // Generate UUID for the transcription
 
-    const transcribedOn = new Date().toISOString(); // Get the current date and time for when the transcription was started
+    const transcribedOn = new Date().getTime(); // Get the current date and time for when the transcription was started
 
     // Generate output path
     const outputDir = join(entry.path, 'transcriptions', uuid);
@@ -89,7 +92,7 @@ export default ipcMain.handle(
           const parameters: entryTranscription = {
             uuid,
             transcribedOn,
-            completedOn: new Date().toISOString(),
+            completedOn: new Date().getTime(),
             model, // Model used to transcribe
             language, // Language of the audio file
             status: transcriptionStatus.COMPLETE, // Status of the transcription

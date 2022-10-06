@@ -17,6 +17,7 @@ import './handlers/runWhisper/runWhisper'; // Run whisper model
 import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
 import './handlers/newEntry/newEntry'; // Add a new entry to the database
 import './handlers/deleteStore/deleteStore'; // Non functional
+import './handlers/fetchAudioFile/fetchAudioFile'; // Fetch audio file from disk
 import { initializeApp } from './functions/initialize/initializeApp';
 
 // Electron Defaults
