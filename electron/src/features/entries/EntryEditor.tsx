@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 // Components
-import { Button, Card, Loader, Stack, Text } from '@mantine/core';
+import { Button, Card, Center, Group, Loader, Stack, Text, Title } from '@mantine/core';
 // import { RichTextEditor } from '@mantine/rte';
 
 // Types
@@ -39,6 +39,7 @@ const filePathToURL = async (filePath: string): Promise<string> => {
 };
 
 type formattedVTTLine = {
+  key: string;
   start: number;
   end: number;
   duration: number;
@@ -109,7 +110,11 @@ function EntryEditor() {
   // Audio Controls
   const [audioControls, setAudioControls] = React.useState<JSX.Element | null>(null);
 
-  let content = <Loader />;
+  let content = (
+    <Center>
+      <Loader />
+    </Center>
+  );
 
   // Audio Control Use Effect
   // Update the audio controls when the audio player changes
@@ -145,11 +150,12 @@ function EntryEditor() {
         const formattedLines = [] as Array<formattedVTTLine>;
         vttNodes.forEach((node: Node) => {
           if (node.type === 'cue') {
+            const key = uuidv4();
             const start = node.data.start;
             const end = node.data.end;
             const duration = end - start;
             const text = node.data.text;
-            formattedLines.push({ start, end, duration, text });
+            formattedLines.push({ start, end, duration, text, key });
           }
         });
 
@@ -174,7 +180,7 @@ function EntryEditor() {
               ...formattedVTTLines.reduce((acc, line) => {
                 const start = line.start;
                 const duration = line.duration;
-                const name = uuidv4();
+                const name = line.key;
                 return { ...acc, [name]: [start, duration] };
               }, {})
             }
@@ -206,6 +212,36 @@ function EntryEditor() {
     if (entry && entry.transcriptions[0] && entry.transcriptions[0].vtt) {
       // If the audio player is ready
       if (audioPlayer) {
+        // Generate Quick Transcription Preview for all lines
+        const tempDisplay = formattedVTTLines.map((line) => {
+          return (
+            <Card withBorder key={line.key} my="sm">
+              <Group spacing="md" position="apart">
+                <Text>{line.text}</Text>
+                <Group position="apart">
+                  <Text>
+                    {/* {line.start / 1000}s - {line.end / 1000}s */}
+                    {/* Line showing time in seconds formatted to mins */}
+                    {String(Math.floor(line.start / 1000 / 60)).padStart(2, '0')}:
+                    {String(Math.floor(line.start / 1000) % 60).padStart(2, '0')} -{' '}
+                    {String(Math.floor(line.end / 1000 / 60)).padStart(2, '0')}:
+                    {String(Math.floor(line.end / 1000) % 60).padStart(2, '0')}
+                  </Text>
+                  <Button
+                    onClick={() => {
+                      console.log('Play Line - temp');
+                      console.log('Current Line: ', line);
+                    }}
+                    disabled
+                  >
+                    Play Line - Disabled
+                  </Button>
+                </Group>
+              </Group>
+            </Card>
+          );
+        });
+
         content = (
           <>
             <Text italic align="center">
@@ -213,6 +249,11 @@ function EntryEditor() {
               to work use CMD-R or F5 to refresh this page in the meantime
             </Text>
             {audioControls}
+
+            <Title mt={'md'} align="center">
+              {entry.config.name}
+            </Title>
+            {tempDisplay}
           </>
         );
       } else {
@@ -229,8 +270,15 @@ function EntryEditor() {
         </Card>
       );
     }
+  } else {
+    if (!entry?.transcriptions[0]) {
+      content = (
+        <Card shadow="md" p="lg">
+          <Text>No Transcription Found</Text>
+        </Card>
+      );
+    }
   }
-
   return content;
 }
 
