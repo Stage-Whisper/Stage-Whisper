@@ -7,34 +7,22 @@ import { useAppSelector } from '../../redux/hooks';
 // Components
 import EntryCard from './components/EntryCard';
 import { selectActiveEntry, selectEntries } from './entrySlice';
+import EntryEditor from './EntryEditor';
 
 // Localization
-import EntryEditor from './components/EntryEditor';
 
 // Component for displaying entry progress / results
 function Entries() {
   // Get All Entries
   const entries = useAppSelector(selectEntries);
 
-  // Get Active Transcription (if it exists)
-  const activeId = useAppSelector(selectActiveEntry);
-
-  const transcriptionCards = entries.map((entry) => {
-    return <EntryCard key={entry.config.uuid} entry={entry} />;
-  });
-
-  console.log('Active Entry ID: ' + activeId);
-  if (activeId === null) {
-    return (
-      <Stack>
-        <Center>
-          <Stack spacing="md">{transcriptionCards}</Stack>
-        </Center>
-      </Stack>
-    );
-  } else {
-    return <EntryEditor active={entries.filter((entry) => entry.config.uuid === activeId)[0]} />;
-  }
+  return (
+    <Stack>
+      {entries.map((entry) => {
+        return <EntryCard key={entry.config.uuid} entry={entry} />;
+      })}
+    </Stack>
+  );
 }
 
 export default Entries;

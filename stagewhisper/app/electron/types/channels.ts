@@ -5,7 +5,7 @@ export enum Channels {
   // Utility channels
   deleteStore = 'delete-store',
   openDirectoryDialog = 'open-directory-dialog', // Trigger a directory picker
-  audioPlayback = 'audio-playback', // Control audio playback
+  fetchAudioFile = 'fetch-audio-file', // Convert an audio file to a Uint8Array and send it back to the renderer
 
   // Database channels
   loadDatabase = 'load-database', // Loads all entries from the database and returns them
@@ -18,13 +18,7 @@ export enum Channels {
   whisperError = 'whisper-error' // Returns the error message
 }
 
-// Channel Response Types
-// Audio Playback Response
-export type audioPlaybackResponse = {
-  success: boolean;
-  state: 'playing' | 'paused' | 'stopped';
-};
-
+// Channel Response Types\
 // Delete Store Response
 export interface DeleteStoreResponse {
   success?: boolean;
@@ -52,7 +46,7 @@ export type RunWhisperResponse = {
   transcription_uuid: string;
   outputDir: string;
   entry: entry;
-  transcribedOn: string;
+  transcribedOn: number;
 };
 
 // Response type for the whisper-complete channel
