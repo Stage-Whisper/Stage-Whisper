@@ -70,11 +70,16 @@ function EntryEditor({ entry }: { entry: entry }) {
   // The limits of the current line (in milliseconds)
   const [lineLimits, setLineLimits] = React.useState<[number, number]>([0, 0]);
 
+  // Set up the audio player state
+  const [audioPlayer, setAudioPlayer] = React.useState<Howl | null>(null);
+
   useEffect(() => {
     // If the entry has a transcription
     if (entry && entry.transcriptions[0] && entry.transcriptions[0].vtt) {
       // TODO: Change this to select the correct transcription
       const vttNodes = entry.transcriptions[0].vtt;
+      console.log('Got VTT Nodes: ', vttNodes);
+
       // Format the VTT lines
       const formattedLines = [] as Array<formattedVTTLine>;
       vttNodes.forEach((node: Node) => {
@@ -88,22 +93,24 @@ function EntryEditor({ entry }: { entry: entry }) {
       });
 
       // Set the formatted lines
+      console.log('Setting Formatted Lines: ', formattedLines);
       setFormattedVTTLines(formattedLines);
     }
     // Set the page as ready
+    console.log('Setting Ready');
     setReady(true);
   }, [entry]);
-
-  // Set up the audio player state
-  const [audioPlayer, setAudioPlayer] = React.useState<Howl | null>(null);
 
   // Set up the audio player
   useEffect(() => {
     // If the entry has a transcription
-    if (entry && entry.transcriptions[0] && entry.audio.path) {
+    if (ready && entry && entry.transcriptions[0] && entry.audio.path) {
       // Get the audio file path
+
+      console.log('Got Audio Path: ', entry.audio.path);
       const audioFilePath = entry.audio.path;
       // Convert the audio file path to a URL
+      console.log('Converting Audio Path to URL');
       filePathToURL(audioFilePath).then((audioURL) => {
         // Create a new Howl object
         const newAudioPlayer = new Howl({
@@ -111,10 +118,7 @@ function EntryEditor({ entry }: { entry: entry }) {
           html5: true,
           format: ['mp3'],
           preload: true,
-          onload: () => {
-            // Set the audio player
-            setAudioPlayer(newAudioPlayer);
-          },
+
           sprite: {
             // Create a sprite for each line
             ...formattedVTTLines.reduce((acc, line) => {
@@ -125,41 +129,12 @@ function EntryEditor({ entry }: { entry: entry }) {
             }, {})
           }
         });
+        // Set the audio player
+        console.log('Setting Audio Player', newAudioPlayer);
+        setAudioPlayer(newAudioPlayer);
       });
     }
-  }, [entry, formattedVTTLines]);
-
-  // On end of audio, set the current line to null
-  useEffect(() => {
-    // If the audio player is ready
-    if (audioPlayer) {
-      // When the audio player finishes playing
-      audioPlayer.on('end', () => {
-        // Set the current line to null
-        setCurrentLine(null);
-      });
-    }
-  }, [audioPlayer]);
-
-  // On play of file, switch the current line
-  useEffect(() => {
-    // If the audio player is ready
-    if (audioPlayer) {
-      // When the audio player finishes playing
-      audioPlayer.on('play', () => {
-        // Get the current time
-        const currentTime = audioPlayer.seek();
-        // Find the current line
-        const currentLine = formattedVTTLines.find((line) => {
-          return currentTime >= line.start && currentTime <= line.end;
-        });
-        // Set the current line
-        if (currentLine) {
-          setCurrentLine(currentLine);
-        }
-      });
-    }
-  }, [audioPlayer, formattedVTTLines]);
+  }, [entry]);
 
   let content = null;
 
@@ -176,8 +151,26 @@ function EntryEditor({ entry }: { entry: entry }) {
 
             <Stack spacing="md">
               {/* Button Section */}
-              <Button onClick={() => audioPlayer.play()}>Play</Button>
-              <Button onClick={() => audioPlayer.pause()}>Pause</Button>
+              <Button
+                onClick={() => {
+                  console.log('Play');
+                  console.log('Current Line: ', currentLine);
+                  // console.log(audioPlayer.play());
+                  console.log('About to trigger', audioPlayer);
+                  audioPlayer.play();
+                }}
+              >
+                Play
+              </Button>
+              <Button onClick={() => console.log(audioPlayer)}>Log Audio Player</Button>
+
+              <Button
+                onClick={() => {
+                  audioPlayer.pause();
+                }}
+              >
+                Pause
+              </Button>
             </Stack>
           </Card>
         );
