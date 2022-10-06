@@ -11,14 +11,14 @@ Stage Whisper consists of two connected components:
 
 ### Prerequisites
 
-You will need the following installed on your machine to develop Stage Whisper:
+You will need the following installed on your machine to develop Stage Whisper. For the moment it is possible to separately work on the Electron interface or the Python backend--if you are planning to only work on one or the other, you can install the requirements specific to that component.
 
-* [Python 3.x](https://www.python.org/)
-* [Node](https://nodejs.org/en/)
-* [Rust](https://www.rust-lang.org/)
-* [ffmpeg](https://ffmpeg.org/)
-* [Poetry](https://python-poetry.org/)
-* [Yarn](https://yarnpkg.com/)
+* [Node](https://nodejs.org/en/) (required for Electron)
+* [Yarn](https://yarnpkg.com/) (required for Electron)
+* [Python 3.x](https://www.python.org/) (required for backend)
+* [Rust](https://www.rust-lang.org/) (required for backend)
+* [ffmpeg](https://ffmpeg.org/) (required for backend)
+* [Poetry](https://python-poetry.org/) (required for backend)
 
 There's any number of ways to get all these dependencies installed on your workstation, but here is one example of how you might install all of the above on a Mac (skip any step for something you have already installed):
 
