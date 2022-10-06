@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 // Components
-import { Button, Card, Center, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { Button, Card, Center, Code, Divider, Group, Loader, Stack, Text, Title } from '@mantine/core';
 // import { RichTextEditor } from '@mantine/rte';
 
 // Types
@@ -216,28 +216,39 @@ function EntryEditor() {
         const tempDisplay = formattedVTTLines.map((line) => {
           return (
             <Card withBorder key={line.key} my="sm">
-              <Group spacing="md" position="apart">
-                <Text>{line.text}</Text>
-                <Group position="apart">
-                  <Text>
-                    {/* {line.start / 1000}s - {line.end / 1000}s */}
-                    {/* Line showing time in seconds formatted to mins */}
-                    {String(Math.floor(line.start / 1000 / 60)).padStart(2, '0')}:
-                    {String(Math.floor(line.start / 1000) % 60).padStart(2, '0')} -{' '}
-                    {String(Math.floor(line.end / 1000 / 60)).padStart(2, '0')}:
-                    {String(Math.floor(line.end / 1000) % 60).padStart(2, '0')}
+              <Stack spacing="md">
+                <Card withBorder>
+                  <Text italic align="center" size="lg" weight={700} style={{ fontFamily: 'Greycliff CF, sans-serif' }}>
+                    {line.text}
                   </Text>
-                  <Button
-                    onClick={() => {
-                      console.log('Play Line - temp');
-                      console.log('Current Line: ', line);
-                    }}
-                    disabled
-                  >
-                    Play Line - Disabled
-                  </Button>
-                </Group>
-              </Group>
+                </Card>
+                <Card withBorder>
+                  <Group position="apart">
+                    <Text>
+                      {/* {line.start / 1000}s - {line.end / 1000}s */}
+                      {/* Line showing time in seconds formatted to mins */}
+                      {String(Math.floor(line.start / 1000 / 60)).padStart(2, '0')}:
+                      {String(Math.floor(line.start / 1000) % 60).padStart(2, '0')}
+                    </Text>
+
+                    <Button
+                      onClick={() => {
+                        console.log('Play Line - temp');
+                        console.log('Current Line: ', line);
+                      }}
+                      disabled
+                    >
+                      Play Line - Disabled
+                    </Button>
+
+                    <Text>
+                      {' '}
+                      {String(Math.floor(line.end / 1000 / 60)).padStart(2, '0')}:
+                      {String(Math.floor(line.end / 1000) % 60).padStart(2, '0')}
+                    </Text>
+                  </Group>
+                </Card>
+              </Stack>
             </Card>
           );
         });
