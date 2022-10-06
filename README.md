@@ -6,8 +6,32 @@ The main repo for Stage Whisper, our easy to use AI transcriber, powered by Open
 
 Stage Whisper consists of two connected components:
 
-* A Node/Electron-powered interface
 * A Python backend that interfaces with OpenAI's Whisper library
+* A Node/Electron-powered interface
+
+### Prerequisites
+
+You will need the following installed on your machine to develop Stage Whisper:
+
+* [Python 3.x](https://www.python.org/)
+* [Node](https://nodejs.org/en/)
+* [Rust](https://www.rust-lang.org/)
+* [ffmpeg](https://ffmpeg.org/)
+* [Poetry](https://python-poetry.org/)
+* [Yarn](https://yarnpkg.com/)
+
+There's any number of ways to get all these dependencies installed on your workstation, but here is one example of how you might install all of the above on a Mac (skip any step for something you have already installed):
+
+```sh
+# Install Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install Python, Node, Rust, ffmpeg, and Yarn
+brew install python node rust ffmpeg yarn
+
+# Install Poetry
+curl -sSL https://install.python-poetry.org | POETRY_HOME=/etc/poetry python3 -
+```
 
 ### Running the Python Backend
 
