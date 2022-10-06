@@ -7,6 +7,7 @@ authors = ["Your Name <you@example.com>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 whisper = {git = "https://github.com/openai/whisper.git", rev = "8cf36f3508c9acd341a45eb2364239a3d81458b9"}
+rich-click = "^1.5.2"
 
 [tool.poetry.dev-dependencies]
 
