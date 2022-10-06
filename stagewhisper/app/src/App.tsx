@@ -54,6 +54,7 @@ import {
 } from './features/entries/entrySlice';
 import Debug from './debug/Debug';
 import { selectTranscribingStatus } from './features/whisper/whisperSlice';
+import { NotificationsProvider } from '@mantine/notifications';
 // import { ipcRenderer } from 'electron';
 // import { Channels } from '../electron/types/channels';
 
@@ -206,131 +207,133 @@ function App() {
 
   return (
     <MantineProvider theme={{ colorScheme: darkMode ? 'dark' : 'light' }} withGlobalStyles withNormalizeCSS>
-      <AppShell
-        navbarOffsetBreakpoint="sm"
-        asideOffsetBreakpoint="sm"
-        navbar={
-          // Main navigation sidebar with Dashboard, Transcribe, Interview and Transcription pages
-          <Navbar hiddenBreakpoint="sm" hidden={!burgerOpen} width={{ sm: 200, lg: 300 }}>
-            <Navbar.Section m={0}>
-              <NavLink
-                label={<Text>{strings.dashboard?.title}</Text>}
-                icon={<IconHome size={18} />}
-                active={location.pathname === '/'}
-                component={Link}
-                to="/"
-              />
-              <NavLink
-                label={<Text>{strings.input?.title}</Text>}
-                icon={<IconLanguage size={18} />}
-                active={location.pathname === '/transcribe'}
-                component={Link}
-                to="/transcribe"
-              />
-              <NavLink
-                label={<Text>{strings.interview?.title} </Text>}
-                component={Link}
-                disabled
-                to="/interview"
-                icon={<IconMicrophone2 size={18} />}
-                active={location.pathname === '/interview'}
-              />
-              <NavLink
-                label={<Text>{strings.entries?.title} </Text>}
-                component={Link}
-                to="/entries"
-                icon={<IconFileDescription size={18} />}
-                onClick={() => dispatch(setActiveEntry(null))}
-                disabled={numberOfEntries === 0}
-                active={location.pathname === '/entries' && activeEntry === null}
-              />
-            </Navbar.Section>
-            {/* Entries List*/}
-            <Navbar.Section>{EntryList()}</Navbar.Section>
-
-            {/* Recent Transcription Section */}
-            <Navbar.Section grow component={ScrollArea}>
-              {/* FIXME: Disabled pending possible removal */}
-              {false && RecentTranscriptions()}
-            </Navbar.Section>
-            {/* Settings Section */}
-            <Navbar.Section>
-              <NavLink
-                label={<Text>{strings.settings?.title}</Text>}
-                component={Link}
-                to="/settings"
-                icon={<IconSettings size={18} />}
-                active={location.pathname === '/settings'}
-              />
-              <NavLink
-                label={<Text>{strings.about?.title}</Text>}
-                component={Link}
-                to="/about"
-                icon={<IconInfoCircle size={18} />}
-                active={location.pathname === '/about'}
-              />
-            </Navbar.Section>
-          </Navbar>
-        }
-        // aside={
-        //   <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
-        //     <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
-        //       <Text>{strings.sidebar?.title}</Text>
-        //     </Aside>
-        //   </MediaQuery>
-        // }
-        // footer={
-        //   <Footer height={60} p="md">
-        //     <Group position="apart">
-        //       <Text>{strings.about?.title}</Text>
-
-        //     </Group>
-        //   </Footer>
-        // }
-        header={
-          <Header height={70} p="md">
-            <Group style={{ display: 'flex', height: '100%' }}>
-              <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
-                <Burger
-                  opened={burgerOpen}
-                  onClick={() => dispatch(setBurgerOpen(!burgerOpen))}
-                  size="sm"
-                  color={theme.colors.gray[6]}
-                  mr="xl"
+      <NotificationsProvider>
+        <AppShell
+          navbarOffsetBreakpoint="sm"
+          asideOffsetBreakpoint="sm"
+          navbar={
+            // Main navigation sidebar with Dashboard, Transcribe, Interview and Transcription pages
+            <Navbar hiddenBreakpoint="sm" hidden={!burgerOpen} width={{ sm: 200, lg: 300 }}>
+              <Navbar.Section m={0}>
+                <NavLink
+                  label={<Text>{strings.dashboard?.title}</Text>}
+                  icon={<IconHome size={18} />}
+                  active={location.pathname === '/'}
+                  component={Link}
+                  to="/"
                 />
-              </MediaQuery>
+                <NavLink
+                  label={<Text>{strings.input?.title}</Text>}
+                  icon={<IconLanguage size={18} />}
+                  active={location.pathname === '/transcribe'}
+                  component={Link}
+                  to="/transcribe"
+                />
+                <NavLink
+                  label={<Text>{strings.interview?.title} </Text>}
+                  component={Link}
+                  disabled
+                  to="/interview"
+                  icon={<IconMicrophone2 size={18} />}
+                  active={location.pathname === '/interview'}
+                />
+                <NavLink
+                  label={<Text>{strings.entries?.title} </Text>}
+                  component={Link}
+                  to="/entries"
+                  icon={<IconFileDescription size={18} />}
+                  onClick={() => dispatch(setActiveEntry(null))}
+                  disabled={numberOfEntries === 0}
+                  active={location.pathname === '/entries' && activeEntry === null}
+                />
+              </Navbar.Section>
+              {/* Entries List*/}
+              <Navbar.Section>{EntryList()}</Navbar.Section>
 
-              <Title variant="gradient" weight={800} gradient={{ from: 'red', to: 'blue', deg: 135 }}>
-                {strings.util.app_name}
-              </Title>
+              {/* Recent Transcription Section */}
+              <Navbar.Section grow component={ScrollArea}>
+                {/* FIXME: Disabled pending possible removal */}
+                {false && RecentTranscriptions()}
+              </Navbar.Section>
+              {/* Settings Section */}
+              <Navbar.Section>
+                <NavLink
+                  label={<Text>{strings.settings?.title}</Text>}
+                  component={Link}
+                  to="/settings"
+                  icon={<IconSettings size={18} />}
+                  active={location.pathname === '/settings'}
+                />
+                <NavLink
+                  label={<Text>{strings.about?.title}</Text>}
+                  component={Link}
+                  to="/about"
+                  icon={<IconInfoCircle size={18} />}
+                  active={location.pathname === '/about'}
+                />
+              </Navbar.Section>
+            </Navbar>
+          }
+          // aside={
+          //   <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
+          //     <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
+          //       <Text>{strings.sidebar?.title}</Text>
+          //     </Aside>
+          //   </MediaQuery>
+          // }
+          // footer={
+          //   <Footer height={60} p="md">
+          //     <Group position="apart">
+          //       <Text>{strings.about?.title}</Text>
+
+          //     </Group>
+          //   </Footer>
+          // }
+          header={
+            <Header height={70} p="md">
+              <Group style={{ display: 'flex', height: '100%' }}>
+                <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
+                  <Burger
+                    opened={burgerOpen}
+                    onClick={() => dispatch(setBurgerOpen(!burgerOpen))}
+                    size="sm"
+                    color={theme.colors.gray[6]}
+                    mr="xl"
+                  />
+                </MediaQuery>
+
+                <Title variant="gradient" weight={800} gradient={{ from: 'red', to: 'blue', deg: 135 }}>
+                  {strings.util.app_name}
+                </Title>
+              </Group>
+            </Header>
+          }
+        >
+          <Outlet />
+          {/* Debugging Component */}
+          {useAppSelector(selectDebugMenu) ? <Affix position={{ bottom: 60, right: 20 }}>{<Debug />}</Affix> : <></>}
+
+          <Affix position={{ bottom: 20, right: 20 }}>
+            <Group>
+              <ActionIcon
+                variant="gradient"
+                gradient={darkMode ? { from: 'red', to: 'yellow', deg: 135 } : { from: 'blue', to: 'violet', deg: 135 }}
+                onClick={() => dispatch(toggleDarkMode())}
+                title={strings.settings?.dark_mode}
+              >
+                {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
+              </ActionIcon>
+              <ActionIcon
+                variant="filled"
+                onClick={() => dispatch(toggleDebugMenu())}
+                title={strings.settings?.debug_menu}
+              >
+                {useAppSelector(selectDebugMenu) ? <IconBugOff size={18} /> : <IconBug size={18} />}
+              </ActionIcon>
             </Group>
-          </Header>
-        }
-      >
-        <Outlet />
-        {/* Debugging Component */}
-        {useAppSelector(selectDebugMenu) ? <Affix position={{ bottom: 60, right: 20 }}>{<Debug />}</Affix> : <></>}
-
-        <Affix position={{ bottom: 20, right: 20 }}>
-          <Group>
-            <ActionIcon
-              variant="gradient"
-              gradient={darkMode ? { from: 'red', to: 'yellow', deg: 135 } : { from: 'blue', to: 'violet', deg: 135 }}
-              onClick={() => dispatch(toggleDarkMode())}
-              title={strings.settings?.dark_mode}
-            >
-              {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
-            </ActionIcon>
-            <ActionIcon
-              variant="filled"
-              onClick={() => dispatch(toggleDebugMenu())}
-              title={strings.settings?.debug_menu}
-            >
-              {useAppSelector(selectDebugMenu) ? <IconBugOff size={18} /> : <IconBug size={18} />}
-            </ActionIcon>
-          </Group>
-        </Affix>
-      </AppShell>
+          </Affix>
+        </AppShell>
+      </NotificationsProvider>
     </MantineProvider>
   );
 }

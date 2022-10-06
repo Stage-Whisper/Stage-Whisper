@@ -1,3 +1,4 @@
+import { cleanNotifications, showNotification, updateNotification } from '@mantine/notifications';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RunWhisperResponse } from '../../../electron/types/channels';
 // import { RunWhisperResponse } from '../../../electron/types/channels';
@@ -70,7 +71,15 @@ export const whisperSlice = createSlice({
     builder.addCase(passToWhisper.pending, (state, action) => {
       // Set the status to loading
       state.status = 'loading';
-
+      showNotification({
+        id: 'transcribing',
+        title: `Transcribing`,
+        message: `Transcribing audio ${action.meta.arg.entry.audio.name}`,
+        disallowClose: true,
+        autoClose: false,
+        color: 'blue',
+        loading: true
+      });
       // Set the entry to the current entry
       state.entry = action.meta.arg.entry;
     });
@@ -78,6 +87,17 @@ export const whisperSlice = createSlice({
     builder.addCase(passToWhisper.fulfilled, (state) => {
       // Whisper has finished running the transcription for the active entry
 
+      // Clear notification
+
+      updateNotification({
+        id: 'transcribing',
+        title: `Transcription complete!`,
+        message: `Transcription complete for ${state.entry?.audio.name}`,
+        disallowClose: false,
+        color: 'green',
+        loading: false,
+        autoClose: 3000
+      });
       // Reset the entry
       state.entry = undefined;
 
