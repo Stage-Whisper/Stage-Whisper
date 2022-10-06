@@ -4,14 +4,37 @@ The main repo for Stage Whisper, our easy to use AI transcriber, powered by Open
 
 ## Quickstart
 
-To get started, run the following commands inside the repo:
+Stage Whisper consists of two connected components:
+
+* A Node/Electron-powered interface
+* A Python backend that interfaces with OpenAI's Whisper library
+
+### Running the Python Backend
+
+Install dependencies:
 
 ```sh
-cd stagewhisper
-cd app
+cd backend
+poetry install
+```
+
+While the backend's primary purpose will be to run as a service for the Electron app to connect to, it can also be run as a standalone script. To do so, run:
+
+```sh
+poetry run python stagewhisper --input /path/to/audio/file.mp3
+```
+
+### Running the Electron Interface
+
+```sh
+cd electron
 yarn
 yarn dev
 ```
+
+### ⚠️ Integration Incomplete ⚠️
+
+For the moment these components are not integrated! The eventual plan is for the Electron app to use the Python backend for transcription. Until that integration is complete, you will need to separately install [Whisper](https://github.com/openai/whisper) in order to use the Electron app to complete a transcription.
 
 ## Goal
 
