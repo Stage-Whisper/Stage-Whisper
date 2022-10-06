@@ -25,6 +25,7 @@ export const strings = new LocalizedStrings(
           edit: 'Edit',
           save: 'Save',
           upload: 'Upload',
+          export: 'Export',
           uploadFile: 'Upload File',
           uploadFiles: 'Upload Files',
           uploadFolder: 'Upload Folder',

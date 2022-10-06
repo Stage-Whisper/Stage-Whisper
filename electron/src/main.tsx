@@ -16,6 +16,7 @@ import { setupStore } from './redux/store';
 import About from './features/about/About';
 import Settings from './features/settings/Settings';
 import Entries from './features/entries/Entries';
+import EntryEditor from './features/entries/EntryEditor';
 
 export const store = setupStore();
 
@@ -30,6 +31,9 @@ ReactDOM.render(
             <Route path="/settings" element={<Settings />} />
             <Route path="/about" element={<About />} />
             <Route path="/entries" element={<Entries />} />
+            <Route path="/entries/:entryId" element={<EntryEditor />} />
+            {/* <Route path=":entryId" element={<EntryEditor />} /> */}
+
             <Route path="*" element={<div>404</div>} />
           </Route>
         </Routes>
