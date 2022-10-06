@@ -53,6 +53,7 @@ import {
   getLocalFiles
 } from './features/entries/entrySlice';
 import Debug from './debug/Debug';
+import { selectTranscribingStatus } from './features/whisper/whisperSlice';
 // import { ipcRenderer } from 'electron';
 // import { Channels } from '../electron/types/channels';
 
@@ -182,13 +183,26 @@ function App() {
   const theme = useMantineTheme();
 
   // Monitor the current language and update when it changes
-  strings.setLanguage(displayLanguage || 'en'); // FIXME: This needs country codes
+  strings.setLanguage(displayLanguage || 'en');
 
   const location = useLocation();
 
   useEffect(() => {
+    // Get local files on app load
     dispatch(getLocalFiles());
   }, []);
+
+  const transcription = useAppSelector(selectTranscribingStatus);
+
+  useEffect(() => {
+    // UseEffect that watches the status of Whisper and triggers a reload if it changes
+    //BUG: This will cause bugs with the state updating while users are interacting with the app.
+    // Fix: When a whisper process completes, it should only reload the entry that completed
+    if (transcription.status === 'succeeded') {
+      console.warn('App: UseEffect Triggered, Transcription Status Changed, Reloading Entries');
+      dispatch(getLocalFiles());
+    }
+  }, [transcription.status]);
 
   return (
     <MantineProvider theme={{ colorScheme: darkMode ? 'dark' : 'light' }} withGlobalStyles withNormalizeCSS>
@@ -236,7 +250,8 @@ function App() {
 
             {/* Recent Transcription Section */}
             <Navbar.Section grow component={ScrollArea}>
-              {RecentTranscriptions()}
+              {/* FIXME: Disabled pending possible removal */}
+              {false && RecentTranscriptions()}
             </Navbar.Section>
             {/* Settings Section */}
             <Navbar.Section>

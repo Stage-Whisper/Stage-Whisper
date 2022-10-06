@@ -35,7 +35,7 @@ export default ipcMain.handle(
           uuid: uuidv4(),
           inQueue: false,
           name: args.config.name,
-          created: new Date(),
+          created: new Date().getTime(),
           queueWeight: 0,
           tags: args.config.tags,
           description: args.config.description,
@@ -46,7 +46,7 @@ export default ipcMain.handle(
           type: args.audio.type,
           fileLength: await getAudioDurationInSeconds(args.filePath),
           language: args.audio.language,
-          addedOn: new Date(),
+          addedOn: new Date().getTime(),
           path: newFilePath
         },
         path: join(dataPath, uuid),
