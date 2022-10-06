@@ -2,6 +2,7 @@ import { Button, Card, Center, Divider, Grid, Group, Loader, Stack, Text, Title 
 import { useMediaQuery } from '@mantine/hooks';
 import { IconFileCheck, IconFileDescription } from '@tabler/icons';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // Redux
 
@@ -17,6 +18,8 @@ import { setActiveEntry } from '../entrySlice';
 function TranscriptionCard({ entry }: { entry: entry }) {
   const dispatch = useAppDispatch();
 
+  const navigate = useNavigate();
+
   // may not be the same as the entry passed into this component
   const transcribing = useAppSelector(selectTranscribingStatus);
 
@@ -29,13 +32,23 @@ function TranscriptionCard({ entry }: { entry: entry }) {
       <>
         <Button
           onClick={() => {
-            dispatch(setActiveEntry(entry));
+            navigate(`/entries/${entry.config.uuid}`);
+          }}
+          color="green"
+          variant="outline"
+        >
+          {strings.util.buttons?.export}
+        </Button>
+        <Button
+          onClick={() => {
+            navigate(`/entries/${entry.config.uuid}`);
           }}
           color="primary"
           variant="outline"
         >
           {strings.util.buttons?.open}
         </Button>
+
         <Button
           onClick={() => {
             console.log('Delete');
@@ -54,7 +67,7 @@ function TranscriptionCard({ entry }: { entry: entry }) {
           onClick={() => {
             dispatch(passToWhisper({ entry }));
           }}
-          color="green"
+          color="violet"
           variant="outline"
           disabled={transcribing.status === 'loading'}
         >
@@ -119,7 +132,10 @@ function TranscriptionCard({ entry }: { entry: entry }) {
                 </Text>
                 {/* Added */}
 
-                <Text weight={500}>{new Date(entry.config.created).toDateString()}</Text>
+                <Text span weight={500}>
+                  {new Date(entry.config.created).toDateString()} -{' '}
+                  {new Date(entry.config.created).toLocaleTimeString()}
+                </Text>
               </Stack>
             </Group>
             <Divider hidden={!isMobile} />
