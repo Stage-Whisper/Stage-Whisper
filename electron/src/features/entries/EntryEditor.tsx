@@ -17,9 +17,11 @@ import { entry } from '../../../electron/types/types';
 import { Howl } from 'howler';
 import { v4 as uuidv4 } from 'uuid';
 import { useParams } from 'react-router-dom';
-import { useAppSelector } from '../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectEntries } from './entrySlice';
 import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons';
+import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
+import strings from '../../localization';
 
 // Convert an internal audio path to a url that can be used by howler
 const filePathToURL = async (filePath: string): Promise<string> => {
@@ -107,6 +109,9 @@ function AudioControls(audioPlayer: Howl) {
 // This is a component that will be used to display the transcription editor when an entry is selected
 function EntryEditor() {
   // Get the active entry id
+  const dispatch = useAppDispatch();
+
+  const transcribing = useAppSelector(selectTranscribingStatus);
   const { entryId } = useParams<{ entryId: string }>();
 
   // Get all entries
@@ -340,9 +345,22 @@ function EntryEditor() {
   } else {
     if (!entry?.transcriptions[0]) {
       content = (
-        <Card shadow="md" p="lg">
-          <Text>No Transcription Found</Text>
-        </Card>
+        <Center>
+          <Stack>
+            <Title order={3}>No Transcription Found</Title>
+            <Button
+              onClick={() => {
+                //@ts-expect-error entry is always going to be defined here
+                dispatch(passToWhisper({ entry }));
+              }}
+              color="violet"
+              variant="outline"
+              disabled={transcribing.status === 'loading'}
+            >
+              {strings.util.buttons?.transcribe}
+            </Button>{' '}
+          </Stack>
+        </Center>
       );
     }
   }
