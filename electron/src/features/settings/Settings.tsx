@@ -7,20 +7,18 @@ import {
   HoverCard,
   NumberInput,
   NumberInputHandlers,
-  Select,
-  Slider,
   Stack,
   Switch,
   Text,
   Title
 } from '@mantine/core';
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 
 // Components
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { selectAudioPadding, setAllowLargeModel, setAudioPadding, setDisplayLanguage } from './settingsSlice';
+import { selectAllowLargeModels, selectAudioPadding, setAllowLargeModel, setAudioPadding } from './settingsSlice';
 
 // Localization
 import strings from '../../localization';
@@ -30,6 +28,7 @@ function Settings() {
   const dispatch = useAppDispatch();
   const handlers = useRef<NumberInputHandlers>();
   const audioPadding = useAppSelector(selectAudioPadding);
+  const largeModels = useAppSelector(selectAllowLargeModels);
 
   // Get a list of all languages and their codes
   // const languages = generateLanguageList();
@@ -80,6 +79,7 @@ function Settings() {
             <Title order={3}>{strings.settings?.large_model_support?.title}</Title>
 
             <Switch
+              checked={largeModels}
               onLabel={strings.util?.on}
               offLabel={strings.util?.off}
               onChange={(event) => {
