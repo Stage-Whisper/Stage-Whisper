@@ -44,10 +44,9 @@ jobs:
       - name: Super-Linter
         uses: github/super-linter@v4.9.7
         env:
-          VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
-          # Only lint files in ./electron/src and ./electron/electron folders
-          FILTER_REGEX_INCLUDE: .*/electron/(src|electron)/.*
+          # Only lint files in /electron/src and /electron/electron folders in format # .*src/test.*
+          FILTER_REGEX_INCLUDE: ".*electron/src/.*|.*electron/electron/.*"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
           TYPESCRIPT_DEFAULT_STYLE: prettier
