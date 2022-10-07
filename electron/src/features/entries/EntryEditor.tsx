@@ -352,6 +352,8 @@ function EntryEditor() {
               onClick={() => {
                 if (entry) {
                   dispatch(passToWhisper({ entry }));
+                } else {
+                  throw new Error('No Audio File Found');
                 }
               }}
               color="violet"
