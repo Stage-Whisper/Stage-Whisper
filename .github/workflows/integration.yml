@@ -39,11 +39,11 @@ jobs:
 
       - name: Build
         run:
-          npm build:vite
+          npm run build:vite
 
           # Run Linters
       - name: lint
         run: npm run lint
 
-      - name: Test
-        run: npm test
+      # - name: Test
+      # run: npm test
