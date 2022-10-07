@@ -350,8 +350,9 @@ function EntryEditor() {
             <Title order={3}>No Transcription Found</Title>
             <Button
               onClick={() => {
-                //@ts-expect-error entry is always going to be defined here
-                dispatch(passToWhisper({ entry }));
+                if (entry) {
+                  dispatch(passToWhisper({ entry }));
+                }
               }}
               color="violet"
               variant="outline"
