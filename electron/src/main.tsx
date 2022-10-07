@@ -1,7 +1,7 @@
 import React from 'react';
 import App from './App';
 import ReactDOM from 'react-dom';
-
+import { createRoot } from 'react-dom/client';
 // Views
 import Dashboard from './features/dashboard/Dashboard';
 import Input from './features/input/Input';
@@ -20,7 +20,12 @@ import EntryEditor from './features/entries/EntryEditor';
 
 export const store = setupStore();
 
-ReactDOM.render(
+// Convert from ReactDOM.render to createRoot
+
+const rootElement = document.getElementById('root') as Element;
+const root = createRoot(rootElement);
+
+root.render(
   <React.StrictMode>
     <Provider store={store}>
       <HashRouter>
@@ -39,6 +44,5 @@ ReactDOM.render(
         </Routes>
       </HashRouter>
     </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );
