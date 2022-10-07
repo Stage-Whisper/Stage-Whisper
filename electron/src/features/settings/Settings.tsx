@@ -1,11 +1,24 @@
-import { Card, Center, Divider, Group, HoverCard, Select, Stack, Switch, Text, Title } from '@mantine/core';
-import React from 'react';
+import {
+  ActionIcon,
+  Card,
+  Center,
+  Divider,
+  Group,
+  HoverCard,
+  NumberInput,
+  NumberInputHandlers,
+  Stack,
+  Switch,
+  Text,
+  Title
+} from '@mantine/core';
+import React, { useRef } from 'react';
 
 // Components
 
 // Redux
-import { useAppDispatch } from '../../redux/hooks';
-import { setAllowLargeModel, setDisplayLanguage } from './settingsSlice';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { selectAllowLargeModels, selectAudioPadding, setAllowLargeModel, setAudioPadding } from './settingsSlice';
 
 // Localization
 import strings from '../../localization';
@@ -13,6 +26,26 @@ import strings from '../../localization';
 function Settings() {
   // Redux
   const dispatch = useAppDispatch();
+  // const handlers = useRef<NumberInputHandlers>();
+  const audioPadding = useAppSelector(selectAudioPadding);
+  const largeModels = useAppSelector(selectAllowLargeModels);
+
+  const handleAudioPaddingChange = (changeValue: number) => {
+    // Check if the value is valid
+    const newValue = audioPadding + changeValue;
+
+    if (newValue >= 0 && newValue <= 10) {
+      dispatch(setAudioPadding(newValue));
+    } else if (newValue < 0) {
+      dispatch(setAudioPadding(0));
+    }
+  };
+
+  const handleAudioPaddingSet = (value: number) => {
+    if (value >= 0 && value <= 10) {
+      dispatch(setAudioPadding(value));
+    }
+  };
 
   // Get a list of all languages and their codes
   // const languages = generateLanguageList();
@@ -63,6 +96,7 @@ function Settings() {
             <Title order={3}>{strings.settings?.large_model_support?.title}</Title>
 
             <Switch
+              checked={largeModels}
               onLabel={strings.util?.on}
               offLabel={strings.util?.off}
               onChange={(event) => {
@@ -73,6 +107,37 @@ function Settings() {
           </Group>
           <Divider my={'sm'} />
           <Text italic> {strings.settings?.large_model_support?.subtitle}</Text>
+        </Card>
+        <Card withBorder>
+          <Group position="apart">
+            <Title order={3}>{strings.settings?.audio_padding_amount?.title}</Title>
+            <Group spacing={5}>
+              <ActionIcon size={42} variant="default" onClick={() => handleAudioPaddingChange(-0.25)}>
+                –
+              </ActionIcon>
+
+              <NumberInput
+                hideControls
+                value={audioPadding}
+                onChange={(val) => val && handleAudioPaddingSet(val)}
+                onInput={(event) => {
+                  const val = parseInt(event.currentTarget.value);
+                  handleAudioPaddingSet(val);
+                }}
+                max={10.0}
+                precision={2}
+                min={0.0}
+                step={0.25}
+                styles={{ input: { width: 54, textAlign: 'center' } }}
+              />
+
+              <ActionIcon size={42} variant="default" onClick={() => handleAudioPaddingChange(0.25)}>
+                +
+              </ActionIcon>
+            </Group>
+          </Group>
+          <Divider my={'sm'} />
+          <Text italic> {strings.settings?.audio_padding_amount?.subtitle}</Text>
         </Card>
       </Stack>
     </Center>

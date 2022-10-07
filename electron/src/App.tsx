@@ -59,87 +59,87 @@ import { NotificationsProvider } from '@mantine/notifications';
 // import { Channels } from '../electron/types/channels';
 
 // Recent Transcription Constructor - Shows jobs that are in progress or queued
-function RecentTranscriptions() {
-  const entries = useAppSelector(selectEntries);
-  const activeEntry = useAppSelector(selectActiveEntry);
-  const dispatch = useAppDispatch();
+// function RecentTranscriptions() {
+//   const entries = useAppSelector(selectEntries);
+//   const activeEntry = useAppSelector(selectActiveEntry);
+//   const dispatch = useAppDispatch();
 
-  if (!entries.length) {
-    return <></>;
-  } else {
-    return (
-      <>
-        <Divider mt={'sm'} />
-        {/* <Title order={6}>{strings.entries?.recent_transcriptions}</Title> */}
+//   if (!entries.length) {
+//     return <></>;
+//   } else {
+//     return (
+//       <>
+//         <Divider mt={'sm'} />
+//         {/* <Title order={6}>{strings.entries?.recent_transcriptions}</Title> */}
 
-        {entries.map((entry) => {
-          let icon: JSX.Element;
+//         {entries.map((entry) => {
+//           let icon: JSX.Element;
 
-          return entry.transcriptions.map((transcription) => {
-            switch (transcription.status) {
-              case 'idle' || 'paused':
-                icon = <IconPlayerPause />;
-                break;
-              case 'processing':
-                icon = <Loader size={'xs'} variant="oval" />;
-                break;
-              case 'error':
-                icon = <IconFileAlert />;
-                break;
-              case 'complete':
-                icon = <IconFileCheck />;
-                break;
-              case 'queued':
-                icon = <IconCaretRight />;
-                break;
-              case 'deleted':
-                icon = <IconTrash />;
-                break;
-              case 'unknown':
-                icon = <IconQuestionMark />;
-                break;
-              case 'stalled':
-                icon = <IconRefreshAlert />;
-                break;
-              case 'cancelled':
-                icon = <IconFileAlert />;
-                break;
+//           return entry.transcriptions.map((transcription) => {
+//             switch (transcription.status) {
+//               case 'idle' || 'paused':
+//                 icon = <IconPlayerPause />;
+//                 break;
+//               case 'processing':
+//                 icon = <Loader size={'xs'} variant="oval" />;
+//                 break;
+//               case 'error':
+//                 icon = <IconFileAlert />;
+//                 break;
+//               case 'complete':
+//                 icon = <IconFileCheck />;
+//                 break;
+//               case 'queued':
+//                 icon = <IconCaretRight />;
+//                 break;
+//               case 'deleted':
+//                 icon = <IconTrash />;
+//                 break;
+//               case 'unknown':
+//                 icon = <IconQuestionMark />;
+//                 break;
+//               case 'stalled':
+//                 icon = <IconRefreshAlert />;
+//                 break;
+//               case 'cancelled':
+//                 icon = <IconFileAlert />;
+//                 break;
 
-              default:
-                icon = <IconAlertTriangle />;
-                break;
-            }
+//               default:
+//                 icon = <IconAlertTriangle />;
+//                 break;
+//             }
 
-            return (
-              <NavLink
-                key={transcription.uuid}
-                label={<Text lineClamp={1}>{entry.config.name}</Text>}
-                component={Link}
-                to={`/entries`}
-                onClick={() => {
-                  dispatch(setActiveEntry(entry));
-                  dispatch(setBurgerOpen(false));
-                }}
-                active={entry.config.uuid === activeEntry}
-                icon={
-                  icon
-                  // transcription.status === 'error' || transcription.status === 'unknown' ? ( // If transcription is error or unknown show error icon
-                  //   <IconBugOff />
-                  // ) : transcription.status === '' ? ( // If transcription is in progress show loading icon
-                  //   <Loader size={'xs'} variant="oval" />
-                  // ) : (
-                  //   // Else show nothing
-                  //   <></>
-                  // )
-                }
-              />
-            );
-          });
-        })}
-      </>
-    );
-  }
-}
+//             return (
+//               <NavLink
+//                 key={transcription.uuid}
+//                 label={<Text lineClamp={1}>{entry.config.name}</Text>}
+//                 component={Link}
+//                 to={`/entries`}
+//                 onClick={() => {
+//                   dispatch(setActiveEntry(entry));
+//                   dispatch(setBurgerOpen(false));
+//                 }}
+//                 active={entry.config.uuid === activeEntry}
+//                 icon={
+//                   icon
+//                   // transcription.status === 'error' || transcription.status === 'unknown' ? ( // If transcription is error or unknown show error icon
+//                   //   <IconBugOff />
+//                   // ) : transcription.status === '' ? ( // If transcription is in progress show loading icon
+//                   //   <Loader size={'xs'} variant="oval" />
+//                   // ) : (
+//                   //   // Else show nothing
+//                   //   <></>
+//                   // )
+//                 }
+//               />
+//             );
+//           });
+//         })}
+//       </>
+//     );
+//   }
+// }
 
 // Entries list - Shows all entries
 function EntryList() {
@@ -248,13 +248,10 @@ function App() {
                 />
               </Navbar.Section>
               {/* Entries List*/}
-              <Navbar.Section>{EntryList()}</Navbar.Section>
-
-              {/* Recent Transcription Section */}
-              <Navbar.Section grow component={ScrollArea}>
-                {/* FIXME: Disabled pending possible removal */}
-                {false && RecentTranscriptions()}
+              <Navbar.Section component={ScrollArea} grow>
+                {EntryList()}
               </Navbar.Section>
+              <Divider />
               {/* Settings Section */}
               <Navbar.Section>
                 <NavLink
