@@ -272,7 +272,7 @@ function EntryEditor() {
                         //Play audio from 1 second
                         setCurrentLine(line);
                         //The amount of padding to add to the start and end of the line
-                        const playBackPadding = audioPadding;
+                        const playBackPadding = audioPadding as number;
                         //The start time of the line after accounting for padding
                         const computedLineStart = Math.max(line.start / 1000 - playBackPadding, 0);
                         //The end time of the line after accounting for padding
