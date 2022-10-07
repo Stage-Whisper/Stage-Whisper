@@ -14,7 +14,7 @@ jobs:
     # Set the working directory to the front end for all steps in the job
     defaults:
       run:
-        working-directory: ./electron # Set the working directory to the front end for all steps in the job
+        working-directory: electron # Set the working directory to the front end for all steps in the job
 
     steps:
       # Checkout the repository
@@ -27,6 +27,7 @@ jobs:
         with:
           node-version: 17
           cache: "npm"
+          cache-dependency-path: electron/package-lock.json
 
       # Install dependencies
       - run: npm ci
