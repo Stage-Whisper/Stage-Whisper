@@ -35,15 +35,21 @@ jobs:
         run: npm list
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Build
         run:
-          npm run build:vite
+          npm install
 
           # Run Linters
-      - name: lint
-        run: npm run lint
+      - name: Super-Linter
+        uses: github/super-linter@v4.9.7
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TYPESCRIPT_ES_CONFIG_FILE: ".eslintrc.json"
+          IGNORE_GITIGNORED_FILES: true
+
+      - name: Build
+        run: npm run build:vite
 
       # - name: Test
       # run: npm test
