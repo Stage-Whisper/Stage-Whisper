@@ -296,7 +296,6 @@ function EntryEditor() {
                         const interval = setInterval(() => {
                           const currentTime = audioPlayer.seek(); //in seconds
                           const progress = (currentTime - computedLineStart) / (computedLineEnd - computedLineStart);
-                          console.log('hello');
                           setLineAudioProgress(progress * 100);
                         }, 50);
                         setIntervalNode(interval);
