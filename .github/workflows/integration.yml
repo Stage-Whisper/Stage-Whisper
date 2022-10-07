@@ -1,5 +1,4 @@
-name: CI - Vite
-
+name: Caching with npm
 on:
   push:
     branches:
@@ -10,31 +9,38 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    # Set the working directory to the front end for all steps in the job
-    defaults:
-      run:
-        working-directory: electron # Set the working directory to the front end for all steps in the job
-
     steps:
-      # Checkout the repository
-      - name: Check out Git repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-        # Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Cache node modules
+        id: cache-npm
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
         with:
-          node-version: 17
-          cache: "npm"
-          cache-dependency-path: electron/package-lock.json
+          # npm cache files are stored in `~/.npm` on Linux/macOS
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
 
-      # Install dependencies
-      - run: npm ci
-      - run: npm build:vite
+      - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+        name: List the state of node modules
+        continue-on-error: true
+        run: npm list
 
-      # Run Linters
-      - run: npm run lint
+      - name: Install dependencies
+        run: npm install
 
-      # Tests
-      # - run: npm test
+      - name: Build
+        run:
+          npm build:vite
+
+          # Run Linters
+      - name: lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
