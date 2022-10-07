@@ -22,6 +22,7 @@ import { selectEntries } from './entrySlice';
 import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons';
 import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
 import strings from '../../localization';
+import { selectAudioPadding } from '../settings/settingsSlice';
 
 // Convert an internal audio path to a url that can be used by howler
 const filePathToURL = async (filePath: string): Promise<string> => {
@@ -147,6 +148,9 @@ function EntryEditor() {
   //Create a boolean
   const [toBeCleared, setToBeCleared] = React.useState<boolean>(false);
 
+  //Get audioPadding from redux
+  const audioPadding = useAppSelector(selectAudioPadding);
+
   let content = (
     <Center>
       <Loader />
@@ -268,7 +272,7 @@ function EntryEditor() {
                         //Play audio from 1 second
                         setCurrentLine(line);
                         //The amount of padding to add to the start and end of the line
-                        const playBackPadding = 0.5;
+                        const playBackPadding = audioPadding;
                         //The start time of the line after accounting for padding
                         const computedLineStart = Math.max(line.start / 1000 - playBackPadding, 0);
                         //The end time of the line after accounting for padding
