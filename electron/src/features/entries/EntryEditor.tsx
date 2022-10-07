@@ -289,7 +289,7 @@ function EntryEditor() {
                           const currentTime = audioPlayer.seek(); //in seconds
                           const progress = (100 * (currentTime - line.start / 1000)) / (line.duration / 1000);
                           setLineAudioProgress(progress);
-                        }, line.duration / 50);
+                        }, line.duration / 100);
                         setIntervalNode(interval);
                       }}
                       // disabled
