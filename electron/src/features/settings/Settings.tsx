@@ -1,11 +1,26 @@
-import { Card, Center, Divider, Group, HoverCard, Select, Stack, Switch, Text, Title } from '@mantine/core';
-import React from 'react';
+import {
+  ActionIcon,
+  Card,
+  Center,
+  Divider,
+  Group,
+  HoverCard,
+  NumberInput,
+  NumberInputHandlers,
+  Select,
+  Slider,
+  Stack,
+  Switch,
+  Text,
+  Title
+} from '@mantine/core';
+import React, { useEffect, useRef } from 'react';
 
 // Components
 
 // Redux
-import { useAppDispatch } from '../../redux/hooks';
-import { setAllowLargeModel, setDisplayLanguage } from './settingsSlice';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { selectAudioPadding, setAllowLargeModel, setAudioPadding, setDisplayLanguage } from './settingsSlice';
 
 // Localization
 import strings from '../../localization';
@@ -13,6 +28,8 @@ import strings from '../../localization';
 function Settings() {
   // Redux
   const dispatch = useAppDispatch();
+  const handlers = useRef<NumberInputHandlers>();
+  const audioPadding = useAppSelector(selectAudioPadding);
 
   // Get a list of all languages and their codes
   // const languages = generateLanguageList();
@@ -73,6 +90,34 @@ function Settings() {
           </Group>
           <Divider my={'sm'} />
           <Text italic> {strings.settings?.large_model_support?.subtitle}</Text>
+        </Card>
+        <Card withBorder>
+          <Group position="apart">
+            <Title order={3}>{strings.settings?.audio_padding_amount?.title}</Title>
+            <Group spacing={5}>
+              <ActionIcon size={42} variant="default" onClick={() => handlers.current?.decrement()}>
+                –
+              </ActionIcon>
+
+              <NumberInput
+                hideControls
+                value={audioPadding}
+                onChange={(val) => setAudioPadding(val)}
+                handlersRef={handlers}
+                max={10.0}
+                precision={2}
+                min={0.0}
+                step={0.25}
+                styles={{ input: { width: 54, textAlign: 'center' } }}
+              />
+
+              <ActionIcon size={42} variant="default" onClick={() => handlers.current?.increment()}>
+                +
+              </ActionIcon>
+            </Group>
+          </Group>
+          <Divider my={'sm'} />
+          <Text italic> {strings.settings?.audio_padding_amount?.subtitle}</Text>
         </Card>
       </Stack>
     </Center>

@@ -262,6 +262,11 @@ export const strings = new LocalizedStrings(
           title: 'Large Model Support',
           subtitle:
             'This will enable the use of the large models, this will require a significant amount of memory and is not suitable for most users'
+        },
+        audio_padding_amount: {
+          title: 'Audio Padding Amount',
+          subtitle:
+            'This is the amount of padding (in seconds) that will be added to the beginning and end of the audio file when transcribing, this can enhance the listening and reviewing experience'
         }
       },
       // Text for the about page
