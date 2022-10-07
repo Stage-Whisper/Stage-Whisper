@@ -23,7 +23,7 @@ const initialState: settingsState = {
   displayLanguage: 'English', // TODO: Change to user's language
   burgerOpen: false,
   allowLargeModels: false,
-  audio_padding_level: 0
+  audio_padding_level: 0.5
 };
 
 export const settingsSlice = createSlice({
