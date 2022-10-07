@@ -353,7 +353,8 @@ function EntryEditor() {
                 if (entry) {
                   dispatch(passToWhisper({ entry }));
                 } else {
-                  throw new Error('No Audio File Found');
+                  console.warn("No Entry Found, can't pass to whisper");
+                  // This should eventually be a modal
                 }
               }}
               color="violet"
@@ -361,7 +362,7 @@ function EntryEditor() {
               disabled={transcribing.status === 'loading'}
             >
               {strings.util.buttons?.transcribe}
-            </Button>{' '}
+            </Button>
           </Stack>
         </Center>
       );
