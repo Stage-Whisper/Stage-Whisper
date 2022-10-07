@@ -38,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         run:
-          npm ci
+          npm install
 
           # Run Linters
       - name: Super-Linter
