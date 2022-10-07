@@ -267,35 +267,43 @@ function EntryEditor() {
                       onClick={() => {
                         //Play audio from 1 second
                         setCurrentLine(line);
-                        // setToBeCleared(false);
+                        //The amount of padding to add to the start and end of the line
+                        const playBackPadding = 0.5;
+                        //The start time of the line after accounting for padding
+                        const computedLineStart = Math.max(line.start / 1000 - playBackPadding, 0);
+                        //The end time of the line after accounting for padding
+                        const computedLineEnd = Math.min(line.end / 1000 + playBackPadding, audioPlayer.duration());
+                        console.log('Computed Line Start: ', computedLineStart);
+                        console.log('Computed Line End: ', computedLineEnd);
                         //Cancel timeouts
                         timeOutList.forEach((timeout) => {
                           clearTimeout(timeout);
                         });
                         //Cancel intervals
                         if (intervalNode) {
-                          if (intervalNode) {
-                            clearInterval(intervalNode);
-                          }
+                          clearInterval(intervalNode);
                         }
                         setLineAudioProgress(0);
                         audioPlayer.unload();
                         audioPlayer.play();
-                        audioPlayer.seek(line.start / 1000);
-                        //stop audio after 5 seconds\\
-                        const timeout = setTimeout(() => {
-                          audioPlayer.stop();
-                          setCurrentLine(null);
-                        }, line.duration);
-                        setTimeOutList([...timeOutList, timeout]);
+                        audioPlayer.seek(computedLineStart);
 
                         //Every time 5% of the line is played update the progress bar setLineAudioProgressx
                         const interval = setInterval(() => {
                           const currentTime = audioPlayer.seek(); //in seconds
-                          const progress = (100 * (currentTime - line.start / 1000)) / (line.duration / 1000);
-                          setLineAudioProgress(progress);
-                        }, line.duration / 200);
+                          const progress = (currentTime - computedLineStart) / (computedLineEnd - computedLineStart);
+                          console.log('hello');
+                          setLineAudioProgress(progress * 100);
+                        }, 50);
                         setIntervalNode(interval);
+
+                        //stop audio after it finishes
+                        const timeout = setTimeout(() => {
+                          audioPlayer.stop();
+                          setCurrentLine(null);
+                          clearInterval(interval);
+                        }, (computedLineEnd - computedLineStart) * 1000);
+                        setTimeOutList([...timeOutList, timeout]);
                       }}
                       // disabled
                     >
