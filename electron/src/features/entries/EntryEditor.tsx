@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 
 // Components
-import { Button, Card, Center, Code, Divider, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { Button, Card, Center, Code, Divider, Group, Loader, Progress, Stack, Text, Title } from '@mantine/core';
 // import { RichTextEditor } from '@mantine/rte';
 
 // Types
@@ -19,6 +19,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useParams } from 'react-router-dom';
 import { useAppSelector } from '../../redux/hooks';
 import { selectEntries } from './entrySlice';
+import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons';
 
 // Convert an internal audio path to a url that can be used by howler
 const filePathToURL = async (filePath: string): Promise<string> => {
@@ -49,35 +50,57 @@ type formattedVTTLine = {
 // Construct Audio Player -- Required as will need to refresh with new audio player
 function AudioControls(audioPlayer: Howl) {
   console.log('AudioControls: Constructing New Audio Controls');
+  //Get currentplaying state from redux
+  //
+  // Audio Player\
 
+  let currentPlaying = false;
+  audioPlayer.on('play', () => {
+    currentPlaying = true;
+  });
+  audioPlayer.on('pause', () => {
+    currentPlaying = false;
+  });
+  audioPlayer.on('end', () => {
+    currentPlaying = false;
+  });
   return (
-    <Card shadow="md" p="lg">
-      {/* <Text>{currentLine?.text}</Text> */}
-      <Stack spacing="md">
-        {/* Button Section */}
-        <Button
-          onClick={() => {
-            console.log('Play');
-            // console.log('Current Line: ', currentLine);
-            console.log('State about to trigger: ', audioPlayer.state());
-            // console.log(audioPlayer.play());
-            console.log('About to trigger', audioPlayer);
-            audioPlayer.play();
-          }}
-        >
-          Play
-        </Button>
-        <Button onClick={() => console.log(audioPlayer)}>Log Audio Player</Button>
+    <>
+      {/* Create a button floating on the bottom right  */}
+      <Card style={{ position: 'absolute', right: '20px', bottom: '70px', zIndex: 99999 }} shadow="md" p="lg">
+        {/* <Text>{currentLine?.text}</Text> */}
+        <Group spacing="md">
+          {/* Button Section */}
+          {/* Check if the audio is playing in which case render. Make sure to rerender the app every time the audio finishes*/}
 
-        <Button
-          onClick={() => {
-            audioPlayer.pause();
-          }}
-        >
-          Pause
-        </Button>
-      </Stack>
-    </Card>
+          <Button
+            onClick={() => {
+              console.log('Play');
+              // console.log('Current Line: ', currentLine);
+              console.log('State about to trigger: ', audioPlayer.state());
+              // console.log(audioPlayer.play());
+              console.log('About to trigger', audioPlayer);
+              if (currentPlaying) {
+                audioPlayer.unload();
+                audioPlayer.play();
+              } else {
+                audioPlayer.play();
+              }
+            }}
+          >
+            <IconPlayerPlay></IconPlayerPlay>
+          </Button>
+          <Button
+            onClick={() => {
+              audioPlayer.pause();
+            }}
+          >
+            <IconPlayerPause></IconPlayerPause>
+          </Button>
+          <Button onClick={() => console.log(audioPlayer)}>Log Audio Player</Button>
+        </Group>
+      </Card>
+    </>
   );
 }
 
@@ -106,9 +129,18 @@ function EntryEditor() {
 
   // Set up the audio player state
   const [audioPlayer, setAudioPlayer] = React.useState<Howl | null>(null);
+  // const [audioPlayerArray, setAudioPlayerArray] = React.useState<Array<Howl>>([]);
 
   // Audio Controls
   const [audioControls, setAudioControls] = React.useState<JSX.Element | null>(null);
+  //Timeout
+  const [timeOutList, setTimeOutList] = React.useState<Array<NodeJS.Timeout>>([]);
+  //Progress bar
+  const [lineAudioProgress, setLineAudioProgress] = React.useState<number>(0);
+  //Intervals
+  const [intervalNode, setIntervalNode] = React.useState<NodeJS.Timeout | null>(null);
+  //Create a boolean
+  const [toBeCleared, setToBeCleared] = React.useState<boolean>(false);
 
   let content = (
     <Center>
@@ -120,9 +152,9 @@ function EntryEditor() {
   // Update the audio controls when the audio player changes
 
   useEffect(() => {
-    console.log('AudioControls: Audio Player Changed');
     // If the audio player is not null
     if (audioPlayer) {
+      console.log('AudioControls: Audio Player Changed');
       // Construct the audio controls
       setAudioControls(AudioControls(audioPlayer));
       setReady(true);
@@ -137,73 +169,68 @@ function EntryEditor() {
     setCurrentLine(null);
     setReady(false);
     setLineLimits([0, 0]);
+    audioPlayer?.unload();
+    audioPlayer?.off();
     setAudioPlayer(null);
+    setToBeCleared(true);
+    if (intervalNode) {
+      clearInterval(intervalNode);
+    }
+    setIntervalNode(null);
+    setTimeOutList([]);
+    setLineAudioProgress(0);
     console.log(' ---- Reset State ---- ');
 
-    const loadPage = async () => {
-      // If the entry has a transcription
-      if (entry && entry.transcriptions[0] && entry.transcriptions[0].vtt) {
-        const vttNodes = entry.transcriptions[0].vtt;
-        console.log('Got VTT Nodes: ', vttNodes);
+    // const loadPage = async () => {
+    // If the entry has a transcription
+    if (entry && entry.transcriptions[0] && entry.transcriptions[0].vtt) {
+      const vttNodes = entry.transcriptions[0].vtt;
+      console.log('Got VTT Nodes: ', vttNodes);
 
-        // Format the VTT lines
-        const formattedLines = [] as Array<formattedVTTLine>;
-        vttNodes.forEach((node: Node) => {
-          if (node.type === 'cue') {
-            const key = uuidv4();
-            const start = node.data.start;
-            const end = node.data.end;
-            const duration = end - start;
-            const text = node.data.text;
-            formattedLines.push({ start, end, duration, text, key });
-          }
+      // Format the VTT lines
+      const formattedLines = [] as Array<formattedVTTLine>;
+      vttNodes.forEach((node: Node) => {
+        if (node.type === 'cue') {
+          const key = uuidv4();
+          const start = node.data.start;
+          const end = node.data.end;
+          const duration = end - start;
+          const text = node.data.text;
+          formattedLines.push({ start, end, duration, text, key });
+        }
+      });
+
+      // Set the formatted lines
+      console.log('Setting Formatted Lines: ', formattedLines);
+      setFormattedVTTLines(formattedLines);
+      console.log('Got Audio Path: ', entry.audio.path);
+      const audioFilePath = entry.audio.path;
+      // Convert the audio file path to a URL
+      console.log('Converting Audio Path to URL');
+      filePathToURL(audioFilePath).then((audioURL) => {
+        // Create a new Howl object
+        const newAudioPlayer = new Howl({
+          src: [audioURL],
+          html5: true,
+          format: ['mp3'],
+          preload: true
         });
-
-        // Set the formatted lines
-        console.log('Setting Formatted Lines: ', formattedLines);
-        setFormattedVTTLines(formattedLines);
-
-        console.log('Got Audio Path: ', entry.audio.path);
-        const audioFilePath = entry.audio.path;
-        // Convert the audio file path to a URL
-        console.log('Converting Audio Path to URL');
-        filePathToURL(audioFilePath).then((audioURL) => {
-          // Create a new Howl object
-          const newAudioPlayer = new Howl({
-            src: [audioURL],
-            html5: true,
-            format: ['mp3'],
-            preload: true,
-
-            sprite: {
-              // Create a sprite for each line
-              ...formattedVTTLines.reduce((acc, line) => {
-                const start = line.start;
-                const duration = line.duration;
-                const name = line.key;
-                return { ...acc, [name]: [start, duration] };
-              }, {})
-            }
-          });
-
-          new Promise((resolve, reject) => {
-            newAudioPlayer.on('load', () => {
-              console.log('Audio Player Loaded');
-              setAudioPlayer(newAudioPlayer);
-              resolve(newAudioPlayer);
-            });
-            newAudioPlayer.once('loaderror', (id, error) => {
-              console.log('Audio Player Load Error');
-              reject(error);
-            });
-          });
+        newAudioPlayer.on('load', () => {
+          console.log('Audio Player Loaded');
+          setAudioPlayer(newAudioPlayer);
         });
-      } else {
-        console.log('No Transcription Found');
-      }
-    };
+        newAudioPlayer.once('loaderror', (id, error) => {
+          console.log('Audio Player Load Error');
+          // reject(error);
+        });
+        // });
+      });
+    } else {
+      console.log('No Transcription Found');
+    }
+    // };
 
-    loadPage();
+    // loadPage();
   }, [entry]);
 
   // If the page is ready
@@ -233,14 +260,42 @@ function EntryEditor() {
 
                     <Button
                       onClick={() => {
-                        console.log('Play Line - temp');
-                        console.log('Current Line: ', line);
-                      }}
-                      disabled
-                    >
-                      Play Line - Disabled
-                    </Button>
+                        //Play audio from 1 second
+                        setCurrentLine(line);
+                        // setToBeCleared(false);
+                        //Cancel timeouts
+                        timeOutList.forEach((timeout) => {
+                          clearTimeout(timeout);
+                        });
+                        //Cancel intervals
+                        if (intervalNode) {
+                          if (intervalNode) {
+                            clearInterval(intervalNode);
+                          }
+                        }
+                        setLineAudioProgress(0);
+                        audioPlayer.unload();
+                        audioPlayer.play();
+                        audioPlayer.seek(line.start / 1000);
+                        //stop audio after 5 seconds\\
+                        const timeout = setTimeout(() => {
+                          audioPlayer.stop();
+                          setCurrentLine(null);
+                        }, line.duration);
+                        setTimeOutList([...timeOutList, timeout]);
 
+                        //Every time 5% of the line is played update the progress bar setLineAudioProgressx
+                        const interval = setInterval(() => {
+                          const currentTime = audioPlayer.seek(); //in seconds
+                          const progress = (100 * (currentTime - line.start / 1000)) / (line.duration / 1000);
+                          setLineAudioProgress(progress);
+                        }, line.duration / 50);
+                        setIntervalNode(interval);
+                      }}
+                      // disabled
+                    >
+                      Play Line
+                    </Button>
                     <Text>
                       {' '}
                       {String(Math.floor(line.end / 1000 / 60)).padStart(2, '0')}:
@@ -248,6 +303,7 @@ function EntryEditor() {
                     </Text>
                   </Group>
                 </Card>
+                <Progress value={currentLine == line ? lineAudioProgress : 0}></Progress>
               </Stack>
             </Card>
           );
