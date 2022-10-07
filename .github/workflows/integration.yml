@@ -8,13 +8,15 @@ on:
       - main
 jobs:
   build:
+    name: Lint Code Base
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./electron
     steps:
       - uses: actions/checkout@v3
-
+        with:
+          fetch-depth: 0
       - name: Cache node modules
         id: cache-npm
         uses: actions/cache@v3
@@ -36,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         run:
-          npm install
+          npm ci
 
           # Run Linters
       - name: Super-Linter
@@ -44,8 +46,12 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
+          # Only lint files in ./electron/src and ./electron/electron folders
+          FILTER_REGEX_INCLUDE: .*/electron/(src|electron)/.*
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # IGNORE_GITIGNORED_FILES: true
+          TYPESCRIPT_ES_CONFIG_FILE: .eslintrc.json
+          TYPESCRIPT_DEFAULT_STYLE: prettier
+          LINTER_RULES_PATH: /electron
 
       - name: Build
         run: npm run build:vite
