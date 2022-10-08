@@ -3,7 +3,6 @@ import { useMediaQuery } from '@mantine/hooks';
 import React from 'react';
 
 // Components
-import Language from './components/language/Language';
 // import Model from './components/model/Model';
 import Audio, { AudioType } from './components/audio/Audio';
 
@@ -30,6 +29,7 @@ import { getLocalFiles } from '../entries/entrySlice';
 import About, { AboutType } from './components/about/About';
 import { WhisperArgs } from '../../../electron/types/whisperTypes';
 import SimpleInput from './components/audio/SimpleInput';
+import { entryAudioParams } from '../../../electron/types/types';
 
 function Input() {
   // Redux
@@ -62,12 +62,16 @@ function Input() {
       console.log('Input: All selections made');
       dispatch(setHighlightInvalid(false));
       dispatch(setSubmitting(true));
+
+      // Convert audio type string to valid entryAudioParams type
+      const audioType = audio.type?.split('/')[1] as entryAudioParams['type'];
+
       await window.Main.newEntry({
         // TODO: #51 Convert to redux action
         filePath: audio.path,
         audio: {
           name: audio.name,
-          type: audio.type || audio.path.split('.').pop() || 'unknown',
+          type: audioType,
           language: language
         },
         config: {
@@ -161,7 +165,6 @@ function Input() {
             </Title>
             <About />
             <Audio />
-            <Language />
           </>
         )}
 

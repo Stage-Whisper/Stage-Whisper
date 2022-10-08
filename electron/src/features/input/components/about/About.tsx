@@ -4,10 +4,6 @@ import strings from '../../../../localization';
 import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
 import { selectAbout, selectHighlightInvalid, setAbout } from '../../inputSlice';
 
-// Redux
-// import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
-// import { selectDirectory, selectHighlightInvalid, setDirectory } from '../../inputSlice';
-
 // Localization
 // import strings from '../../../../localization';
 

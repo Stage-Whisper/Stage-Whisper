@@ -1,7 +1,6 @@
 import React from 'react';
+import { createRoot } from 'react-dom/client';
 import App from './App';
-import ReactDOM from 'react-dom';
-
 // Views
 import Dashboard from './features/dashboard/Dashboard';
 import Input from './features/input/Input';
@@ -14,13 +13,18 @@ import { Provider } from 'react-redux';
 import { setupStore } from './redux/store';
 
 import About from './features/about/About';
-import Settings from './features/settings/Settings';
 import Entries from './features/entries/Entries';
 import EntryEditor from './features/entries/EntryEditor';
+import Settings from './features/settings/Settings';
 
 export const store = setupStore();
 
-ReactDOM.render(
+// Convert from ReactDOM.render to createRoot
+
+const rootElement = document.getElementById('root') as Element;
+const root = createRoot(rootElement);
+
+root.render(
   <React.StrictMode>
     <Provider store={store}>
       <HashRouter>
@@ -32,13 +36,11 @@ ReactDOM.render(
             <Route path="/about" element={<About />} />
             <Route path="/entries" element={<Entries />} />
             <Route path="/entries/:entryId" element={<EntryEditor />} />
-            {/* <Route path=":entryId" element={<EntryEditor />} /> */}
 
             <Route path="*" element={<div>404</div>} />
           </Route>
         </Routes>
       </HashRouter>
     </Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );

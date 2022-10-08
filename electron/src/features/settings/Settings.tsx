@@ -6,13 +6,12 @@ import {
   Group,
   HoverCard,
   NumberInput,
-  NumberInputHandlers,
   Stack,
   Switch,
   Text,
   Title
 } from '@mantine/core';
-import React, { useRef } from 'react';
+import React from 'react';
 
 // Components
 

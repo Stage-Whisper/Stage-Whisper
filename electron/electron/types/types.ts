@@ -1,6 +1,5 @@
 import { NodeList } from 'subtitle';
 import { WhisperArgs } from './whisperTypes';
-// Response to a request for the app data from "get-entries"
 
 // Entry Config Object
 export type entryConfig = {

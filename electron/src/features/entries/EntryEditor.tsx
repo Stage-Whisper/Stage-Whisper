@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 
 // Components
-import { Button, Card, Center, Code, Divider, Group, Loader, Progress, Stack, Text, Title } from '@mantine/core';
+import { Button, Card, Center, Group, Loader, Progress, Stack, Text, Title } from '@mantine/core';
 // import { RichTextEditor } from '@mantine/rte';
 
 // Types
 import { Node } from 'subtitle';
-import { entry } from '../../../electron/types/types';
 
 // Redux
 // import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
@@ -14,15 +13,15 @@ import { entry } from '../../../electron/types/types';
 // import { selectActiveEntry, selectEntries } from '../entrySlice';
 
 // Packages
-import { Howl } from 'howler';
-import { v4 as uuidv4 } from 'uuid';
-import { useParams } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { selectEntries } from './entrySlice';
 import { IconPlayerPause, IconPlayerPlay } from '@tabler/icons';
-import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
+import { Howl } from 'howler';
+import { useParams } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import strings from '../../localization';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectAudioPadding } from '../settings/settingsSlice';
+import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
+import { selectEntries } from './entrySlice';
 
 // Convert an internal audio path to a url that can be used by howler
 const filePathToURL = async (filePath: string): Promise<string> => {
@@ -53,9 +52,6 @@ type formattedVTTLine = {
 // Construct Audio Player -- Required as will need to refresh with new audio player
 function AudioControls(audioPlayer: Howl) {
   console.log('AudioControls: Constructing New Audio Controls');
-  //Get currentplaying state from redux
-  //
-  // Audio Player\
 
   let currentPlaying = false;
   audioPlayer.on('play', () => {
@@ -79,10 +75,6 @@ function AudioControls(audioPlayer: Howl) {
           <Button
             onClick={() => {
               console.log('Play');
-              // console.log('Current Line: ', currentLine);
-              console.log('State about to trigger: ', audioPlayer.state());
-              // console.log(audioPlayer.play());
-              console.log('About to trigger', audioPlayer);
               if (currentPlaying) {
                 audioPlayer.unload();
                 audioPlayer.play();
@@ -131,7 +123,7 @@ function EntryEditor() {
   const [ready, setReady] = React.useState<boolean>(false);
 
   // The limits of the current line (in milliseconds)
-  const [lineLimits, setLineLimits] = React.useState<[number, number]>([0, 0]);
+  // const [lineLimits, setLineLimits] = React.useState<[number, number]>([0, 0]);
 
   // Set up the audio player state
   const [audioPlayer, setAudioPlayer] = React.useState<Howl | null>(null);
@@ -146,7 +138,7 @@ function EntryEditor() {
   //Intervals
   const [intervalNode, setIntervalNode] = React.useState<NodeJS.Timeout | null>(null);
   //Create a boolean
-  const [toBeCleared, setToBeCleared] = React.useState<boolean>(false);
+  // const [toBeCleared, setToBeCleared] = React.useState<boolean>(false);
 
   //Get audioPadding from redux
   const audioPadding = useAppSelector(selectAudioPadding);
@@ -159,7 +151,6 @@ function EntryEditor() {
 
   // Audio Control Use Effect
   // Update the audio controls when the audio player changes
-
   useEffect(() => {
     // If the audio player is not null
     if (audioPlayer) {
@@ -177,11 +168,11 @@ function EntryEditor() {
     setFormattedVTTLines([]);
     setCurrentLine(null);
     setReady(false);
-    setLineLimits([0, 0]);
+    // setLineLimits([0, 0]);
     audioPlayer?.unload();
     audioPlayer?.off();
     setAudioPlayer(null);
-    setToBeCleared(true);
+    // setToBeCleared(true);
     if (intervalNode) {
       clearInterval(intervalNode);
     }
@@ -228,18 +219,13 @@ function EntryEditor() {
           console.log('Audio Player Loaded');
           setAudioPlayer(newAudioPlayer);
         });
-        newAudioPlayer.once('loaderror', (id, error) => {
-          console.log('Audio Player Load Error');
-          // reject(error);
+        newAudioPlayer.once('loaderror', (_id, error) => {
+          console.log('Audio Player Load Error ', error);
         });
-        // });
       });
     } else {
       console.log('No Transcription Found');
     }
-    // };
-
-    // loadPage();
   }, [entry]);
 
   // If the page is ready

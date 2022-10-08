@@ -2,12 +2,10 @@ import {
   ActionIcon,
   Affix,
   AppShell,
-  // Aside,
   Burger,
   Divider,
   Group,
   Header,
-  Loader,
   MantineProvider,
   MediaQuery,
   Navbar,
@@ -21,130 +19,36 @@ import React, { useEffect } from 'react';
 import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
 
 import {
-  IconAlertTriangle,
   IconBug,
   IconBugOff,
-  IconCaretRight,
-  IconFileAlert,
-  IconFileCheck,
   IconFileDescription,
   IconHome,
   IconInfoCircle,
   IconLanguage,
   IconMicrophone2,
   IconMoonStars,
-  IconPlayerPause,
-  IconQuestionMark,
-  IconRefreshAlert,
   IconSettings,
-  IconSun,
-  IconTrash
+  IconSun
 } from '@tabler/icons';
 import strings from './localization';
 import { useAppDispatch, useAppSelector } from './redux/hooks';
 
-import { selectBurgerOpen, selectDebugMenu, setBurgerOpen, toggleDebugMenu } from './appSlice';
-import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
-import {
-  selectActiveEntry,
-  selectNumberOfEntries,
-  selectEntries,
-  setActiveEntry,
-  getLocalFiles
-} from './features/entries/entrySlice';
-import Debug from './debug/Debug';
-import { selectTranscribingStatus } from './features/whisper/whisperSlice';
 import { NotificationsProvider } from '@mantine/notifications';
-// import { ipcRenderer } from 'electron';
-// import { Channels } from '../electron/types/channels';
-
-// Recent Transcription Constructor - Shows jobs that are in progress or queued
-// function RecentTranscriptions() {
-//   const entries = useAppSelector(selectEntries);
-//   const activeEntry = useAppSelector(selectActiveEntry);
-//   const dispatch = useAppDispatch();
-
-//   if (!entries.length) {
-//     return <></>;
-//   } else {
-//     return (
-//       <>
-//         <Divider mt={'sm'} />
-//         {/* <Title order={6}>{strings.entries?.recent_transcriptions}</Title> */}
-
-//         {entries.map((entry) => {
-//           let icon: JSX.Element;
-
-//           return entry.transcriptions.map((transcription) => {
-//             switch (transcription.status) {
-//               case 'idle' || 'paused':
-//                 icon = <IconPlayerPause />;
-//                 break;
-//               case 'processing':
-//                 icon = <Loader size={'xs'} variant="oval" />;
-//                 break;
-//               case 'error':
-//                 icon = <IconFileAlert />;
-//                 break;
-//               case 'complete':
-//                 icon = <IconFileCheck />;
-//                 break;
-//               case 'queued':
-//                 icon = <IconCaretRight />;
-//                 break;
-//               case 'deleted':
-//                 icon = <IconTrash />;
-//                 break;
-//               case 'unknown':
-//                 icon = <IconQuestionMark />;
-//                 break;
-//               case 'stalled':
-//                 icon = <IconRefreshAlert />;
-//                 break;
-//               case 'cancelled':
-//                 icon = <IconFileAlert />;
-//                 break;
-
-//               default:
-//                 icon = <IconAlertTriangle />;
-//                 break;
-//             }
-
-//             return (
-//               <NavLink
-//                 key={transcription.uuid}
-//                 label={<Text lineClamp={1}>{entry.config.name}</Text>}
-//                 component={Link}
-//                 to={`/entries`}
-//                 onClick={() => {
-//                   dispatch(setActiveEntry(entry));
-//                   dispatch(setBurgerOpen(false));
-//                 }}
-//                 active={entry.config.uuid === activeEntry}
-//                 icon={
-//                   icon
-//                   // transcription.status === 'error' || transcription.status === 'unknown' ? ( // If transcription is error or unknown show error icon
-//                   //   <IconBugOff />
-//                   // ) : transcription.status === '' ? ( // If transcription is in progress show loading icon
-//                   //   <Loader size={'xs'} variant="oval" />
-//                   // ) : (
-//                   //   // Else show nothing
-//                   //   <></>
-//                   // )
-//                 }
-//               />
-//             );
-//           });
-//         })}
-//       </>
-//     );
-//   }
-// }
+import { selectBurgerOpen, selectDebugMenu, setBurgerOpen, toggleDebugMenu } from './appSlice';
+import Debug from './debug/Debug';
+import {
+  getLocalFiles,
+  selectActiveEntry,
+  selectEntries,
+  selectNumberOfEntries,
+  setActiveEntry
+} from './features/entries/entrySlice';
+import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
+import { selectTranscribingStatus } from './features/whisper/whisperSlice';
 
 // Entries list - Shows all entries
 function EntryList() {
   const entries = useAppSelector(selectEntries);
-  const activeEntry = useAppSelector(selectActiveEntry);
   const dispatch = useAppDispatch();
   const { entryId } = useParams();
   return (
@@ -271,21 +175,6 @@ function App() {
               </Navbar.Section>
             </Navbar>
           }
-          // aside={
-          //   <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
-          //     <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 300 }}>
-          //       <Text>{strings.sidebar?.title}</Text>
-          //     </Aside>
-          //   </MediaQuery>
-          // }
-          // footer={
-          //   <Footer height={60} p="md">
-          //     <Group position="apart">
-          //       <Text>{strings.about?.title}</Text>
-
-          //     </Group>
-          //   </Footer>
-          // }
           header={
             <Header height={70} p="md">
               <Group style={{ display: 'flex', height: '100%' }}>

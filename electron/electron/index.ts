@@ -6,19 +6,19 @@ import { join } from 'path';
 import installExtension, { REDUX_DEVTOOLS } from 'electron-devtools-installer';
 
 // Packages
-import { app, BrowserWindow, dialog, ipcMain, IpcMainEvent } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
-import { Channels, OpenDirectoryDialogResponse } from './types/channels';
 import { existsSync, readFile } from 'fs';
+import { Channels, OpenDirectoryDialogResponse } from './types/channels';
 
 // Import handlers
-import './types/whisperTypes'; // Types for whisper model
-import './handlers/runWhisper/runWhisper'; // Run whisper model
-import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
-import './handlers/newEntry/newEntry'; // Add a new entry to the database
+import { initializeApp } from './functions/initialize/initializeApp';
 import './handlers/deleteStore/deleteStore'; // Non functional
 import './handlers/fetchAudioFile/fetchAudioFile'; // Fetch audio file from disk
-import { initializeApp } from './functions/initialize/initializeApp';
+import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
+import './handlers/newEntry/newEntry'; // Add a new entry to the database
+import './handlers/runWhisper/runWhisper'; // Run whisper model
+import './types/whisperTypes'; // Types for whisper model
 
 // Electron Defaults
 const height = 600;
@@ -31,7 +31,6 @@ declare global {
   }
 }
 
-//#region Utility Functions
 // Promise wrapper for readFile
 export const readFilePromise = (path: string): Promise<string> =>
   new Promise((resolve, reject) => {
@@ -45,7 +44,6 @@ export const readFilePromise = (path: string): Promise<string> =>
         })
       : reject(new Error('File does not exist'));
   });
-//#endregion
 
 function createWindow() {
   // Create the browser window.
@@ -70,29 +68,7 @@ function createWindow() {
     window?.loadFile(url);
   }
 
-  // eslint-disable-next-line no-unused-expressions
   isDev && window?.webContents.openDevTools({ mode: 'detach' });
-
-  // // Whisper
-
-  // For AppBar
-  ipcMain.on('minimize', () => {
-    // eslint-disable-next-line no-unused-expressions
-    window.isMinimized() ? window.restore() : window.minimize();
-  });
-  ipcMain.on('maximize', () => {
-    // eslint-disable-next-line no-unused-expressions
-    window.isMaximized() ? window.restore() : window.maximize();
-  });
-
-  // // Listen for Whisper model to complete
-  // ipcMain.on(Channels.transcriptionComplete, (_event: IpcMainEvent, args: string) => {
-  //   window.webContents.send(Channels.transcriptionComplete, args);
-  // });
-
-  ipcMain.on('close', () => {
-    window.close();
-  });
 }
 
 // This method will be called when Electron has finished
@@ -119,16 +95,6 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
-});
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
-
-// listen the channel `message` and resend the received message to the renderer process
-ipcMain.on('message', (event: IpcMainEvent, message: unknown) => {
-  // eslint-disable-next-line no-console
-  console.log(message);
-  setTimeout(() => event.sender.send('message', 'hi from electron'), 500);
 });
 
 ipcMain.handle(Channels.openDirectoryDialog, async (): Promise<OpenDirectoryDialogResponse> => {

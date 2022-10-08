@@ -1,21 +1,20 @@
-import { ipcMain, IpcMainInvokeEvent } from 'electron';
+import { ipcMain } from 'electron';
 import { DeleteStoreResponse } from '../../types/channels';
-// File to import all data from the data folder
 
+// File to import all data from the data folder
 import { app } from 'electron';
 import { rmdir } from 'fs/promises';
 import { join } from 'path';
 import { Channels } from '../../types/channels';
 
 // Paths
-
 const rootPath = app.getPath('userData'); // Path to the top level of the data folder
 const storePath = join(rootPath, 'store'); // Path to the store folder
 
 // Get all entries
 export default ipcMain.handle(
   Channels.deleteStore, // BUG: #53 This will not work no matter what I do
-  async (_event: IpcMainInvokeEvent): Promise<DeleteStoreResponse> => {
+  async (): Promise<DeleteStoreResponse> => {
     try {
       // Delete the store folder
       console.log('DeleteStore: Deleting store folder');

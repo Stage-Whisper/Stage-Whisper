@@ -1,4 +1,4 @@
-import { Button, Card, Stack, Title, Notification, Alert } from '@mantine/core';
+import { Button, Card, Notification, Stack, Title } from '@mantine/core';
 
 import React, { useState } from 'react';
 import { useAppDispatch } from '../redux/hooks';
@@ -7,8 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { getLocalFiles } from '../features/entries/entrySlice';
 
 function Debug() {
-  //#region Testing area
-
   interface notificationType {
     id: string;
     title: string;
@@ -17,10 +15,8 @@ function Debug() {
   }
 
   const [notifications, setNotifications] = useState<notificationType[]>([]);
-  //#endregion
 
   const dispatch = useAppDispatch();
-  // const notifications = [] as JSX.Element[];
 
   const handleDeleteStore = async () => {
     window.Main.deleteStore();
