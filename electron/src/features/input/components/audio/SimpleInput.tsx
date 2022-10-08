@@ -1,18 +1,16 @@
-import { Card, FileInput, Group, Stack, Text, Title } from '@mantine/core';
+import { Card, Group, Stack, Text } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
-import { IconCheckbox, IconMusic, IconUpload, IconX } from '@tabler/icons';
+import { IconCheckbox, IconUpload, IconX } from '@tabler/icons';
 import React from 'react';
-import strings from '../../../../localization';
 import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
-import { selectAudio, selectHighlightInvalid, setAudioValid, setSimpleAudioInput } from '../../inputSlice';
-import { FileWithPath } from '@mantine/dropzone';
+import { selectAudio, setAudioValid, setSimpleAudioInput } from '../../inputSlice';
 // Card with file picker that allows user to select a file from their computer
 function SimpleInput() {
   // Redux
   const dispatch = useAppDispatch();
   //Theming
   const { audioValid } = useAppSelector(selectAudio);
-  const highlightInvalid = useAppSelector(selectHighlightInvalid);
+  // const highlightInvalid = useAppSelector(selectHighlightInvalid);
   // const [audioValid, setAudioValid] = React.useState(false);
 
   return (
