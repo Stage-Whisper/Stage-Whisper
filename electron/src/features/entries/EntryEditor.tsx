@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 // Components
+
 import {
   ActionIcon,
   Affix,
@@ -15,13 +16,16 @@ import {
   Text,
   Title
 } from '@mantine/core';
+
 // import { RichTextEditor } from '@mantine/rte';
 import { DataTable } from 'mantine-datatable';
 // Types
 import { Node } from 'subtitle';
 
+
 // Packages
 import { IconEdit, IconPlayerPause, IconPlayerPlay, IconPlayerStop, IconTrash } from '@tabler/icons';
+
 import { Howl } from 'howler';
 import { useParams } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -59,6 +63,7 @@ type formattedVTTLine = {
 
 // Construct Audio Player -- Required as will need to refresh with new audio player
 function AudioControls(audioPlayer: Howl) {
+
   let currentPlaying = false;
   audioPlayer.on('play', () => {
     currentPlaying = true;
@@ -72,6 +77,7 @@ function AudioControls(audioPlayer: Howl) {
   return (
     <>
       {/* Create a button floating on the bottom right  */}
+
       <Affix position={{ bottom: 20, right: 20 }}>
         <Card shadow="md" p="lg">
           <Group spacing="md">
@@ -98,6 +104,7 @@ function AudioControls(audioPlayer: Howl) {
           </Group>
         </Card>
       </Affix>
+
     </>
   );
 }
@@ -134,7 +141,9 @@ function EntryEditor() {
   // Empty state to store the formatted VTT lines
   const [formattedVTTLines, setFormattedVTTLines] = useState<Array<formattedVTTLine>>([]);
   // Empty state to store the current line
+
   const [currentLine, setCurrentLine] = useState<formattedVTTLine | null>(null);
+
   // Set up the audio player state
   const [audioPlayer, setAudioPlayer] = useState<Howl | null>(null);
   // Audio Controls
@@ -148,7 +157,9 @@ function EntryEditor() {
     setLineAudioProgress
   ] = useState<number>(0);
   //Intervals
+
   const [intervalNode, setIntervalNode] = useState<NodeJS.Timeout | null>(null);
+
   //Get audioPadding from redux
   const audioPadding = useAppSelector(selectAudioPadding);
 
@@ -185,9 +196,11 @@ function EntryEditor() {
     // Reset all the states when the entry changes
     setFormattedVTTLines([]);
     setCurrentLine(null);
+
     audioPlayer?.unload();
     audioPlayer?.off();
     setAudioPlayer(null);
+
     if (intervalNode) {
       clearInterval(intervalNode);
     }

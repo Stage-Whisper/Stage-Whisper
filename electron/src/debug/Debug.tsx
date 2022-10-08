@@ -1,4 +1,6 @@
+
 import { ActionIcon, Affix, Button, Card, Group, Notification, Stack, Title } from '@mantine/core';
+
 
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
@@ -21,7 +23,9 @@ function Debug() {
   const [notifications, setNotifications] = useState<notificationType[]>([]);
 
   const dispatch = useAppDispatch();
+
   const darkMode = useAppSelector(selectDarkMode);
+
 
   const handleDeleteStore = async () => {
     window.Main.deleteStore();

@@ -17,6 +17,9 @@ import React, { useEffect } from 'react';
 import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
 
 import {
+
+
+
   IconFileDescription,
   IconHome,
   IconInfoCircle,
@@ -28,7 +31,9 @@ import strings from './localization';
 import { useAppDispatch, useAppSelector } from './redux/hooks';
 
 import { NotificationsProvider } from '@mantine/notifications';
+
 import { selectBurgerOpen, setBurgerOpen } from './appSlice';
+
 import Debug from './debug/Debug';
 import {
   getLocalFiles,
@@ -37,7 +42,9 @@ import {
   selectNumberOfEntries,
   setActiveEntry
 } from './features/entries/entrySlice';
+
 import { selectDarkMode, selectDisplayLanguage } from './features/settings/settingsSlice';
+
 import { selectTranscribingStatus } from './features/whisper/whisperSlice';
 
 // Entries list - Shows all entries
