@@ -142,7 +142,11 @@ function EntryEditor() {
   //Timeout
   const [timeOutList, setTimeOutList] = useState<Array<NodeJS.Timeout>>([]);
   //Progress bar
-  const [lineAudioProgress, setLineAudioProgress] = useState<number>(0);
+  const [
+    ,
+    // lineAudioProgress
+    setLineAudioProgress
+  ] = useState<number>(0);
   //Intervals
   const [intervalNode, setIntervalNode] = useState<NodeJS.Timeout | null>(null);
   //Get audioPadding from redux
@@ -402,6 +406,7 @@ function EntryEditor() {
                         color="blue"
                         onClick={() => {
                           setEditingLine(line);
+                          editModal();
                         }}
                       >
                         <IconEdit size={16} />
