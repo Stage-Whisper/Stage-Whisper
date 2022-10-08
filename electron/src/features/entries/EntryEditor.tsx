@@ -313,10 +313,6 @@ function EntryEditor() {
 
         content = (
           <>
-            <Text italic align="center">
-              Known Bug: If you refresh this page the audio element loses track of files and refuses to play. To get it
-              to work use CMD-R or F5 to refresh this page in the meantime
-            </Text>
             {audioControls}
 
             <Title mt={'md'} align="center">
