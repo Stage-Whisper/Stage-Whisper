@@ -399,51 +399,7 @@ function EntryEditor() {
                       {/* {String(Math.floor(duration / 1000 / 60)).padStart(2, '0')}: */}
                       {String(Math.floor(duration / 1000) % 60)}s
                     </Text>
-                  </Group>
-                </Card>
-                <Progress value={currentLine == line ? lineAudioProgress : 0}></Progress>
-              </Stack>
-            </Card>
-          );
-        });
-
-        content = (
-          <>
-            {audioControls}
-
-            <Title mt={'md'} align="center">
-              {entry.config.name}
-            </Title>
-            {tempDisplay}
-          </>
-        );
-      } else {
-        content = (
-          <Card shadow="md" p="lg">
-            <Text>Audio Loading...</Text>
-          </Card>
-        );
-      }
-    } else {
-      content = (
-        <Card shadow="md" p="lg">
-          <Text>No Transcription Found</Text>
-        </Card>
-      );
-    }
-  } else {
-    if (!entry?.transcriptions[0]) {
-      content = (
-        <Center>
-          <Stack>
-            <Title order={3}>No Transcription Found</Title>
-            <Button
-              onClick={() => {
-                if (entry) {
-                  dispatch(passToWhisper({ entry }));
-                } else {
-                  console.warn("No Entry Found, can't pass to whisper");
-                  // This should eventually be a modal
+                  );
                 }
               },
               // Action Column
