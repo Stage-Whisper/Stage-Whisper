@@ -284,7 +284,6 @@ function EntryEditor() {
             recordsPerPage={pageSize}
             page={page}
             onPageChange={(p) => setPage(p)}
-            fetching={transcribingStatus.status === 'loading'}
             records={records} // {}type formattedVTTLine = {key: string;start: number;end: number;duration: number;text: string;};
             columns={[
               // Play button column
