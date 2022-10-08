@@ -3533,6 +3533,11 @@ make-dir@^3.0.0:
   dependencies:
     semver "^6.0.0"
 
+mantine-datatable@^1.7.5:
+  version "1.7.5"
+  resolved "https://registry.yarnpkg.com/mantine-datatable/-/mantine-datatable-1.7.5.tgz#c5be9acb3b6b4744ce8fae81f85adcabd3158c54"
+  integrity sha512-joAFuDRWjF/k9YWphiGxHlLrIVThQmB5yHXHd+CQ15L7F1+6b//Uzoow5aAiwYlXrPXBDxMxHdTgwY2BK/Tb9Q==
+
 matcher@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/matcher/-/matcher-3.0.0.tgz#bd9060f4c5b70aa8041ccc6f80368760994f30ca"
