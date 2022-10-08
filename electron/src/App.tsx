@@ -1,6 +1,4 @@
 import {
-  ActionIcon,
-  Affix,
   AppShell,
   Burger,
   Divider,
@@ -19,22 +17,18 @@ import React, { useEffect } from 'react';
 import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
 
 import {
-  IconBug,
-  IconBugOff,
   IconFileDescription,
   IconHome,
   IconInfoCircle,
   IconLanguage,
   IconMicrophone2,
-  IconMoonStars,
-  IconSettings,
-  IconSun
+  IconSettings
 } from '@tabler/icons';
 import strings from './localization';
 import { useAppDispatch, useAppSelector } from './redux/hooks';
 
 import { NotificationsProvider } from '@mantine/notifications';
-import { selectBurgerOpen, selectDebugMenu, setBurgerOpen, toggleDebugMenu } from './appSlice';
+import { selectBurgerOpen, setBurgerOpen } from './appSlice';
 import Debug from './debug/Debug';
 import {
   getLocalFiles,
@@ -43,7 +37,7 @@ import {
   selectNumberOfEntries,
   setActiveEntry
 } from './features/entries/entrySlice';
-import { selectDarkMode, selectDisplayLanguage, toggleDarkMode } from './features/settings/settingsSlice';
+import { selectDarkMode, selectDisplayLanguage } from './features/settings/settingsSlice';
 import { selectTranscribingStatus } from './features/whisper/whisperSlice';
 
 // Entries list - Shows all entries
@@ -197,27 +191,7 @@ function App() {
         >
           <Outlet />
           {/* Debugging Component */}
-          {useAppSelector(selectDebugMenu) ? <Affix position={{ bottom: 60, right: 20 }}>{<Debug />}</Affix> : <></>}
-
-          <Affix position={{ bottom: 20, right: 20 }}>
-            <Group>
-              <ActionIcon
-                variant="gradient"
-                gradient={darkMode ? { from: 'red', to: 'yellow', deg: 135 } : { from: 'blue', to: 'violet', deg: 135 }}
-                onClick={() => dispatch(toggleDarkMode())}
-                title={strings.settings?.dark_mode}
-              >
-                {darkMode ? <IconSun size={18} /> : <IconMoonStars size={18} />}
-              </ActionIcon>
-              <ActionIcon
-                variant="filled"
-                onClick={() => dispatch(toggleDebugMenu())}
-                title={strings.settings?.debug_menu}
-              >
-                {useAppSelector(selectDebugMenu) ? <IconBugOff size={18} /> : <IconBug size={18} />}
-              </ActionIcon>
-            </Group>
-          </Affix>
+          <Debug />
         </AppShell>
       </NotificationsProvider>
     </MantineProvider>
