@@ -8,11 +8,6 @@ export default ipcMain.handle(
   Channels.fetchAudioFile,
   async (_event: IpcMainInvokeEvent, audioPath: string): Promise<Uint8Array> => {
     try {
-      // var buffer = new ArrayBuffer(8);
-      // ipcRenderer.send('sendData', {
-      //   data: new Uint8Array(buffer)
-      // });
-
       // Get the audio file and convert it to a buffer
       const audioBuffer = readFileSync(audioPath);
 

@@ -1,7 +1,6 @@
 import React from 'react';
-import App from './App';
-import ReactDOM from 'react-dom';
 import { createRoot } from 'react-dom/client';
+import App from './App';
 // Views
 import Dashboard from './features/dashboard/Dashboard';
 import Input from './features/input/Input';
@@ -14,9 +13,9 @@ import { Provider } from 'react-redux';
 import { setupStore } from './redux/store';
 
 import About from './features/about/About';
-import Settings from './features/settings/Settings';
 import Entries from './features/entries/Entries';
 import EntryEditor from './features/entries/EntryEditor';
+import Settings from './features/settings/Settings';
 
 export const store = setupStore();
 
@@ -37,7 +36,6 @@ root.render(
             <Route path="/about" element={<About />} />
             <Route path="/entries" element={<Entries />} />
             <Route path="/entries/:entryId" element={<EntryEditor />} />
-            {/* <Route path=":entryId" element={<EntryEditor />} /> */}
 
             <Route path="*" element={<div>404</div>} />
           </Route>

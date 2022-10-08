@@ -1,6 +1,6 @@
 import { entry } from './../../../electron/types/types';
-
 import { RootState } from '../../redux/store';
+
 // Transcription Slice
 // This holds the state of the transcriptions and will be updated by electron/node processes
 

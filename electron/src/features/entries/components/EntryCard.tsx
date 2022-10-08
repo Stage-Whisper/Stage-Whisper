@@ -1,19 +1,17 @@
-import { Button, Card, Center, Divider, Grid, Group, Loader, Stack, Text, Title } from '@mantine/core';
+import { Button, Card, Center, Divider, Grid, Group, Loader, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconFileCheck, IconFileDescription } from '@tabler/icons';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Redux
-
 import { entry } from '../../../../electron/types/types';
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 
 // Localization
-
 import strings from '../../../localization';
-import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
+
 import { passToWhisper, selectTranscribingStatus } from '../../whisper/whisperSlice';
-import { setActiveEntry } from '../entrySlice';
 
 function TranscriptionCard({ entry }: { entry: entry }) {
   const dispatch = useAppDispatch();

@@ -6,7 +6,7 @@ import {
   OpenDirectoryDialogResponse,
   RunWhisperResponse
 } from './types/channels';
-// import { initializeApp } from './functions/initialize/initializeApp';
+
 import { newEntryArgs } from './handlers/newEntry/newEntry';
 import { entry } from './types/types';
 import { WhisperArgs } from './types/whisperTypes';
@@ -87,6 +87,7 @@ const api = {
     }
   },
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on: (channel: string, callback: (data: any) => void) => {
     ipcRenderer.on(channel, (_, data) => callback(data));
   }

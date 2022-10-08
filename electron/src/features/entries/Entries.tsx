@@ -1,4 +1,4 @@
-import { Center, Stack } from '@mantine/core';
+import { Stack } from '@mantine/core';
 import React from 'react';
 
 // Redux
@@ -6,10 +6,7 @@ import { useAppSelector } from '../../redux/hooks';
 
 // Components
 import EntryCard from './components/EntryCard';
-import { selectActiveEntry, selectEntries } from './entrySlice';
-import EntryEditor from './EntryEditor';
-
-// Localization
+import { selectEntries } from './entrySlice';
 
 // Component for displaying entry progress / results
 function Entries() {

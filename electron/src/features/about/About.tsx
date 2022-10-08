@@ -1,4 +1,4 @@
-import { Text, Center, Stack, Card, Title, Divider } from '@mantine/core';
+import { Card, Center, Divider, Stack, Text, Title } from '@mantine/core';
 import React from 'react';
 import strings from '../../localization';
 

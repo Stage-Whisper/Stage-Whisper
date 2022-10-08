@@ -1,4 +1,4 @@
-import { cleanNotifications, showNotification, updateNotification } from '@mantine/notifications';
+import { showNotification, updateNotification } from '@mantine/notifications';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RunWhisperResponse } from '../../../electron/types/channels';
 // import { RunWhisperResponse } from '../../../electron/types/channels';
@@ -22,13 +22,6 @@ const initialState: WhisperState = {
   status: 'idle'
 };
 
-/* 
-  Note! 
-  Due to limitations in the ability for thunks to call other thunks, logic for the handling of queueing will probably have to be in react components
-  This is because the thunk cannot call itself, and the thunk cannot call another thunk. I have removed the queueing logic from this file for now.
-  @oenu
-*/
-
 export const passToWhisper = createAsyncThunk(
   // A promise that will be resolved when the transcription is complete
   'whisper/passToWhisper',
@@ -40,7 +33,6 @@ export const passToWhisper = createAsyncThunk(
         inputPath: entry.audio.path
       };
     }
-    // Update the status with the entry that is being processed
 
     // Send the request to the electron handler
     const result = await window.Main.runWhisper(args, entry); // Resolves when the transcription is complete
@@ -88,7 +80,6 @@ export const whisperSlice = createSlice({
       // Whisper has finished running the transcription for the active entry
 
       // Clear notification
-
       updateNotification({
         id: 'transcribing',
         title: `Transcription complete!`,
