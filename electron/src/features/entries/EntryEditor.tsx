@@ -22,7 +22,6 @@ import { DataTable } from 'mantine-datatable';
 // Types
 import { Node } from 'subtitle';
 
-
 // Packages
 import { IconEdit, IconPlayerPause, IconPlayerPlay, IconPlayerStop, IconTrash } from '@tabler/icons';
 
@@ -63,7 +62,6 @@ type formattedVTTLine = {
 
 // Construct Audio Player -- Required as will need to refresh with new audio player
 function AudioControls(audioPlayer: Howl) {
-
   let currentPlaying = false;
   audioPlayer.on('play', () => {
     currentPlaying = true;
@@ -104,7 +102,6 @@ function AudioControls(audioPlayer: Howl) {
           </Group>
         </Card>
       </Affix>
-
     </>
   );
 }
