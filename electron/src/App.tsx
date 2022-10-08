@@ -4,6 +4,7 @@ import {
   Divider,
   Group,
   Header,
+  Loader,
   MantineProvider,
   MediaQuery,
   Navbar,
@@ -17,6 +18,7 @@ import React, { useEffect } from 'react';
 import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
 
 import {
+  IconFileCheck,
   IconFileDescription,
   IconHome,
   IconInfoCircle,
@@ -47,6 +49,7 @@ import { selectTranscribingStatus } from './features/whisper/whisperSlice';
 // Entries list - Shows all entries
 function EntryList() {
   const entries = useAppSelector(selectEntries);
+  const transcribing = useAppSelector(selectTranscribingStatus);
   const dispatch = useAppDispatch();
   const { entryId } = useParams();
   return (
@@ -58,13 +61,21 @@ function EntryList() {
           <NavLink
             key={entry.config.uuid}
             label={<Text lineClamp={1}>{entry.config.name}</Text>}
+            icon={
+              transcribing.entry?.config.uuid === entry.config.uuid ? (
+                <Loader size={'sm'} />
+              ) : entry.transcriptions[0] ? (
+                <IconFileCheck color="green" />
+              ) : (
+                <IconFileDescription />
+              )
+            }
             component={Link}
             to={`/entries/${entry.config.uuid}`}
             onClick={() => {
               dispatch(setBurgerOpen(false));
             }}
             active={entry.config.uuid === entryId}
-            icon={<IconFileDescription />}
           />
         );
       })}
