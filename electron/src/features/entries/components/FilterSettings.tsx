@@ -1,15 +1,13 @@
-import { Button, Card, Chip, createStyles, Group, Select, Step, Switch, TextInput } from '@mantine/core';
-import { IconArrowsSort, IconSearch, IconSortAscending, IconSortDescending } from '@tabler/icons';
+import { Button, Chip, Group, Select, TextInput } from '@mantine/core';
+import { IconSearch, IconSortAscending, IconSortDescending } from '@tabler/icons';
 import React, { useEffect, useState } from 'react';
 import { entry } from '../../../../electron/types/types';
 function FilterSettings({
   entries,
-  setEntries,
-  sortedEntries
+  setEntries
 }: {
   entries: entry[];
   setEntries: React.Dispatch<React.SetStateAction<entry[]>>;
-  sortedEntries: entry[];
 }) {
   //Use state to store the current filter of type sortConfig
   const [filter, setFilter] = useState<sortConfig>({
@@ -82,7 +80,7 @@ function FilterSettings({
           radius="xl"
           size="md"
           onChange={handleQueryChange}
-          placeholder="Search questions"
+          placeholder="Search Entries"
         />
 
         <Group grow={false}>
