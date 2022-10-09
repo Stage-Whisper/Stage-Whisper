@@ -18,7 +18,7 @@ function Entries() {
   return (
     <Stack>
       {/* Add filtering options */}
-      <FilterSettings entries={entries} sortedEntries={sortedEntries} setEntries={setSortedEntries}></FilterSettings>
+      <FilterSettings entries={entries} setEntries={setSortedEntries}></FilterSettings>
 
       {sortedEntries.map((entry) => {
         return <EntryCard key={entry.config.uuid} entry={entry} />;
