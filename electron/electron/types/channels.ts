@@ -10,6 +10,7 @@ export enum Channels {
   // Database channels
   loadDatabase = 'load-database', // Loads all entries from the database and returns them
   newEntry = 'new-entry', // Creates a new entry in the database and returns it
+  editTranscription = 'edit-transcription', // Takes an entry and an edited transcription appends changes to the formatted transcription json file
 
   // Whisper channels
   runWhisper = 'run-whisper', // Runs the whisper model with given arguments and returns the entry
