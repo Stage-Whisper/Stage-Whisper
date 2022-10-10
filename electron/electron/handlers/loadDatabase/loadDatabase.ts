@@ -128,11 +128,10 @@ export default ipcMain.handle(Channels.loadDatabase, async (): Promise<LoadDatab
             return; // TODO: #55 Implement a way to handle this error ( Transcription was not handled and has no transcript file )
           }
 
-          // Get the transcription JSON file
+          // Get the output JSON file
           const data = JSON.parse(
             readFileSync(join(transcriptionPath, 'formatted.json'), 'utf8')
           ) as entryTranscription['data'];
-          // const data = readFileSync(join(vttPath), 'utf8');
 
           // Add the transcription to the transcriptions array
           const transcription: entryTranscription = {
