@@ -70,10 +70,10 @@ export type transcriptionLine = {
   end: number; // End time of  the transcript line in milliseconds
   text: string; // Text of the transcript line
   edit: {
-    start: number; // Start time of the transcript line in milliseconds
-    end: number; // End time of  the transcript line in milliseconds
-    text: string; // Text of the transcript line
-    deleted: boolean; // Whether the transcript line has been deleted
+    start?: number; // Start time of the transcript line in milliseconds
+    end?: number; // End time of  the transcript line in milliseconds
+    text?: string; // Text of the transcript line
+    deleted?: boolean; // Whether the transcript line has been deleted
   } | null; // The transcript line edit object
 };
 
