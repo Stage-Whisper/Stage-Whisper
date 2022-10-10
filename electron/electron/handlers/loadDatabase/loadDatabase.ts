@@ -8,9 +8,6 @@ import { app } from 'electron';
 import { entry, entryTranscription } from '../../types/types';
 import { Channels } from '../../types/channels';
 
-// Subtitle Parser
-import { parseSync } from 'subtitle';
-
 // Paths
 const rootPath = app.getPath('userData'); // Path to the top level of the data folder
 const storePath = join(rootPath, 'store'); // Path to the store folder
@@ -123,20 +120,19 @@ export default ipcMain.handle(Channels.loadDatabase, async (): Promise<LoadDatab
           // If it exists get the transcription.json file
           const parameters = JSON.parse(readFileSync(join(transcriptionConfigPath), 'utf8'));
 
-          // Check if the transcription folder has a transcript.vtt file
+          // Check if the transcription folder has a transcription file
           try {
-            readdirSync(transcriptionPath).includes(`${audio.name}.vtt`);
+            readdirSync(transcriptionPath).includes(`transcription.json`);
           } catch {
             console.warn(`LoadDatabase: Transcription ${transcriptionFolder.name} does not have a transcript.vtt file`);
             return; // TODO: #55 Implement a way to handle this error ( Transcription was not handled and has no transcript file )
           }
 
-          // If it exists get the transcript.vtt file
-
-          const vttPath = join(transcriptionPath, `${audio.name}.vtt`);
-          // const transcript = readFileSync(join(vttPath), 'utf8');
-          const vttFile = readFileSync(join(vttPath), 'utf8');
-          const vtt = parseSync(vttFile);
+          // Get the transcription JSON file
+          const data = JSON.parse(
+            readFileSync(join(transcriptionPath, 'formatted.json'), 'utf8')
+          ) as entryTranscription['data'];
+          // const data = readFileSync(join(vttPath), 'utf8');
 
           // Add the transcription to the transcriptions array
           const transcription: entryTranscription = {
@@ -145,12 +141,12 @@ export default ipcMain.handle(Channels.loadDatabase, async (): Promise<LoadDatab
             language: parameters.language,
             model: parameters.model,
             path: join(transcriptionFolderPath, transcriptionFolder.name),
-            vtt,
             status: parameters.status,
             progress: parameters.progress,
             translated: parameters.translated,
             completedOn: parameters.completedOn,
-            error: parameters.error
+            error: parameters.error,
+            data
           };
           console.log('LoadDatabase: Transcription Added: ', transcription.uuid);
           transcriptions.push(transcription);

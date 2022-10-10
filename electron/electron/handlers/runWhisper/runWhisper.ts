@@ -7,12 +7,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Types
 import { Channels, RunWhisperResponse } from '../../types/channels';
-import { entry, entryTranscription, transcriptionStatus } from '../../types/types';
+import { entry, entryTranscription, transcriptionLine, transcriptionStatus } from '../../types/types';
 import { WhisperArgs } from '../../types/whisperTypes';
 
 // Node
 import { spawn } from 'child_process';
-import { writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { NodeCue, parseSync } from 'subtitle';
 
 export default ipcMain.handle(
   Channels.runWhisper,
@@ -119,6 +120,61 @@ export default ipcMain.handle(
         }
       });
     });
+
+    // ------------------  Convert the VTT file to Json ------------------ //
+    const vttPath = join(outputDir, `${entry.audio.name}.vtt`);
+    const jsonPath = join(outputDir, `formatted.json`);
+    console.log('RunWhisper: Converting VTT to JSON');
+    console.log('RunWhisper: vttPath', vttPath);
+    console.log('RunWhisper: jsonPath', jsonPath);
+
+    // Check that the VTT file exists
+    try {
+      existsSync(vttPath);
+    } catch (error) {
+      console.log('RunWhisper: Error checking if VTT file exists', error);
+      throw new Error('Error checking if VTT file exists');
+    }
+
+    // Read the VTT file
+    let vttFile;
+    try {
+      vttFile = readFileSync(vttPath, 'utf8');
+    } catch (error) {
+      console.log('RunWhisper: Error reading VTT file', error);
+      throw new Error('Error reading VTT file');
+    }
+
+    // Split the VTT file into an array of lines
+    const lines = parseSync(vttFile);
+
+    // Check if the VTT file is empty
+    if (lines.length === 0) {
+      console.log('RunWhisper: VTT file is empty');
+      throw new Error('VTT file is empty');
+    }
+
+    // Remove header lines from the VTT file
+    const cues = lines.filter((line) => line.type === 'cue') as NodeCue[];
+
+    // Generate the formatted lines
+    const formattedLines = cues.map((line, index): transcriptionLine => {
+      return {
+        index,
+        start: line.data.start,
+        end: line.data.end,
+        text: line.data.text,
+        edit: null
+      };
+    });
+
+    // Write the formatted lines to a JSON file
+    try {
+      writeFileSync(jsonPath, JSON.stringify(formattedLines));
+    } catch (error) {
+      console.log('RunWhisper: Error writing JSON file', error);
+      throw new Error('Error writing JSON file');
+    }
 
     // ------------------  Return the transcription Information ------------------ //
     if (transcription) {
