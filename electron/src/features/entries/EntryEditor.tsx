@@ -147,15 +147,6 @@ function EntryEditor() {
   const [audioControls, setAudioControls] = useState<JSX.Element | null>(null);
   //Timeout
   const [timeOutList, setTimeOutList] = useState<Array<NodeJS.Timeout>>([]);
-  //Progress bar
-  const [
-    ,
-    // lineAudioProgress
-    setLineAudioProgress
-  ] = useState<number>(0);
-  //Intervals
-
-  const [intervalNode, setIntervalNode] = useState<NodeJS.Timeout | null>(null);
 
   //Get audioPadding from redux
   const audioPadding = useAppSelector(selectAudioPadding);
@@ -198,12 +189,7 @@ function EntryEditor() {
     audioPlayer?.off();
     setAudioPlayer(null);
 
-    if (intervalNode) {
-      clearInterval(intervalNode);
-    }
-    setIntervalNode(null);
     setTimeOutList([]);
-    setLineAudioProgress(0);
 
     // If the entry has a transcription
     if (entry && entry.transcriptions[0] && entry.transcriptions[0].vtt) {
@@ -332,28 +318,17 @@ function EntryEditor() {
                           });
 
                           // Cancel intervals
-                          if (intervalNode) {
-                            clearInterval(intervalNode);
-                          }
 
-                          setLineAudioProgress(0);
                           audioPlayer.unload();
                           audioPlayer.play();
                           audioPlayer.seek(computedLineStart);
 
                           //Every time 5% of the line is played update the progress bar setLineAudioProgress
-                          const interval = setInterval(() => {
-                            const currentTime = audioPlayer.seek(); //in seconds
-                            const progress = (currentTime - computedLineStart) / (computedLineEnd - computedLineStart);
-                            setLineAudioProgress(progress * 100);
-                          }, 50);
-                          setIntervalNode(interval);
 
                           //stop audio after it finishes
                           const timeout = setTimeout(() => {
                             audioPlayer.stop();
                             setCurrentLine(null);
-                            clearInterval(interval);
                           }, (computedLineEnd - computedLineStart) * 1000);
                           setTimeOutList([...timeOutList, timeout]);
                         }
