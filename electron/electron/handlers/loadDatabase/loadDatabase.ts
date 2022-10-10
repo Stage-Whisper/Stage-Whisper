@@ -124,7 +124,9 @@ export default ipcMain.handle(Channels.loadDatabase, async (): Promise<LoadDatab
           try {
             readdirSync(transcriptionPath).includes(`transcription.json`);
           } catch {
-            console.warn(`LoadDatabase: Transcription ${transcriptionFolder.name} does not have a transcript.vtt file`);
+            console.warn(
+              `LoadDatabase: Transcription ${transcriptionFolder.name} does not have a transcript.json file`
+            );
             return; // TODO: #55 Implement a way to handle this error ( Transcription was not handled and has no transcript file )
           }
 
