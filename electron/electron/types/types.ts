@@ -1,4 +1,3 @@
-import { NodeList } from 'subtitle';
 import { WhisperArgs } from './whisperTypes';
 
 // Entry Config Object
@@ -54,12 +53,27 @@ export type entryTranscription = {
   path: string; // Path to the transcription folder
   model: WhisperArgs['model']; // Model used to transcribe the audio
   language: WhisperArgs['language']; // Language of the audio file
-  vtt?: NodeList; // The transcript in vtt format
   status: transcriptionStatus; // Status of the transcription -- also used to determine if the transcription is complete
   progress: number; // Progress of the transcription
   translated: boolean; // Whether the transcription has been translated
   error: string | undefined; // Error message if the transcription failed
   completedOn: number; // Date the transcription was completed (in milliseconds since 1970)
+  data?: transcriptionLine; // The transcript data object
+};
+
+// Transcription Data Object
+// Represents the transcript data parsed from a VTT file, along with any edits made to the transcript
+export type transcriptionLine = {
+  index: number; // Index of the line in the transcript
+  start: number; // Start time of the transcript line in milliseconds
+  end: number; // End time of  the transcript line in milliseconds
+  text: string; // Text of the transcript line
+  edit: {
+    start: number; // Start time of the transcript line in milliseconds
+    end: number; // End time of  the transcript line in milliseconds
+    text: string; // Text of the transcript line
+    deleted: boolean; // Whether the transcript line has been deleted
+  } | null; // The transcript line edit object
 };
 
 // An entry object - represents
