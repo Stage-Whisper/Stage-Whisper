@@ -37,7 +37,7 @@
     "@mantine/dropzone": "^5.4.4",
     "@mantine/form": "^5.4.4",
     "@mantine/hooks": "^5.4.4",
-    "@mantine/modals": "^5.4.4",
+    "@mantine/modals": "^5.5.4",
     "@mantine/notifications": "^5.4.4",
     "@mantine/nprogress": "^5.4.4",
     "@mantine/rte": "^5.4.4",
