@@ -160,6 +160,7 @@ export default ipcMain.handle(
     // Generate the formatted lines
     const formattedLines = cues.map((line, index): transcriptionLine => {
       return {
+        id: uuidv4(),
         index,
         start: line.data.start,
         end: line.data.end,

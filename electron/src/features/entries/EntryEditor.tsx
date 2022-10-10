@@ -20,19 +20,18 @@ import {
 // import { RichTextEditor } from '@mantine/rte';
 import { DataTable } from 'mantine-datatable';
 // Types
-import { Node } from 'subtitle';
 
 // Packages
 import { IconEdit, IconPlayerPause, IconPlayerPlay, IconPlayerStop, IconTrash } from '@tabler/icons';
 
 import { Howl } from 'howler';
 import { useParams } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import strings from '../../localization';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectAudioPadding } from '../settings/settingsSlice';
 import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
 import { selectEntries } from './entrySlice';
+import { transcriptionLine } from '../../../electron/types/types';
 
 // Convert an internal audio path to a url that can be used by howler
 const filePathToURL = async (filePath: string): Promise<string> => {
@@ -105,20 +104,6 @@ function AudioControls(audioPlayer: Howl) {
     </>
   );
 }
-
-// Line Handlers
-// const handleEditLine = (line: formattedVTTLine) => {
-//   console.log('Edit Line');
-// };
-
-// const handleDeleteLine = (line: Node) => {
-//   console.log('Delete Line');
-//   console.log(line);
-// };
-
-// const handleAdjustTimestamp = (line: Node, newStart: number, newEnd: number) => {
-//   console.log('Adjust Timestamp');
-// };
 
 // This is a component that will be used to display the transcription editor when an entry is selected
 function EntryEditor() {
@@ -206,26 +191,25 @@ function EntryEditor() {
     setLineAudioProgress(0);
 
     // If the entry has a transcription
-    if (entry && entry.transcriptions[0] && entry.transcriptions[0].vtt) {
-      const vttNodes = entry.transcriptions[0].vtt;
+    if (entry && entry.transcriptions[0] && entry.transcriptions[0].data) {
+      // Get the transcription data
+      const transcriptionData = entry.transcriptions[0].data;
       // log the number of nodes
-      console.debug(`EntryEditor: ${vttNodes.length} Nodes Found`);
+      console.debug(`EntryEditor: ${transcriptionData.length} Nodes Found`);
 
-      // Format the VTT lines
-      const formattedLines = [] as Array<formattedVTTLine>;
-      vttNodes.forEach((node: Node) => {
-        if (node.type === 'cue') {
-          const key = uuidv4();
-          const start = node.data.start;
-          const end = node.data.end;
-          const duration = end - start;
-          const text = node.data.text;
-          formattedLines.push({ start, end, duration, text, key });
-        }
+      // Generate the formatted lines
+      const formattedLines = transcriptionData.map((line: transcriptionLine) => {
+        return {
+          start: line.start,
+          end: line.end,
+          duration: line.end - line.start,
+          text: line.text,
+          key: line.id,
+          index: line.index
+        };
       });
 
       // Set the formatted lines
-
       setFormattedVTTLines(formattedLines);
       console.log('Got Audio Path: ', entry.audio.path);
       const audioFilePath = entry.audio.path;
@@ -486,7 +470,7 @@ function EntryEditor() {
   }
 
   // If an entry has been passed in and it has a transcription and the audio player is ready
-  if (entry && entry.transcriptions[0] && entry.transcriptions[0].vtt) {
+  if (entry && entry.transcriptions[0] && entry.transcriptions[0].data) {
     return (
       <>
         <Title mt={'md'} align="center">

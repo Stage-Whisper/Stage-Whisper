@@ -58,12 +58,13 @@ export type entryTranscription = {
   translated: boolean; // Whether the transcription has been translated
   error: string | undefined; // Error message if the transcription failed
   completedOn: number; // Date the transcription was completed (in milliseconds since 1970)
-  data?: transcriptionLine; // The transcript data object
+  data?: transcriptionLine[]; // The transcript data object
 };
 
 // Transcription Data Object
 // Represents the transcript data parsed from a VTT file, along with any edits made to the transcript
 export type transcriptionLine = {
+  id: string; // The unique ID of the line
   index: number; // Index of the line in the transcript
   start: number; // Start time of the transcript line in milliseconds
   end: number; // End time of  the transcript line in milliseconds

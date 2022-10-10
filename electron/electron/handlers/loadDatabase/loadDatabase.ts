@@ -133,6 +133,12 @@ export default ipcMain.handle(Channels.loadDatabase, async (): Promise<LoadDatab
             readFileSync(join(transcriptionPath, 'formatted.json'), 'utf8')
           ) as entryTranscription['data'];
 
+          if (data === undefined || data.length === 0) {
+            console.warn(`LoadDatabase : Transcription ${transcriptionFolder.name} has no data`);
+            throw new Error(`Transcription ${transcriptionFolder.name} has no data`);
+            // TODO:  Implement a way to handle this error ( Transcription was not handled and has no data )
+          }
+
           // Add the transcription to the transcriptions array
           const transcription: entryTranscription = {
             uuid: transcriptionFolder.name,
