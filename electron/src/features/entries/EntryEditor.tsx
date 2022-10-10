@@ -76,32 +76,32 @@ function AudioControls(audioPlayer: Howl) {
     <>
       {/* Create a button floating on the bottom right  */}
 
-      <Affix position={{ bottom: 20, right: 20 }}>
-        <Card shadow="md" p="lg">
-          <Group spacing="md">
-            <Button
-              onClick={() => {
-                console.debug('Play');
-                if (currentPlaying) {
-                  audioPlayer.unload();
-                  audioPlayer.play();
-                } else {
-                  audioPlayer.play();
-                }
-              }}
-            >
-              <IconPlayerPlay />
-            </Button>
-            <Button
-              onClick={() => {
-                audioPlayer.pause();
-              }}
-            >
-              <IconPlayerPause />
-            </Button>
-          </Group>
-        </Card>
-      </Affix>
+      {/* <Affix position={{ bottom: 20, right: 20 }}> */}
+      <Card shadow="md" p="sm">
+        <Group spacing="md">
+          <Button
+            onClick={() => {
+              console.debug('Play');
+              if (currentPlaying) {
+                audioPlayer.unload();
+                audioPlayer.play();
+              } else {
+                audioPlayer.play();
+              }
+            }}
+          >
+            <IconPlayerPlay />
+          </Button>
+          <Button
+            onClick={() => {
+              audioPlayer.pause();
+            }}
+          >
+            <IconPlayerPause />
+          </Button>
+        </Group>
+      </Card>
+      {/* </Affix> */}
     </>
   );
 }
@@ -484,6 +484,7 @@ function EntryEditor() {
             mb={'md'}
           />
 
+          {audioControls}
           {formattedVTTLines[formattedVTTLines.length - 1].end && (
             <Text align="center" color="gray">
               {`Length of Audio: `}
@@ -497,7 +498,6 @@ function EntryEditor() {
         {records && dataTable(formattedVTTLines)}
 
         {/* {false && transcriptionTable(formattedVTTLines)} */}
-        {audioControls}
       </>
     );
   }
