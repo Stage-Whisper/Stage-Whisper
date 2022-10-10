@@ -1,3 +1,4 @@
+import { EditTranscriptionArgs } from './handlers/editTranscription/editTranscription';
 import { contextBridge, ipcRenderer } from 'electron';
 import {
   Channels,
@@ -27,6 +28,15 @@ const api = {
       return audioUint8Array;
     } catch (error) {
       throw new Error(`Preload: Error reading audio file: ${error}`);
+    }
+  },
+
+  // Pass a line to be edited and apply the changes to the transcription
+  editTranscription: async (args: EditTranscriptionArgs): Promise<void> => {
+    try {
+      await ipcRenderer.invoke(Channels.editTranscription, args);
+    } catch (error) {
+      throw new Error(`Preload: Error editing transcription: ${error}`);
     }
   },
 
