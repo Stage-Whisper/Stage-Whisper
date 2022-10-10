@@ -16,6 +16,7 @@ import About from './features/about/About';
 import Entries from './features/entries/Entries';
 import EntryEditor from './features/entries/EntryEditor';
 import Settings from './features/settings/Settings';
+import { ModalsProvider } from '@mantine/modals';
 
 export const store = setupStore();
 
@@ -27,20 +28,22 @@ const root = createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <HashRouter>
-        <Routes>
-          <Route element={<App />}>
-            <Route index element={<Dashboard />} />
-            <Route path="/transcribe" element={<Input />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/entries" element={<Entries />} />
-            <Route path="/entries/:entryId" element={<EntryEditor />} />
+      <ModalsProvider>
+        <HashRouter>
+          <Routes>
+            <Route element={<App />}>
+              <Route index element={<Dashboard />} />
+              <Route path="/transcribe" element={<Input />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/entries" element={<Entries />} />
+              <Route path="/entries/:entryId" element={<EntryEditor />} />
 
-            <Route path="*" element={<div>404</div>} />
-          </Route>
-        </Routes>
-      </HashRouter>
+              <Route path="*" element={<div>404</div>} />
+            </Route>
+          </Routes>
+        </HashRouter>
+      </ModalsProvider>
     </Provider>
   </React.StrictMode>
 );
