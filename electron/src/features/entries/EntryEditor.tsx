@@ -14,6 +14,8 @@ import {
   NumberInput,
   Stack,
   Text,
+  Textarea,
+  TextInput,
   Title
 } from '@mantine/core';
 
@@ -32,6 +34,7 @@ import { selectAudioPadding } from '../settings/settingsSlice';
 import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
 import { selectEntries } from './entrySlice';
 import { transcriptionLine } from '../../../electron/types/types';
+import { openModal } from '@mantine/modals';
 
 // Convert an internal audio path to a url that can be used by howler
 const filePathToURL = async (filePath: string): Promise<string> => {
@@ -49,14 +52,6 @@ const filePathToURL = async (filePath: string): Promise<string> => {
     // Return the blob
     return URL.createObjectURL(blob);
   }
-};
-
-type formattedVTTLine = {
-  key: string;
-  start: number;
-  end: number;
-  duration: number;
-  text: string;
 };
 
 // Construct Audio Player -- Required as will need to refresh with new audio player
@@ -121,10 +116,10 @@ function EntryEditor() {
 
   // Transcription Text States
   // Empty state to store the formatted VTT lines
-  const [formattedVTTLines, setFormattedVTTLines] = useState<Array<formattedVTTLine>>([]);
+  const [formattedLines, setFormattedLines] = useState<Array<transcriptionLine>>([]);
   // Empty state to store the current line
 
-  const [currentLine, setCurrentLine] = useState<formattedVTTLine | null>(null);
+  const [currentLine, setCurrentLine] = useState<transcriptionLine | null>(null);
 
   // Set up the audio player state
   const [audioPlayer, setAudioPlayer] = useState<Howl | null>(null);
@@ -148,20 +143,20 @@ function EntryEditor() {
   // Data Table States
   const [pageSize, setPageSize] = useState(20);
   const [page, setPage] = useState(1);
-  const [records, setRecords] = useState<formattedVTTLine[] | null>(null);
+  const [records, setRecords] = useState<transcriptionLine[] | null>(null);
 
   // Editing States
-  // const [editing, setEditing] = useState<boolean>(false);
-  const [editingLine, setEditingLine] = useState<formattedVTTLine | null>(null);
-  // const [showModal, setShowModal] = useState<boolean>(false);
-  // const [editingText, setEditingText] = useState<string>('');
-  // const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
+  const [editingLine, setEditingLine] = useState<transcriptionLine | null>(null);
+  const [editText, setEditText] = useState<string>('');
+  const [editStart, setEditStart] = useState<number>(0);
+  const [editEnd, setEditEnd] = useState<number>(0);
+  const [editLoading, setEditLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const from = (page - 1) * pageSize;
     const to = from + pageSize;
-    setRecords(formattedVTTLines.slice(from, to));
-  }, [page, formattedVTTLines, pageSize]);
+    setRecords(formattedLines.slice(from, to));
+  }, [page, formattedLines, pageSize]);
 
   // Audio Control Use Effect
   // Update the audio controls when the audio player changes
@@ -176,7 +171,7 @@ function EntryEditor() {
 
   useEffect(() => {
     // Reset all the states when the entry changes
-    setFormattedVTTLines([]);
+    setFormattedLines([]);
     setCurrentLine(null);
 
     audioPlayer?.unload();
@@ -198,19 +193,19 @@ function EntryEditor() {
       console.debug(`EntryEditor: ${transcriptionData.length} Nodes Found`);
 
       // Generate the formatted lines
-      const formattedLines = transcriptionData.map((line: transcriptionLine) => {
+      const formattedLines: transcriptionLine[] = transcriptionData.map((line: transcriptionLine) => {
         return {
-          start: line.start,
-          end: line.end,
-          duration: line.end - line.start,
-          text: line.text,
-          key: line.id,
-          index: line.index
+          id: line.id,
+          start: line.edit?.start || line.start,
+          end: line.edit?.end || line.end,
+          text: line.edit?.text || line.text,
+          index: line.index,
+          edit: line.edit
         };
       });
 
       // Set the formatted lines
-      setFormattedVTTLines(formattedLines);
+      setFormattedLines(formattedLines);
       console.log('Got Audio Path: ', entry.audio.path);
       const audioFilePath = entry.audio.path;
       // Convert the audio file path to a URL
@@ -238,24 +233,9 @@ function EntryEditor() {
 
   // #region Data Table
 
-  const editModal = () => {
-    if (editingLine) {
-      return (
-        <Modal
-          opened={editingLine !== null}
-          onClose={() => {
-            console.log('Close');
-          }}
-        >
-          Test
-        </Modal>
-      );
-    }
-  };
-
   //  Documentation -- remove before prod
   //  https://icflorescu.github.io/mantine-datatable
-  const dataTable = (formatted: formattedVTTLine[]) => {
+  const dataTable = (formatted: transcriptionLine[]) => {
     // Generate a data table using Mantine-Datatable
     if (records) {
       return (
@@ -273,7 +253,7 @@ function EntryEditor() {
               // Play button column
               {
                 title: 'Play',
-                accessor: 'key',
+                accessor: 'id',
                 width: 50,
                 textAlignment: 'center',
                 render: (line) => {
@@ -370,21 +350,21 @@ function EntryEditor() {
                 }
               },
               // Duration Columns
-              {
-                accessor: 'duration',
-                title: 'Length',
-                textAlignment: 'center',
-                width: 70,
+              // {
+              //   accessor: 'duration',
+              //   title: 'Length',
+              //   textAlignment: 'center',
+              //   width: 70,
 
-                render: ({ duration }) => {
-                  return (
-                    <Text>
-                      {/* {String(Math.floor(duration / 1000 / 60)).padStart(2, '0')}: */}
-                      {String(Math.floor(duration / 1000) % 60)}s
-                    </Text>
-                  );
-                }
-              },
+              //   render: ({ duration }) => {
+              //     return (
+              //       <Text>
+              //         {/* {String(Math.floor(duration / 1000 / 60)).padStart(2, '0')}: */}
+              //         {String(Math.floor(duration / 1000) % 60)}s
+              //       </Text>
+              //     );
+              //   }
+              // },
               // Action Column
               {
                 accessor: 'actions',
@@ -398,8 +378,127 @@ function EntryEditor() {
                       <ActionIcon
                         color="blue"
                         onClick={() => {
+                          console.log('Setting states');
                           setEditingLine(line);
-                          editModal();
+                          setEditText(line.text);
+                          setEditStart(line.start);
+                          setEditEnd(line.end);
+                          setEditLoading(false);
+
+                          console.log('Editing Line: ', editingLine);
+                          openModal({
+                            title: 'Edit Line',
+                            size: 'xl',
+
+                            children: (
+                              <>
+                                {editLoading ? (
+                                  <Loader variant="dots" size="lg" />
+                                ) : (
+                                  <>
+                                    <ActionIcon
+                                      onClick={() => {
+                                        if (formatted) {
+                                          // If the line is not null
+                                          if (!line) return;
+
+                                          // If the Audio Player is not null
+                                          if (!audioPlayer) return;
+
+                                          // If current line is playing then stop it
+                                          if (currentLine === line) {
+                                            audioPlayer.stop();
+                                            setCurrentLine(null);
+                                            return;
+                                          }
+
+                                          // Set the current line
+                                          setCurrentLine(line);
+
+                                          // The amount of padding to add to the start and end of the line
+                                          const playBackPadding = audioPadding as number;
+
+                                          // The start time of the line after accounting for padding
+                                          const computedLineStart = Math.max(line.start / 1000 - playBackPadding, 0);
+
+                                          // The end time of the line after accounting for padding
+                                          const computedLineEnd = Math.min(
+                                            line.end / 1000 + playBackPadding,
+                                            audioPlayer.duration()
+                                          );
+
+                                          // Logging for debugging
+                                          console.log('Computed Line Start: ', computedLineStart);
+                                          console.log('Computed Line End: ', computedLineEnd);
+
+                                          // Cancel timeouts for the current line
+                                          timeOutList.forEach((timeout) => {
+                                            clearTimeout(timeout);
+                                          });
+
+                                          // Cancel intervals
+                                          if (intervalNode) {
+                                            clearInterval(intervalNode);
+                                          }
+
+                                          setLineAudioProgress(0);
+                                          audioPlayer.unload();
+                                          audioPlayer.play();
+                                          audioPlayer.seek(computedLineStart);
+
+                                          //Every time 5% of the line is played update the progress bar setLineAudioProgress
+                                          const interval = setInterval(() => {
+                                            const currentTime = audioPlayer.seek(); //in seconds
+                                            const progress =
+                                              (currentTime - computedLineStart) / (computedLineEnd - computedLineStart);
+                                            setLineAudioProgress(progress * 100);
+                                          }, 50);
+                                          setIntervalNode(interval);
+
+                                          //stop audio after it finishes
+                                          const timeout = setTimeout(() => {
+                                            audioPlayer.stop();
+                                            setCurrentLine(null);
+                                            clearInterval(interval);
+                                          }, (computedLineEnd - computedLineStart) * 1000);
+                                          setTimeOutList([...timeOutList, timeout]);
+                                        }
+                                      }}
+                                    >
+                                      {currentLine === line ? <IconPlayerStop /> : <IconPlayerPlay />}
+                                    </ActionIcon>
+                                    <Text>{line.text}</Text>
+                                    <TextInput
+                                      placeholder="Enter New Transcription Text"
+                                      value={
+                                        // If the line.edit.text is not null then use that otherwise use the line.text
+                                        line.edit && line.edit.text !== null ? line.edit.text : line.text
+                                      }
+                                      onChange={(e) => {
+                                        console.log('Edit Text: ', e.target.value);
+                                        setEditText(e.target.value);
+                                      }}
+                                    />
+                                    <Button
+                                      onClick={() => {
+                                        console.log('Editing Line submitted: ', editingLine);
+                                        if (editingLine && entry?.transcriptions[0].data) {
+                                          // BUG: This should be a redux action, will be using main for testing
+                                          window.Main.editTranscription({
+                                            entry: entry,
+                                            transcription: entry.transcriptions[0],
+                                            line: editingLine
+                                          });
+                                        }
+                                      }}
+                                    >
+                                      Save
+                                    </Button>
+                                  </>
+                                )}
+                              </>
+                            )
+                          });
                         }}
                       >
                         <IconEdit size={16} />
@@ -413,7 +512,7 @@ function EntryEditor() {
                 }
               }
             ]}
-            idAccessor="key"
+            idAccessor="id"
           />
         </Box>
       );
@@ -493,23 +592,25 @@ function EntryEditor() {
             mb={'md'}
           />
 
-          {formattedVTTLines[formattedVTTLines.length - 1].end && (
+          {formattedLines[formattedLines.length - 1].end && (
             <Text align="center" color="gray">
               {`Length of Audio: `}
               <Text span>
-                {String(Math.floor(formattedVTTLines[formattedVTTLines.length - 1].end / 1000 / 60)).padStart(2, '0')}:
-                {String(Math.floor(formattedVTTLines[formattedVTTLines.length - 1].end / 1000) % 60).padStart(2, '0')}
+                {String(Math.floor(formattedLines[formattedLines.length - 1].end / 1000 / 60)).padStart(2, '0')}:
+                {String(Math.floor(formattedLines[formattedLines.length - 1].end / 1000) % 60).padStart(2, '0')}
               </Text>
             </Text>
           )}
         </Group>
-        {records && dataTable(formattedVTTLines)}
+        {records && dataTable(formattedLines)}
 
         {/* {false && transcriptionTable(formattedVTTLines)} */}
         {audioControls}
       </>
     );
   }
+
+  return <Text>Entry Not Found</Text>;
 }
 
 export default EntryEditor;
