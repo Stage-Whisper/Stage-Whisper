@@ -20,7 +20,7 @@ import './handlers/newEntry/newEntry'; // Add a new entry to the database
 import './handlers/runWhisper/runWhisper'; // Run whisper model
 import './handlers/editTranscription/editTranscription'; // Edit a line in the transcription
 import './types/whisperTypes'; // Types for whisper model
-import db from './database/initialize';
+import db from './database/initializeDatabase';
 console.log(db);
 console.log('Starting app');
 // Electron Defaults
