@@ -24,7 +24,7 @@ import { DataTable } from 'mantine-datatable';
 // Types
 
 // Packages
-import { IconEdit, IconPlayerPause, IconPlayerPlay, IconPlayerStop, IconTrash } from '@tabler/icons';
+import { IconCheck, IconEdit, IconPlayerPause, IconPlayerPlay, IconPlayerStop, IconTrash, IconX } from '@tabler/icons';
 
 import { Howl } from 'howler';
 import { useParams } from 'react-router-dom';
@@ -32,9 +32,8 @@ import strings from '../../localization';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectAudioPadding } from '../settings/settingsSlice';
 import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
-import { selectEntries } from './entrySlice';
-import { transcriptionLine } from '../../../electron/types/types';
-import { openModal } from '@mantine/modals';
+import { getLocalFiles, selectEntries } from './entrySlice';
+import { entry, entryTranscription, transcriptionLine } from '../../../electron/types/types';
 
 // Convert an internal audio path to a url that can be used by howler
 const filePathToURL = async (filePath: string): Promise<string> => {
@@ -114,6 +113,11 @@ function EntryEditor() {
   // Get the active entry
   const entry = entries.find((entry) => entry.config.uuid === entryId);
 
+  // Set the active transcription
+  const [activeTranscription, setActiveTranscription] = useState<entryTranscription | undefined>(
+    entry?.transcriptions[0]
+  );
+
   // Transcription Text States
   // Empty state to store the formatted VTT lines
   const [formattedLines, setFormattedLines] = useState<Array<transcriptionLine>>([]);
@@ -150,7 +154,32 @@ function EntryEditor() {
   const [editText, setEditText] = useState<string>('');
   const [editStart, setEditStart] = useState<number>(0);
   const [editEnd, setEditEnd] = useState<number>(0);
-  const [editLoading, setEditLoading] = useState<boolean>(true);
+  const [editPending, setEditPending] = useState<boolean>(false); // Whether the submitEdit handler is waiting for a response from the main process
+
+  const submitEdit = async (entry: entry, transcription: entryTranscription, line: transcriptionLine) => {
+    if (editingLine) {
+      // Set the loading state
+      setEditPending(true);
+      // Get the index of the line
+      window.Main.editTranscription({ entry, transcription, line })
+        .then(() => {
+          // If the promise resolved then the edit has been applied
+          // Update the redux store
+          dispatch(getLocalFiles()); // HACK: this is loading the entire store again, which is not ideal
+          // Clear the edit state
+          setEditingLine(null);
+          setEditPending(false);
+        })
+
+        .catch((error) => {
+          // If the promise rejected then the edit failed
+          console.warn(error);
+          // Clear the edit state
+          setEditingLine(null);
+          setEditPending(false);
+        });
+    }
+  };
 
   useEffect(() => {
     const from = (page - 1) * pageSize;
@@ -227,7 +256,11 @@ function EntryEditor() {
         });
       });
     } else {
-      console.log('No Transcription Found');
+      // Check what is missing
+      if (!entry) console.warn('EntryEditor: Entry is null');
+      if (entry && !entry?.transcriptions[0]) console.warn('EntryEditor: Transcription is null');
+      if (entry && !entry?.transcriptions[0] && !entry?.transcriptions[0]?.data)
+        console.warn('EntryEditor: Transcription Data is null');
     }
   }, [entry]);
 
@@ -328,10 +361,17 @@ function EntryEditor() {
                   );
                 }
               },
-              // Title column
+              // Text column
               {
                 accessor: 'text',
-                title: 'Text'
+                title: 'Text',
+                render: (line) => {
+                  if (line === editingLine) {
+                    return <Textarea value={editText || ''} onChange={(e) => setEditText(e.target.value)} />;
+                  } else {
+                    return line.edit?.text || line.text;
+                  }
+                }
               },
               // Time range column
               {
@@ -349,23 +389,7 @@ function EntryEditor() {
                   );
                 }
               },
-              // Duration Columns
-              // {
-              //   accessor: 'duration',
-              //   title: 'Length',
-              //   textAlignment: 'center',
-              //   width: 70,
-
-              //   render: ({ duration }) => {
-              //     return (
-              //       <Text>
-              //         {/* {String(Math.floor(duration / 1000 / 60)).padStart(2, '0')}: */}
-              //         {String(Math.floor(duration / 1000) % 60)}s
-              //       </Text>
-              //     );
-              //   }
-              // },
-              // Action Column
+              // Action Buttons Column
               {
                 accessor: 'actions',
                 title: 'Actions',
@@ -375,138 +399,63 @@ function EntryEditor() {
                 render: (line) => {
                   return (
                     <Group spacing={4} position="right" noWrap>
-                      <ActionIcon
-                        color="blue"
-                        onClick={() => {
-                          console.log('Setting states');
-                          setEditingLine(line);
-                          setEditText(line.text);
-                          setEditStart(line.start);
-                          setEditEnd(line.end);
-                          setEditLoading(false);
+                      {editingLine === line ? (
+                        <>
+                          <ActionIcon
+                            color="green"
+                            onClick={() => {
+                              console.log('save edits');
+                              if (entry && activeTranscription) {
+                                const newline = {
+                                  ...line,
+                                  edit: {
+                                    text: editText
+                                  }
+                                };
+                                console.log('newline', newline);
+                                submitEdit(entry, activeTranscription, newline);
+                              }
+                            }}
+                          >
+                            <IconCheck size={16} />
+                          </ActionIcon>
 
-                          console.log('Editing Line: ', editingLine);
-                          openModal({
-                            title: 'Edit Line',
-                            size: 'xl',
+                          <ActionIcon
+                            color="red"
+                            onClick={() => {
+                              // Cancel editing
+                              setEditingLine(null);
+                              setEditText('');
+                            }}
+                          >
+                            <IconX size={16} />
+                          </ActionIcon>
+                        </>
+                      ) : (
+                        <>
+                          <ActionIcon
+                            color="blue"
+                            onClick={() => {
+                              // Set current line
 
-                            children: (
-                              <>
-                                {editLoading ? (
-                                  <Loader variant="dots" size="lg" />
-                                ) : (
-                                  <>
-                                    <ActionIcon
-                                      onClick={() => {
-                                        if (formatted) {
-                                          // If the line is not null
-                                          if (!line) return;
-
-                                          // If the Audio Player is not null
-                                          if (!audioPlayer) return;
-
-                                          // If current line is playing then stop it
-                                          if (currentLine === line) {
-                                            audioPlayer.stop();
-                                            setCurrentLine(null);
-                                            return;
-                                          }
-
-                                          // Set the current line
-                                          setCurrentLine(line);
-
-                                          // The amount of padding to add to the start and end of the line
-                                          const playBackPadding = audioPadding as number;
-
-                                          // The start time of the line after accounting for padding
-                                          const computedLineStart = Math.max(line.start / 1000 - playBackPadding, 0);
-
-                                          // The end time of the line after accounting for padding
-                                          const computedLineEnd = Math.min(
-                                            line.end / 1000 + playBackPadding,
-                                            audioPlayer.duration()
-                                          );
-
-                                          // Logging for debugging
-                                          console.log('Computed Line Start: ', computedLineStart);
-                                          console.log('Computed Line End: ', computedLineEnd);
-
-                                          // Cancel timeouts for the current line
-                                          timeOutList.forEach((timeout) => {
-                                            clearTimeout(timeout);
-                                          });
-
-                                          // Cancel intervals
-                                          if (intervalNode) {
-                                            clearInterval(intervalNode);
-                                          }
-
-                                          setLineAudioProgress(0);
-                                          audioPlayer.unload();
-                                          audioPlayer.play();
-                                          audioPlayer.seek(computedLineStart);
-
-                                          //Every time 5% of the line is played update the progress bar setLineAudioProgress
-                                          const interval = setInterval(() => {
-                                            const currentTime = audioPlayer.seek(); //in seconds
-                                            const progress =
-                                              (currentTime - computedLineStart) / (computedLineEnd - computedLineStart);
-                                            setLineAudioProgress(progress * 100);
-                                          }, 50);
-                                          setIntervalNode(interval);
-
-                                          //stop audio after it finishes
-                                          const timeout = setTimeout(() => {
-                                            audioPlayer.stop();
-                                            setCurrentLine(null);
-                                            clearInterval(interval);
-                                          }, (computedLineEnd - computedLineStart) * 1000);
-                                          setTimeOutList([...timeOutList, timeout]);
-                                        }
-                                      }}
-                                    >
-                                      {currentLine === line ? <IconPlayerStop /> : <IconPlayerPlay />}
-                                    </ActionIcon>
-                                    <Text>{line.text}</Text>
-                                    <TextInput
-                                      placeholder="Enter New Transcription Text"
-                                      value={
-                                        // If the line.edit.text is not null then use that otherwise use the line.text
-                                        line.edit && line.edit.text !== null ? line.edit.text : line.text
-                                      }
-                                      onChange={(e) => {
-                                        console.log('Edit Text: ', e.target.value);
-                                        setEditText(e.target.value);
-                                      }}
-                                    />
-                                    <Button
-                                      onClick={() => {
-                                        console.log('Editing Line submitted: ', editingLine);
-                                        if (editingLine && entry?.transcriptions[0].data) {
-                                          // BUG: This should be a redux action, will be using main for testing
-                                          window.Main.editTranscription({
-                                            entry: entry,
-                                            transcription: entry.transcriptions[0],
-                                            line: editingLine
-                                          });
-                                        }
-                                      }}
-                                    >
-                                      Save
-                                    </Button>
-                                  </>
-                                )}
-                              </>
-                            )
-                          });
-                        }}
-                      >
-                        <IconEdit size={16} />
-                      </ActionIcon>
-                      <ActionIcon color="red" onClick={() => console.log('delete')} disabled>
-                        {/* HACK: Delete is disabled until a way to sync changes is complete */}
-                        <IconTrash size={16} />
-                      </ActionIcon>
+                              // Check if line has an edit
+                              if (line.edit) {
+                                setEditText(line.edit.text || line.text);
+                                setEditingLine(line);
+                              } else {
+                                setEditText(line.text);
+                                setEditingLine(line);
+                              }
+                            }}
+                          >
+                            <IconEdit size={16} />
+                          </ActionIcon>
+                          <ActionIcon color="red" onClick={() => console.log('delete')} disabled>
+                            {/* HACK: Delete is disabled until a way to sync changes is complete */}
+                            <IconTrash size={16} />
+                          </ActionIcon>
+                        </>
+                      )}
                     </Group>
                   );
                 }

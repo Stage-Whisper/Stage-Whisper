@@ -1,4 +1,4 @@
-import { EditTranscriptionArgs } from './handlers/editTranscription/editTranscription';
+import { EditTranscriptionArgs, EditTranscriptionResponse } from './handlers/editTranscription/editTranscription';
 import { contextBridge, ipcRenderer } from 'electron';
 import {
   Channels,
@@ -32,9 +32,14 @@ const api = {
   },
 
   // Pass a line to be edited and apply the changes to the transcription
-  editTranscription: async (args: EditTranscriptionArgs): Promise<void> => {
+  editTranscription: async (args: {
+    entry: EditTranscriptionArgs['entry'];
+    transcription: EditTranscriptionArgs['transcription'];
+    line: EditTranscriptionArgs['line'];
+  }): Promise<EditTranscriptionResponse> => {
     try {
-      await ipcRenderer.invoke(Channels.editTranscription, args);
+      const response = await ipcRenderer.invoke(Channels.editTranscription, args);
+      return response;
     } catch (error) {
       throw new Error(`Preload: Error editing transcription: ${error}`);
     }

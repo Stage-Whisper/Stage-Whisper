@@ -18,6 +18,7 @@ import './handlers/fetchAudioFile/fetchAudioFile'; // Fetch audio file from disk
 import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
 import './handlers/newEntry/newEntry'; // Add a new entry to the database
 import './handlers/runWhisper/runWhisper'; // Run whisper model
+import './handlers/editTranscription/editTranscription'; // Edit a line in the transcription
 import './types/whisperTypes'; // Types for whisper model
 
 // Electron Defaults
