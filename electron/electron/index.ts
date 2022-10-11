@@ -12,7 +12,7 @@ import { existsSync, readFile } from 'fs';
 import { Channels, OpenDirectoryDialogResponse } from './types/channels';
 
 // Import handlers
-import { initializeApp } from './functions/initialize/initializeApp';
+import { initializeApp } from './app/initializeApp';
 import './handlers/deleteStore/deleteStore'; // Non functional
 import './handlers/fetchAudioFile/fetchAudioFile'; // Fetch audio file from disk
 import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
@@ -20,7 +20,9 @@ import './handlers/newEntry/newEntry'; // Add a new entry to the database
 import './handlers/runWhisper/runWhisper'; // Run whisper model
 import './handlers/editTranscription/editTranscription'; // Edit a line in the transcription
 import './types/whisperTypes'; // Types for whisper model
-
+import db from './database/initialize';
+console.log(db);
+console.log('Starting app');
 // Electron Defaults
 const height = 600;
 const width = 800;
