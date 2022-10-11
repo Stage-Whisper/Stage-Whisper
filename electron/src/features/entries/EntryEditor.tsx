@@ -24,7 +24,16 @@ import { DataTable } from 'mantine-datatable';
 // Types
 
 // Packages
-import { IconCheck, IconEdit, IconPlayerPause, IconPlayerPlay, IconPlayerStop, IconTrash, IconX } from '@tabler/icons';
+import {
+  IconArrowBack,
+  IconCheck,
+  IconEdit,
+  IconPlayerPause,
+  IconPlayerPlay,
+  IconPlayerStop,
+  IconTrash,
+  IconX
+} from '@tabler/icons';
 
 import { Howl } from 'howler';
 import { useParams } from 'react-router-dom';
@@ -157,28 +166,26 @@ function EntryEditor() {
   const [editPending, setEditPending] = useState<boolean>(false); // Whether the submitEdit handler is waiting for a response from the main process
 
   const submitEdit = async (entry: entry, transcription: entryTranscription, line: transcriptionLine) => {
-    if (editingLine) {
-      // Set the loading state
-      setEditPending(true);
-      // Get the index of the line
-      window.Main.editTranscription({ entry, transcription, line })
-        .then(() => {
-          // If the promise resolved then the edit has been applied
-          // Update the redux store
-          dispatch(getLocalFiles()); // HACK: this is loading the entire store again, which is not ideal
-          // Clear the edit state
-          setEditingLine(null);
-          setEditPending(false);
-        })
+    // Set the loading state
+    setEditPending(true);
+    // Get the index of the line
+    window.Main.editTranscription({ entry, transcription, line })
+      .then(() => {
+        // If the promise resolved then the edit has been applied
+        // Update the redux store
+        dispatch(getLocalFiles()); // HACK: this is loading the entire store again, which is not ideal
+        // Clear the edit state
+        setEditingLine(null);
+        setEditPending(false);
+      })
 
-        .catch((error) => {
-          // If the promise rejected then the edit failed
-          console.warn(error);
-          // Clear the edit state
-          setEditingLine(null);
-          setEditPending(false);
-        });
-    }
+      .catch((error) => {
+        // If the promise rejected then the edit failed
+        console.warn(error);
+        // Clear the edit state
+        setEditingLine(null);
+        setEditPending(false);
+      });
   };
 
   useEffect(() => {
@@ -433,27 +440,47 @@ function EntryEditor() {
                         </>
                       ) : (
                         <>
-                          <ActionIcon
-                            color="blue"
-                            onClick={() => {
-                              // Set current line
+                          {line.edit?.text ? (
+                            <ActionIcon // Reset edits
+                              color="red"
+                              onClick={() => {
+                                if (entry && activeTranscription) {
+                                  const newline = {
+                                    ...line,
+                                    edit: null
+                                  };
+                                  console.log('resetting edits...');
+                                  submitEdit(entry, activeTranscription, newline);
+                                }
+                              }}
+                            >
+                              <IconArrowBack size={16} />
+                            </ActionIcon>
+                          ) : (
+                            <>
+                              <ActionIcon
+                                color="blue"
+                                onClick={() => {
+                                  // Set current line
 
-                              // Check if line has an edit
-                              if (line.edit) {
-                                setEditText(line.edit.text || line.text);
-                                setEditingLine(line);
-                              } else {
-                                setEditText(line.text);
-                                setEditingLine(line);
-                              }
-                            }}
-                          >
-                            <IconEdit size={16} />
-                          </ActionIcon>
-                          <ActionIcon color="red" onClick={() => console.log('delete')} disabled>
-                            {/* HACK: Delete is disabled until a way to sync changes is complete */}
-                            <IconTrash size={16} />
-                          </ActionIcon>
+                                  // Check if line has an edit
+                                  if (line.edit) {
+                                    setEditText(line.edit.text || line.text);
+                                    setEditingLine(line);
+                                  } else {
+                                    setEditText(line.text);
+                                    setEditingLine(line);
+                                  }
+                                }}
+                              >
+                                <IconEdit size={16} />
+                              </ActionIcon>
+                              <ActionIcon color="red" onClick={() => console.log('delete')} disabled>
+                                {/* HACK: Delete is disabled until a way to sync changes is complete */}
+                                <IconTrash size={16} />
+                              </ActionIcon>
+                            </>
+                          )}
                         </>
                       )}
                     </Group>
