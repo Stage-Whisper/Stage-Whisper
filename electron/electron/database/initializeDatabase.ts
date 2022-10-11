@@ -1,11 +1,11 @@
+import { whisperModels } from './../types/whisperTypes';
 import { app } from 'electron';
 import knex from 'knex';
 import path from 'path';
 
 // Types
 import { transcriptionStatus } from '../types/types';
-import { WhisperArgs } from '../types/whisperTypes';
-// import { WhisperArgs } from '../types/whisperTypes';
+import { WhisperArgs, whisperLanguages } from '../types/whisperTypes';
 
 const rootPath = app.getPath('userData'); // Path to the top level of the data folder
 const storePath = path.join(rootPath, 'store'); // Path to the store folder
@@ -79,12 +79,40 @@ declare module 'knex/types/tables' {
     end: number; // End time of the line in seconds
   }
 
+  export interface Settings {
+    darkMode: boolean; // Whether dark mode is enabled
+    language: string; // Language of the app
+  }
+
   export interface Tables {
     entry: Entry;
     transcription: Transcription;
     line: Line;
   }
 }
+
+// Valid Audio Types
+const audioTypes = [
+  'mp3',
+  'mpeg',
+  'wav',
+  'ogg',
+  'flac',
+  'aac',
+  'm4a',
+  'wma',
+  'ac3',
+  'mp2',
+  'amr',
+  'aiff',
+  'au',
+  'mpc',
+  'opus',
+  'tta',
+  'voc',
+  'wv',
+  'webm'
+];
 
 // Create the tables
 console.log('Creating tables...');
@@ -95,19 +123,19 @@ db.schema.hasTable('entry').then((exists) => {
         table.string('uuid').primary().unique().notNullable();
         table.string('name').nullable();
         table.string('description').nullable();
-        table.integer('created').notNullable();
-        table.boolean('inQueue').notNullable();
-        table.integer('queueWeight').notNullable();
-        table.string('tags').nullable();
+        table.integer('created').notNullable().defaultTo(Date.now());
+        table.boolean('inQueue').notNullable().defaultTo(false);
+        table.integer('queueWeight').notNullable().defaultTo(0);
+        table.string('tags').nullable().defaultTo(''); // TODO: Change to an array that works with SQLite (JSON?)
         table.string('activeTranscription').references('uuid').inTable('transcription').nullable();
 
         // Audio
-        table.string('audio_type').notNullable();
+        table.string('audio_type').notNullable().checkIn(audioTypes);
         table.string('audio_path').notNullable();
         table.string('audio_name').notNullable();
-        table.string('audio_language').nullable();
+        table.string('audio_language').nullable().checkIn(Object.keys(whisperLanguages));
         table.integer('audio_fileLength').notNullable();
-        table.integer('audio_addedOn').notNullable();
+        table.integer('audio_addedOn').notNullable().defaultTo(Date.now());
       })
       .then(() => {
         console.log('Created table: entry');
@@ -122,17 +150,17 @@ db.schema.hasTable('transcription').then((exists) => {
   if (!exists) {
     db.schema
       .createTable('transcription', (table) => {
-        table.string('entry').references('uuid').inTable('entry');
-        table.string('uuid').primary();
-        table.integer('transcribedOn');
-        table.string('path');
-        table.string('model');
-        table.string('language');
-        table.string('status');
-        table.integer('progress');
-        table.boolean('translated');
-        table.string('error');
-        table.integer('completedOn');
+        table.string('entry').references('uuid').inTable('entry').notNullable();
+        table.string('uuid').primary().unique().notNullable();
+        table.integer('transcribedOn').notNullable().defaultTo(Date.now());
+        table.string('path').notNullable();
+        table.string('model').notNullable().checkIn(Object.values(whisperModels));
+        table.string('language').notNullable().checkIn(Object.keys(whisperLanguages));
+        table.string('status').notNullable().checkIn(Object.values(transcriptionStatus));
+        table.integer('progress').notNullable().defaultTo(0);
+        table.boolean('translated').notNullable().defaultTo(false);
+        table.string('error').nullable();
+        table.integer('completedOn').nullable();
       })
       .then(() => {
         console.log('Created table: transcription');
@@ -143,17 +171,16 @@ db.schema.hasTable('transcription').then((exists) => {
       });
   }
 });
-
 db.schema.hasTable('line').then((exists) => {
   if (!exists) {
     db.schema
       .createTableIfNotExists('line', (table) => {
-        table.string('uuid').references('uuid').inTable('transcription');
-        table.integer('version');
-        table.integer('index');
-        table.string('text');
-        table.integer('start');
-        table.integer('end');
+        table.string('uuid').references('uuid').inTable('transcription').notNullable();
+        table.integer('version').notNullable().defaultTo(0);
+        table.integer('index').notNullable();
+        table.string('text').notNullable();
+        table.integer('start').notNullable();
+        table.integer('end').notNullable();
       })
       .then(() => {
         console.log('Created table: line');
