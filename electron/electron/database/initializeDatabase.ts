@@ -1,21 +1,168 @@
-import sqlite3 from 'sqlite3';
+import { app } from 'electron';
+import knex from 'knex';
+import path from 'path';
 
-const db = new sqlite3.Database('database.db');
+// Types
+import { transcriptionStatus } from '../types/types';
+import { WhisperArgs } from '../types/whisperTypes';
+// import { WhisperArgs } from '../types/whisperTypes';
 
-// Test IF Sqlite3 can work for this project
-db.serialize(() => {
-  db.run('CREATE TABLE IF NOT EXISTS test (info TEXT)');
-  const stmt = db.prepare('INSERT INTO test VALUES (?)');
-  for (let i = 0; i < 10; i++) {
-    stmt.run('Ipsum ' + i);
+const rootPath = app.getPath('userData'); // Path to the top level of the data folder
+const storePath = path.join(rootPath, 'store'); // Path to the store folder
+
+// Set up Knex
+const db = knex({
+  client: 'better-sqlite3',
+  connection: {
+    filename: path.join(storePath, 'database.sqlite')
+  },
+  useNullAsDefault: true
+});
+// Types
+declare module 'knex/types/tables' {
+  export interface Entry {
+    // Config
+    uuid: string; // UUID of the entry
+    name: string; // Title of the entry
+    description: string; // Description of the entry
+    created: number; // Date the entry was created (in milliseconds since 1970)
+    inQueue: boolean; // If the entry is in the queue
+    queueWeight: number; // Absolute value of the queue weight, 0 is the highest priority
+    activeTranscription: string | null; // The active transcription for the entry
+    // Audio
+    audio_type: //Audio files supported by Whisper in the form of an enum
+    | 'mp3'
+      | 'wav'
+      | 'ogg'
+      | 'flac'
+      | 'aac'
+      | 'm4a'
+      | 'wma'
+      | 'ac3'
+      | 'mp2'
+      | 'amr'
+      | 'aiff'
+      | 'au'
+      | 'mpc'
+      | 'opus'
+      | 'tta'
+      | 'voc'
+      | 'wv'
+      | 'webm';
+    audio_path: string; // Path to the audio file
+    audio_name: string; // Name of the audio file
+    audio_language: WhisperArgs['language'] | undefined; // Language of the audio file
+    audio_fileLength: number; // Length of the audio file in seconds
+    audio_addedOn: number; // Date the audio file was added to the entry (in milliseconds since 1970)
   }
-  stmt.finalize();
 
-  db.each('SELECT rowid AS id, info FROM test', (_err, row) => {
-    console.log(row.id + ': ' + row.info);
-  });
+  export interface Transcription {
+    entry: string; // UUID of the entry
+    uuid: string; // UUID of the transcription
+    transcribedOn: number; // Date the transcription was started (in milliseconds since 1970)
+    path: string; // Path to the transcription folder
+    model: WhisperArgs['model']; // Model used to transcribe the audio
+    language: WhisperArgs['language']; // Language of the audio file
+    status: transcriptionStatus; // Status of the transcription -- also used to determine if the transcription is complete
+    progress: number; // Progress of the transcription
+    translated: boolean; // Whether the transcription has been translated
+    error: string | undefined; // Error message if the transcription failed
+    completedOn: number; // Date the transcription was completed (in milliseconds since 1970)
+  }
 
-  db.run('DELETE FROM test WHERE rowid = 1');
+  export interface Line {
+    uuid: string; // UUID of the transcription
+    version: number; // Version of the line (used for undo/redo, 0 is the original)
+    index: number; // Line number
+    text: string; // Text of the line
+    start: number; // Start time of the line in seconds
+    end: number; // End time of the line in seconds
+  }
+
+  export interface Tables {
+    entry: Entry;
+    transcription: Transcription;
+    line: Line;
+  }
+}
+
+// Create the tables
+console.log('Creating tables...');
+db.schema.hasTable('entry').then((exists) => {
+  if (!exists) {
+    db.schema
+      .createTable('entry', (table) => {
+        table.string('uuid').primary().unique().notNullable();
+        table.string('name').nullable();
+        table.string('description').nullable();
+        table.integer('created').notNullable();
+        table.boolean('inQueue').notNullable();
+        table.integer('queueWeight').notNullable();
+        table.string('tags').nullable();
+        table.string('activeTranscription').references('uuid').inTable('transcription').nullable();
+
+        // Audio
+        table.string('audio_type').notNullable();
+        table.string('audio_path').notNullable();
+        table.string('audio_name').notNullable();
+        table.string('audio_language').nullable();
+        table.integer('audio_fileLength').notNullable();
+        table.integer('audio_addedOn').notNullable();
+      })
+      .then(() => {
+        console.log('Created table: entry');
+      })
+      .catch((err) => {
+        console.log('Error creating table: entry');
+        console.error(err);
+      });
+  }
+});
+db.schema.hasTable('transcription').then((exists) => {
+  if (!exists) {
+    db.schema
+      .createTable('transcription', (table) => {
+        table.string('entry').references('uuid').inTable('entry');
+        table.string('uuid').primary();
+        table.integer('transcribedOn');
+        table.string('path');
+        table.string('model');
+        table.string('language');
+        table.string('status');
+        table.integer('progress');
+        table.boolean('translated');
+        table.string('error');
+        table.integer('completedOn');
+      })
+      .then(() => {
+        console.log('Created table: transcription');
+      })
+      .catch((err) => {
+        console.log('Error creating table: transcription');
+        console.error(err);
+      });
+  }
+});
+
+db.schema.hasTable('line').then((exists) => {
+  if (!exists) {
+    db.schema
+      .createTableIfNotExists('line', (table) => {
+        table.string('uuid').references('uuid').inTable('transcription');
+        table.integer('version');
+        table.integer('index');
+        table.string('text');
+        table.integer('start');
+        table.integer('end');
+      })
+      .then(() => {
+        console.log('Created table: line');
+      })
+      .catch((err) => {
+        console.log('Error creating table: line');
+        console.error(err);
+      });
+  }
 });
 
 export default db;
