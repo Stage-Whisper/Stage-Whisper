@@ -20,9 +20,8 @@ import './handlers/newEntry/newEntry'; // Add a new entry to the database
 import './handlers/runWhisper/runWhisper'; // Run whisper model
 import './handlers/editTranscription/editTranscription'; // Edit a line in the transcription
 import './types/whisperTypes'; // Types for whisper model
-import db from './database/initializeDatabase';
-console.log(db);
-console.log('Starting app');
+import './database/initializeDatabase'; // Initialize database
+
 // Electron Defaults
 const height = 600;
 const width = 800;
@@ -77,7 +76,7 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   installExtension(REDUX_DEVTOOLS)
     .then((name) => console.log(`Added Extension:  ${name}`))
     .catch((err) => console.log('An error occurred: ', err));
