@@ -116,12 +116,24 @@ export enum whisperLanguages {
 
 export const whisperCodes = Object.values(whisperLanguages);
 
+export const whisperModels = [
+  'tiny.en',
+  'tiny',
+  'base.en',
+  'base',
+  'small.en',
+  'small',
+  'medium.en',
+  'medium',
+  'large'
+] as const;
+
 export interface WhisperArgs {
   // Input Path
   inputPath?: string;
 
   // Model: Name of the Whisper model to use (default: small)
-  model?: 'tiny.en' | 'tiny' | 'base.en' | 'base' | 'small.en' | 'small' | 'medium.en' | 'medium' | 'large';
+  model?: typeof whisperModels[number];
 
   // ModelDir: The path to save model files; uses ~/.cache/whisper by default (default: None)
   model_dir?: string;
