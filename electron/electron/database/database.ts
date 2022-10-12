@@ -1,15 +1,19 @@
 import { whisperModels } from '../types/whisperTypes';
 import knex from 'knex';
-import path from 'path';
+import path, { join } from 'path';
 import { WhisperArgs, whisperLanguages } from '../types/whisperTypes';
+import { app } from 'electron';
 
 // Set up Knex
 console.log('Initializing Database');
 
+const rootPath = app.getPath('userData'); // Path to the top level of the data folder
+const storePath = join(rootPath, 'store'); // Path to the store folder
+
 const db = knex({
   client: 'better-sqlite3',
   connection: {
-    filename: path.join(__dirname, 'database.sqlite')
+    filename: path.join(storePath, 'database.sqlite')
   },
   useNullAsDefault: true
 });
@@ -186,17 +190,17 @@ db.schema.hasTable('transcriptions').then((exists) => {
   if (!exists) {
     db.schema
       .createTable('transcriptions', (table) => {
-        table.string('entries').references('uuid').inTable('entries').notNullable();
+        table.string('entry').references('uuid').inTable('entries').notNullable();
         table.string('uuid').primary().unique().notNullable();
-        table.integer('transcribedOn').notNullable().defaultTo(Date.now());
+        table.integer('transcribedOn').notNullable();
         table.string('path').notNullable();
         table.string('model').notNullable().checkIn(Object.values(whisperModels));
-        table.string('language').notNullable().checkIn(Object.keys(whisperLanguages));
+        table.string('language').nullable().checkIn(Object.keys(whisperLanguages));
         table.string('status').notNullable().checkIn(Object.values(transcriptionStatus));
         table.integer('progress').notNullable().defaultTo(0);
-        table.boolean('translated').notNullable().defaultTo(false);
+        table.boolean('translated').nullable();
         table.string('error').nullable();
-        table.integer('completedOn').nullable();
+        table.integer('completedOn').nullable().defaultTo(Date.now());
       })
       .then(() => {
         console.log('Created table: transcriptions');
@@ -214,13 +218,14 @@ db.schema.hasTable('lines').then((exists) => {
     db.schema
       .createTableIfNotExists('lines', (table) => {
         table.string('uuid').primary().notNullable();
-        table.string('transcriptions').references('uuid').inTable('transcriptions').notNullable();
-        table.integer('version').notNullable().defaultTo(0);
-        table.integer('index').notNullable();
-        table.string('text').notNullable();
+        table.string('entry').references('uuid').inTable('entries').notNullable();
+        table.string('transcription').references('uuid').inTable('transcriptions').notNullable();
         table.integer('start').notNullable();
         table.integer('end').notNullable();
+        table.string('text').notNullable();
+        table.integer('index').notNullable();
         table.boolean('deleted').notNullable().defaultTo(false);
+        table.integer('version').notNullable().defaultTo(0);
       })
       .then(() => {
         console.log('Created table: lines');

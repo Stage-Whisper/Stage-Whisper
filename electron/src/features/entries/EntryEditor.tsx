@@ -61,6 +61,8 @@ const filePathToURL = async (filePath: string): Promise<string> => {
   }
 };
 
+/// TODO: Add a way to grab lines from the transcription
+
 // Construct Audio Player -- Required as will need to refresh with new audio player
 function AudioControls(audioPlayer: Howl) {
   let currentPlaying = false;

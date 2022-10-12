@@ -21,16 +21,16 @@ ipcMain.handle(
   QUERY.ADD_ENTRY,
   async (_event: IpcMainInvokeEvent, args: QueryArgs[QUERY.ADD_ENTRY]): QueryReturn[QUERY.ADD_ENTRY] => {
     const { entry } = args;
-    const insertedEntry = (await db('entries').insert(entry).returning('*').first()) as Entry;
-    return insertedEntry;
+    const insertedEntry = (await db('entries').insert(entry).returning('*')) as Entry[];
+    return insertedEntry[0];
   }
 );
 
 // Add Line
 ipcMain.handle(QUERY.ADD_LINE, async (_event: invoke, args: QueryArgs[QUERY.ADD_LINE]): QueryReturn[QUERY.ADD_LINE] => {
   const { line } = args;
-  const insertedLine = (await db('lines').insert(line).returning('*').first()) as Line;
-  return insertedLine;
+  const insertedLine = (await db('lines').insert(line).returning('*')) as Line[];
+  return insertedLine[0];
 });
 
 // Add Lines
@@ -49,11 +49,8 @@ ipcMain.handle(
   QUERY.ADD_TRANSCRIPTION,
   async (_event: invoke, args: QueryArgs[QUERY.ADD_TRANSCRIPTION]): QueryReturn[QUERY.ADD_TRANSCRIPTION] => {
     const { transcription } = args;
-    const insertedTranscription = (await db('transcriptions')
-      .insert(transcription)
-      .returning('*')
-      .first()) as Transcription;
-    return insertedTranscription;
+    const insertedTranscription = (await db('transcriptions').insert(transcription).returning('*')) as Transcription[];
+    return insertedTranscription[0];
   }
 );
 
@@ -213,8 +210,8 @@ ipcMain.handle(
     };
 
     // Add the new line to the database and return it
-    const newLine = (await db('lines').insert(updatedLine).returning('*').first()) as Line;
-    return newLine;
+    const newLine = (await db('lines').insert(updatedLine).returning('*')) as Line[];
+    return newLine[0];
   }
 );
 

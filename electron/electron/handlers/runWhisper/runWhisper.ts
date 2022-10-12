@@ -1,20 +1,18 @@
 // Electron
-import { app, ipcMain, IpcMainInvokeEvent, ipcRenderer } from 'electron';
+import { app, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { join } from 'path';
 
 // Packages
-import { v4 as uuidv4 } from 'uuid';
-import { mkdirSync } from 'fs';
-import { existsSync, readFileSync } from 'fs';
 import { spawn } from 'child_process';
+import { existsSync, mkdirSync, readFileSync } from 'fs';
 import { NodeCue, parseSync } from 'subtitle';
+import { v4 as uuidv4 } from 'uuid';
 
 // Types
+import { Entry, Line, Transcription } from 'knex/types/tables';
+import db, { transcriptionStatus } from '../../database/database';
 import { Channels } from '../../types/channels';
 import { WhisperArgs } from '../../types/whisperTypes';
-import { transcriptionStatus } from '../../database/database';
-import { Entry, Line, Transcription } from 'knex/types/tables';
-import { QUERY } from '../../types/queries';
 
 export type RunWhisperResponse = {
   transcription: Transcription;
@@ -167,7 +165,9 @@ export default ipcMain.handle(
           // invoke the main process to add the transcription to the database
           console.log('RunWhisper: Adding transcription to database...');
           console;
-          const newTranscription = (await ipcRenderer.invoke(QUERY.ADD_TRANSCRIPTION, transcription)) as Transcription;
+          const newTranscription = (
+            (await db('transcriptions').insert(transcription).returning('*')) as Transcription[]
+          )[0];
 
           if (newTranscription.error) {
             console.log('RunWhisper: Error adding transcription to database!', newTranscription.error);
@@ -183,7 +183,7 @@ export default ipcMain.handle(
               transcription: newTranscription.uuid,
               start: cue.data.start,
               end: cue.data.end,
-              text: cue.data.text,
+              text: cue.data.text || '',
               index, // Note! This assumes that the cues are in order from whisper
               deleted: false,
               version: 0
@@ -193,10 +193,13 @@ export default ipcMain.handle(
 
           // Add the lines to the database
           console.log('RunWhisper: Adding lines to database...');
-          const newLines = await ipcRenderer.invoke(QUERY.ADD_LINES, formattedLines);
+          const newLines = (await db('lines').insert(formattedLines).returning('*')) as Line[];
 
-          if (newLines.error) {
-            console.log('RunWhisper: Error adding lines to database!', newLines.error);
+          if (newLines.length !== formattedLines.length) {
+            console.warn(
+              'RunWhisper: Mismatch between number of lines added to database and number of lines generated!'
+            );
+            console.log('RunWhisper: Error adding lines to database!', newLines);
             throw new Error('Error adding lines to database!');
           } else {
             console.log('RunWhisper: Lines added to database successfully!');

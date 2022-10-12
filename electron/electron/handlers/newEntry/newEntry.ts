@@ -61,7 +61,7 @@ export default ipcMain.handle(
     try {
       await db
         .insert(entry)
-        .into('entry')
+        .into('entries')
         .then(() => {
           console.log('NewEntry: Entry added to database!');
           response = entry;

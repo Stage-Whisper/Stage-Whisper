@@ -100,7 +100,7 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
     );
 
   const icon =
-    transcribing?.entry.uuid === entry.uuid ? (
+    transcribing?.entry?.uuid === entry?.uuid ? (
       <Loader /> // If the entry is currently being transcribed, show a loading icon
     ) : entry.transcriptions.length > 0 ? (
       <IconFileCheck color={'green'} size={40} />
