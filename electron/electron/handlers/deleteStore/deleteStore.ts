@@ -13,7 +13,7 @@ const storePath = join(rootPath, 'store'); // Path to the store folder
 
 // Get all entries
 export default ipcMain.handle(
-  Channels.deleteStore, // BUG: #53 This will not work no matter what I do
+  Channels.DELETE_STORE, // BUG: #53 This will not work no matter what I do
   async (): Promise<DeleteStoreResponse> => {
     try {
       // Delete the store folder

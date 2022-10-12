@@ -1,14 +1,15 @@
-import { entry } from './types';
+import { Entry } from 'knex/types/tables';
+
 // List of all channels used by electron IPC
 
 export enum Channels {
   // Utility channels
-  deleteStore = 'delete-store',
-  openDirectoryDialog = 'open-directory-dialog', // Trigger a directory picker
-  fetchAudioFile = 'fetch-audio-file', // Convert an audio file to a Uint8Array and send it back to the renderer
+  DELETE_STORE = 'delete-store',
+  OPEN_DIR_DIALOG = 'open-directory-dialog', // Trigger a directory picker
+  FETCH_AUDIO_FILE = 'fetch-audio-file', // Convert an audio file to a Uint8Array and send it back to the renderer
 
   // Database channels
-  loadDatabase = 'load-database', // Loads all entries from the database and returns them
+  QUERY_DATABASE = 'query-database', // Loads all entries from the database and returns them
   newEntry = 'new-entry', // Creates a new entry in the database and returns it
   editTranscription = 'edit-transcription', // Takes an entry and an edited transcription appends changes to the formatted transcription json file
 
@@ -31,22 +32,16 @@ export interface OpenDirectoryDialogResponse {
   path: string | null;
 }
 
-// Response type for the load-database channel
-export type LoadDatabaseResponse = {
-  entries: entry[];
-  error?: string;
-};
-
 // Response type for the new-entry channel
 export type NewEntryResponse = {
-  entry: entry;
+  entry: Entry;
 };
 
 // Response type for the run-whisper channel
 export type RunWhisperResponse = {
   transcription_uuid: string;
   outputDir: string;
-  entry: entry;
+  entry: Entry;
   transcribedOn: number;
 };
 
@@ -54,7 +49,7 @@ export type RunWhisperResponse = {
 export type WhisperCompleteResponse = {
   outputDir: string;
   code: number;
-  entry: entry;
+  entry: Entry;
   uuid: string;
 };
 
@@ -62,5 +57,5 @@ export type WhisperCompleteResponse = {
 export type WhisperErrorResponse = {
   transcription_uuid: string;
   error: string;
-  entry: entry;
+  entry: Entry;
 };
