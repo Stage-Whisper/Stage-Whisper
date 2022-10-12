@@ -1,25 +1,24 @@
 import { whisperModels } from '../types/whisperTypes';
-import { app } from 'electron';
 import knex from 'knex';
 import path from 'path';
 import { WhisperArgs, whisperLanguages } from '../types/whisperTypes';
 
-const rootPath = app.getPath('userData'); // Path to the top level of the data folder
-const storePath = path.join(rootPath, 'store'); // Path to the store folder
-
 // Set up Knex
+console.log('Initializing Database');
+
 const db = knex({
   client: 'better-sqlite3',
   connection: {
-    filename: path.join(storePath, 'database.sqlite')
+    filename: path.join(__dirname, 'database.sqlite')
   },
   useNullAsDefault: true
 });
 
+console.log('Database initialized');
 /// ---------------------- Types ---------------------- ///
 
 // Valid Audio Types
-const audioTypes = [
+export const validAudioTypes = [
   'mp3',
   'mpeg',
   'wav',
@@ -136,6 +135,7 @@ declare module 'knex/types/tables' {
 // Create the tables
 console.log('Creating tables...');
 
+console.log('Creating settings table...');
 db.schema.hasTable('settings').then((exists) => {
   if (!exists) {
     db.schema
@@ -149,6 +149,7 @@ db.schema.hasTable('settings').then((exists) => {
   }
 });
 
+console.log('Creating entries table...');
 db.schema.hasTable('entries').then((exists) => {
   if (!exists) {
     db.schema
@@ -163,7 +164,7 @@ db.schema.hasTable('entries').then((exists) => {
         table.string('activeTranscription').references('uuid').inTable('transcriptions').nullable();
 
         // Audio
-        table.string('audio_type').notNullable().checkIn(audioTypes);
+        table.string('audio_type').notNullable().checkIn(validAudioTypes);
         table.string('audio_path').notNullable();
         table.string('audio_name').notNullable();
         table.string('audio_language').nullable().checkIn(Object.keys(whisperLanguages));
@@ -179,6 +180,8 @@ db.schema.hasTable('entries').then((exists) => {
       });
   }
 });
+
+console.log('Creating transcriptions table...');
 db.schema.hasTable('transcriptions').then((exists) => {
   if (!exists) {
     db.schema
@@ -204,12 +207,14 @@ db.schema.hasTable('transcriptions').then((exists) => {
       });
   }
 });
-db.schema.hasTable('line').then((exists) => {
+
+console.log('Creating lines table...');
+db.schema.hasTable('lines').then((exists) => {
   if (!exists) {
     db.schema
       .createTableIfNotExists('lines', (table) => {
+        table.string('uuid').primary().notNullable();
         table.string('transcriptions').references('uuid').inTable('transcriptions').notNullable();
-        table.string('uuid').primary().unique().notNullable();
         table.integer('version').notNullable().defaultTo(0);
         table.integer('index').notNullable();
         table.string('text').notNullable();

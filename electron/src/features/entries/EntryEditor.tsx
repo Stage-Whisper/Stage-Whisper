@@ -10,12 +10,10 @@ import {
   Card,
   Group,
   Loader,
-  Modal,
   NumberInput,
   Stack,
   Text,
   Textarea,
-  TextInput,
   Title
 } from '@mantine/core';
 
@@ -36,13 +34,14 @@ import {
 } from '@tabler/icons';
 
 import { Howl } from 'howler';
+import { Line, Transcription } from 'knex/types/tables';
 import { useParams } from 'react-router-dom';
 import strings from '../../localization';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectAudioPadding } from '../settings/settingsSlice';
 import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
-import { getLocalFiles, selectEntries } from './entrySlice';
-import { entry, entryTranscription, transcriptionLine } from '../../../electron/types/types';
+import { getLocalFiles, ReduxEntry, selectEntries } from './entrySlice';
+// import {  Transcription, Line }  from
 
 // Convert an internal audio path to a url that can be used by howler
 const filePathToURL = async (filePath: string): Promise<string> => {
@@ -120,19 +119,17 @@ function EntryEditor() {
   const { entryId } = useParams<{ entryId: string }>();
 
   // Get the active entry
-  const entry = entries.find((entry) => entry.config.uuid === entryId);
+  const entry = entries.find((entry) => entry.uuid === entryId);
 
   // Set the active transcription
-  const [activeTranscription, setActiveTranscription] = useState<entryTranscription | undefined>(
-    entry?.transcriptions[0]
-  );
+  const [activeTranscription, setActiveTranscription] = useState<Transcription | undefined>(entry?.transcriptions[0]);
 
   // Transcription Text States
   // Empty state to store the formatted VTT lines
-  const [formattedLines, setFormattedLines] = useState<Array<transcriptionLine>>([]);
+  const [formattedLines, setFormattedLines] = useState<Array<Line>>([]);
   // Empty state to store the current line
 
-  const [currentLine, setCurrentLine] = useState<transcriptionLine | null>(null);
+  const [currentLine, setCurrentLine] = useState<Line | null>(null);
 
   // Set up the audio player state
   const [audioPlayer, setAudioPlayer] = useState<Howl | null>(null);
@@ -156,20 +153,20 @@ function EntryEditor() {
   // Data Table States
   const [pageSize, setPageSize] = useState(20);
   const [page, setPage] = useState(1);
-  const [records, setRecords] = useState<transcriptionLine[] | null>(null);
+  const [records, setRecords] = useState<Line[] | null>(null);
 
   // Editing States
-  const [editingLine, setEditingLine] = useState<transcriptionLine | null>(null);
+  const [editingLine, setEditingLine] = useState<Line | null>(null);
   const [editText, setEditText] = useState<string>('');
   const [editStart, setEditStart] = useState<number>(0);
   const [editEnd, setEditEnd] = useState<number>(0);
   const [editPending, setEditPending] = useState<boolean>(false); // Whether the submitEdit handler is waiting for a response from the main process
 
-  const submitEdit = async (entry: entry, transcription: entryTranscription, line: transcriptionLine) => {
+  const submitEdit = async (entry: ReduxEntry, transcription: Transcription, line: Line) => {
     // Set the loading state
     setEditPending(true);
     // Get the index of the line
-    window.Main.editTranscription({ entry, transcription, line })
+    window.Main.UPDATE_LINE({ line })
       .then(() => {
         // If the promise resolved then the edit has been applied
         // Update the redux store
@@ -229,21 +226,16 @@ function EntryEditor() {
       console.debug(`EntryEditor: ${transcriptionData.length} Nodes Found`);
 
       // Generate the formatted lines
-      const formattedLines: transcriptionLine[] = transcriptionData.map((line: transcriptionLine) => {
+      const formattedLines: Line[] = transcriptionData.map((line: Line) => {
         return {
-          id: line.id,
-          start: line.edit?.start || line.start,
-          end: line.edit?.end || line.end,
-          text: line.edit?.text || line.text,
-          index: line.index,
-          edit: line.edit
+          ...line // TODO: Implement line editing
         };
       });
 
       // Set the formatted lines
       setFormattedLines(formattedLines);
-      console.log('Got Audio Path: ', entry.audio.path);
-      const audioFilePath = entry.audio.path;
+      console.log('Got Audio Path: ', entry.audio_path);
+      const audioFilePath = entry.audio_path;
       // Convert the audio file path to a URL
       console.log('Converting Audio Path to URL');
       filePathToURL(audioFilePath).then((audioURL) => {
@@ -275,7 +267,7 @@ function EntryEditor() {
 
   //  Documentation -- remove before prod
   //  https://icflorescu.github.io/mantine-datatable
-  const dataTable = (formatted: transcriptionLine[]) => {
+  const dataTable = (formatted: Line[]) => {
     // Generate a data table using Mantine-Datatable
     if (records) {
       return (
@@ -501,7 +493,7 @@ function EntryEditor() {
   }
 
   // If the entry has been passed in, but its transcription is currently being run
-  if (entry && transcribingStatus.entry?.config.uuid === entry.config.uuid && transcribingStatus.status === 'loading') {
+  if (entry && transcribingStatus.entry?.config.uuid === entry.uuid && transcribingStatus.status === 'loading') {
     return (
       <Stack align={'center'} justify="center" style={{ height: '80%' }}>
         <Title order={3}>Transcribing</Title>
@@ -549,7 +541,7 @@ function EntryEditor() {
     return (
       <>
         <Title mt={'md'} align="center">
-          {entry.config.name}
+          {entry.name}
         </Title>
         <Group position="apart">
           <NumberInput

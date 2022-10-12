@@ -1,13 +1,14 @@
 import { Button, Chip, Group, Select, TextInput } from '@mantine/core';
 import { IconSearch, IconSortAscending, IconSortDescending } from '@tabler/icons';
 import React, { useEffect, useState } from 'react';
-import { entry } from '../../../../electron/types/types';
+import { ReduxEntry } from '../entrySlice';
+
 function FilterSettings({
   entries,
   setEntries
 }: {
-  entries: entry[];
-  setEntries: React.Dispatch<React.SetStateAction<entry[]>>;
+  entries: ReduxEntry[];
+  setEntries: React.Dispatch<React.SetStateAction<ReduxEntry[]>>;
 }) {
   //Use state to store the current filter of type sortConfig
   const [filter, setFilter] = useState<sortConfig>({
@@ -40,7 +41,7 @@ function FilterSettings({
     let filteredEntries = [...entries];
     if (filter.query !== '') {
       filteredEntries = filteredEntries.filter((entry) => {
-        return entry.config.name.toLowerCase().includes(filter.query.toLowerCase());
+        return entry.name.toLowerCase().includes(filter.query.toLowerCase());
       });
     }
     if (!filter.showCompleted) {
@@ -58,12 +59,12 @@ function FilterSettings({
     if (filter.sortBy === 'time') {
       console.log('sort by time');
       filteredEntries = filteredEntries.sort((a, b) => {
-        return filter.asc ? a.config.created - b.config.created : b.config.created - a.config.created;
+        return filter.asc ? a.created - b.created : b.created - a.created;
       });
     } else {
       //Sort alphabetically
       filteredEntries = filteredEntries.sort((a, b) => {
-        return filter.asc ? b.config.name.localeCompare(a.config.name) : a.config.name.localeCompare(b.config.name);
+        return filter.asc ? b.name.localeCompare(a.name) : a.name.localeCompare(b.name);
       });
     }
     setEntries(filteredEntries);

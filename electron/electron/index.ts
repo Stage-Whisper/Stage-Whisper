@@ -11,16 +11,7 @@ import isDev from 'electron-is-dev';
 import { existsSync, readFile } from 'fs';
 import { Channels, OpenDirectoryDialogResponse } from './types/channels';
 
-// Import handlers
 import { initializeApp } from './app/initializeApp';
-import './handlers/deleteStore/deleteStore'; // Non functional
-import './handlers/fetchAudioFile/fetchAudioFile'; // Fetch audio file from disk
-import './handlers/queryDatabase/queryDatabase'; // Get all entries from database
-import './handlers/newEntry/newEntry'; // Add a new entry to the database
-import './handlers/runWhisper/runWhisper'; // Run whisper model
-import './types/whisperTypes'; // Types for whisper model
-import './database/database'; // Initialize database
-import './handlers/queryDatabase/queryDatabase'; // Handle database functions
 
 // Electron Defaults
 const height = 600;
@@ -76,7 +67,7 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
   installExtension(REDUX_DEVTOOLS)
     .then((name) => console.log(`Added Extension:  ${name}`))
     .catch((err) => console.log('An error occurred: ', err));
@@ -109,3 +100,15 @@ ipcMain.handle(Channels.OPEN_DIR_DIALOG, async (): Promise<OpenDirectoryDialogRe
     path: directory.canceled ? null : directory.filePaths[0]
   };
 });
+
+// Import handlers
+
+import './database/database'; // Initialize database
+import './handlers/deleteStore/deleteStore'; // Non functional
+import './handlers/fetchAudioFile/fetchAudioFile'; // Fetch audio file from disk
+import './handlers/queryDatabase/queryDatabase'; // Get all entries from database
+import './handlers/newEntry/newEntry'; // Add a new entry to the database
+import './handlers/runWhisper/runWhisper'; // Run whisper model
+import './types/whisperTypes'; // Types for whisper model
+import './handlers/deleteStore/deleteStore'; // Non functional for the moment
+import './handlers/queryDatabase/queryDatabase'; // Handle database functions

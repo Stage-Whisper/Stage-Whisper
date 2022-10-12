@@ -1,4 +1,5 @@
 import { Card, Stack, TextInput, Title } from '@mantine/core';
+import { Entry } from 'knex/types/tables';
 import React from 'react';
 import strings from '../../../../localization';
 import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
@@ -8,11 +9,7 @@ import { selectAbout, selectHighlightInvalid, setAbout } from '../../inputSlice'
 // import strings from '../../../../localization';
 
 // Types
-export interface AboutType {
-  name: string;
-  description: string | undefined;
-  tags: string[] | undefined;
-}
+export type AboutUtilityType = Pick<Entry, 'name' | 'description'>;
 
 function About() {
   // TODO: #45 Add Description component with fields for name, description, and tags
@@ -25,7 +22,6 @@ function About() {
 
   const [name, setName] = React.useState(about.name);
   const [description, setDescription] = React.useState(about.description);
-  const [tags, setTags] = React.useState(about.tags);
 
   return (
     <Card shadow="xs" p="md" withBorder title="Audio">
@@ -58,7 +54,7 @@ function About() {
           }}
         />
         {/* Tags for the entry */}
-        <TextInput
+        {/* <TextInput
           placeholder={strings.input?.about?.tags.placeholder}
           label={strings.input?.about?.tags.prompt}
           value={tags}
@@ -68,7 +64,7 @@ function About() {
           onBlur={() => {
             dispatch(setAbout({ ...about, tags: tags }));
           }}
-        />
+        /> */}
       </Stack>
     </Card>
   );

@@ -7,14 +7,14 @@ import { rmdir } from 'fs/promises';
 import { join } from 'path';
 import { Channels } from '../../types/channels';
 
-// Paths
-const rootPath = app.getPath('userData'); // Path to the top level of the data folder
-const storePath = join(rootPath, 'store'); // Path to the store folder
-
 // Get all entries
 export default ipcMain.handle(
   Channels.DELETE_STORE, // BUG: #53 This will not work no matter what I do
   async (): Promise<DeleteStoreResponse> => {
+    // Paths
+    const rootPath = app.getPath('userData'); // Path to the top level of the data folder
+    const storePath = join(rootPath, 'store'); // Path to the store folder
+
     try {
       // Delete the store folder
       console.log('DeleteStore: Deleting store folder');

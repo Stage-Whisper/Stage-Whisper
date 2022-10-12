@@ -1,26 +1,45 @@
 // Electron
-import { ipcMain, IpcMainInvokeEvent } from 'electron';
+import { app, ipcMain, IpcMainInvokeEvent, ipcRenderer } from 'electron';
 import { join } from 'path';
 
 // Packages
 import { v4 as uuidv4 } from 'uuid';
+import { mkdirSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
+import { spawn } from 'child_process';
+import { NodeCue, parseSync } from 'subtitle';
 
 // Types
-import { Channels, RunWhisperResponse } from '../../types/channels';
-import { entry, entryTranscription, transcriptionLine, transcriptionStatus } from '../../types/types';
+import { Channels } from '../../types/channels';
 import { WhisperArgs } from '../../types/whisperTypes';
+import { transcriptionStatus } from '../../database/database';
+import { Entry, Line, Transcription } from 'knex/types/tables';
+import { QUERY } from '../../types/queries';
 
-// Node
-import { spawn } from 'child_process';
-import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { NodeCue, parseSync } from 'subtitle';
+export type RunWhisperResponse = {
+  transcription: Transcription;
+  entry: Entry;
+};
 
 export default ipcMain.handle(
   Channels.runWhisper,
-  async (_event: IpcMainInvokeEvent, args: WhisperArgs, entry: entry): Promise<RunWhisperResponse> => {
+  async (_event: IpcMainInvokeEvent, args: WhisperArgs, entry: Entry): Promise<RunWhisperResponse> => {
     const { inputPath, language } = args;
     let { model, device, task } = args;
 
+    // Paths
+    const rootPath = app.getPath('userData'); // Path to the top level of the data folder
+    const storePath = join(rootPath, 'store'); // Path to the store folder
+    const whisperPath = join(storePath, 'whisper'); // Path to the whisper folder
+
+    // Check if whisper path exists - if not, create it
+    try {
+      existsSync(whisperPath);
+    } catch (error) {
+      mkdirSync(whisperPath);
+    }
+
+    // Output will be stored in "./store/whisper/{transcription_uuid}/" as an .srt, .vtt, .txt and .json file
     // ------------------  Set defaults for the whisper model ------------------ //
 
     if (!model) model = 'base'; // Default to Base multilingual model
@@ -46,7 +65,7 @@ export default ipcMain.handle(
     const transcribedOn = new Date().getTime(); // Get the current date and time for when the transcription was started
 
     // Generate output path
-    const outputDir = join(entry.path, 'transcriptions', uuid);
+    const outputDir = join(whisperPath, uuid);
     console.log('RunWhisper: outputDir', outputDir);
 
     // ------------------  Construct the input array for the whisper script ------------------ //
@@ -78,7 +97,7 @@ export default ipcMain.handle(
     // Spawn the whisper script
     const childProcess = spawn('whisper', inputArray, { stdio: 'inherit' });
 
-    const transcription = await new Promise((resolve, reject): void => {
+    const transcription = await new Promise<Transcription>((resolve, reject) => {
       childProcess.on('data', (data: string) => {
         console.log(`stdout: ${data}`);
       });
@@ -87,11 +106,11 @@ export default ipcMain.handle(
       });
 
       // ------------------  Listen for the child process to exit and generate a transcription.json file ------------------ //
-      childProcess.on('close', (code: number) => {
+      childProcess.on('close', async (code: number) => {
         console.log(`RunWhisper: Child process closed with code ${code}`);
         if (code === 0) {
           // ------------------  Convert the VTT file to Json ------------------ //
-          const vttPath = join(outputDir, `${entry.audio.name}.vtt`);
+          const vttPath = join(outputDir, `${entry.audio_name}.vtt`);
           console.log('RunWhisper: Converting VTT to JSON...');
           console.log('RunWhisper: vttPath', vttPath);
 
@@ -107,10 +126,10 @@ export default ipcMain.handle(
           let vttFile;
           try {
             vttFile = readFileSync(vttPath, 'utf8');
-            console.log('RunWhisper: VTT file read successfully');
+            console.log('RunWhisper: VTT file read successfully.');
           } catch (error) {
-            console.log('RunWhisper: Error reading VTT file', error);
-            throw new Error('Error reading VTT file');
+            console.log('RunWhisper: Error reading VTT file!', error);
+            throw new Error('Error reading VTT file!');
           }
 
           // Split the VTT file into an array of lines
@@ -119,74 +138,87 @@ export default ipcMain.handle(
 
           // Check if the VTT file is empty
           if (lines.length === 0) {
-            console.log('RunWhisper: VTT file is empty');
-            throw new Error('VTT file is empty');
+            console.log('RunWhisper: VTT file is empty!');
+            throw new Error('VTT file is empty!');
           }
 
           // Remove header lines from the VTT file
           console.log('RunWhisper: Removing header lines from VTT file...');
           const cues = lines.filter((line) => line.type === 'cue') as NodeCue[];
 
-          // Generate the formatted lines
-          console.log('RunWhisper: Generating formatted lines...');
-          const formattedLines = cues.map((line, index): transcriptionLine => {
-            return {
-              id: uuidv4(),
-              index,
-              start: line.data.start,
-              end: line.data.end,
-              text: line.data.text,
-              edit: null
-            };
-          });
-
-          console.log('RunWhisper: Generating formatted transcription...');
-          // Generate the formatted transcription
-
-          const parameters: entryTranscription = {
+          // Add to the database
+          console.log('RunWhisper: Building transcription object...');
+          const transcription: Transcription = {
             uuid,
+            entry: entry.uuid,
             transcribedOn,
+            path: outputDir,
+            model,
+            language,
+            status: transcriptionStatus.COMPLETE,
+            progress: 100,
             completedOn: new Date().getTime(),
-            model, // Model used to transcribe
-            language, // Language of the audio file
-            status: transcriptionStatus.COMPLETE, // Status of the transcription
-            progress: 100, // Progress of the transcription
-            translated: task === 'translate', // If the transcription was translated
-            error: undefined, // Error message
-            path: outputDir, // Path to the transcription folder
-            data: formattedLines
+            error: undefined,
+            translated: task === 'translate' // TODO: Detect if the transcription is translated or not, doesn't work for auto detect
           };
 
-          // Create the transcription.json file
-          const transcriptionPath = join(outputDir, 'transcription.json');
-          console.log('RunWhisper: Creating transcription.json file at', transcriptionPath);
-          console.log('RunWhisper: parameters', parameters);
-          try {
-            writeFileSync(transcriptionPath, JSON.stringify(parameters));
-          } catch (error) {
-            console.log('RunWhisper: Error writing transcription.json file', error);
-            reject(error);
+          // Add the transcription to the database
+
+          // invoke the main process to add the transcription to the database
+          console.log('RunWhisper: Adding transcription to database...');
+          console;
+          const newTranscription = (await ipcRenderer.invoke(QUERY.ADD_TRANSCRIPTION, transcription)) as Transcription;
+
+          if (newTranscription.error) {
+            console.log('RunWhisper: Error adding transcription to database!', newTranscription.error);
+            throw new Error('Error adding transcription to database!');
           }
 
-          resolve(parameters);
+          // Convert cues to Lines objects
+          console.log('RunWhisper: Converting cues to lines...');
+          const formattedLines: Line[] = cues.map((cue, index) => {
+            const line: Line = {
+              uuid: uuidv4(),
+              entry: entry.uuid,
+              transcription: newTranscription.uuid,
+              start: cue.data.start,
+              end: cue.data.end,
+              text: cue.data.text,
+              index, // Note! This assumes that the cues are in order from whisper
+              deleted: false,
+              version: 0
+            };
+            return line;
+          });
+
+          // Add the lines to the database
+          console.log('RunWhisper: Adding lines to database...');
+          const newLines = await ipcRenderer.invoke(QUERY.ADD_LINES, formattedLines);
+
+          if (newLines.error) {
+            console.log('RunWhisper: Error adding lines to database!', newLines.error);
+            throw new Error('Error adding lines to database!');
+          } else {
+            console.log('RunWhisper: Lines added to database successfully!');
+          }
+
+          // ------------------  Delete the VTT file ------------------ //
+          // Not deleting the VTT file for now, as it's useful for debugging
+
+          // ------------------  Resolve the promise ------------------ //
+          resolve(transcription);
         } else {
-          reject(new Error(`Child process exited with code ${code}`));
+          // ------------------  Handle errors ------------------ //
+          console.log('RunWhisper: Error running whisper script!');
+          const error = new Error('Error running whisper script!');
+          reject(error);
         }
       });
     });
 
-    // ------------------  Return the transcription Information ------------------ //
-    if (transcription) {
-      const parameters: RunWhisperResponse = {
-        transcription_uuid: uuid,
-        outputDir,
-        entry,
-        transcribedOn
-      };
-      console.log('RunWhisper: Transcription complete, returning entry');
-      return parameters;
-    } else {
-      throw new Error('Transcription failed');
-    }
+    return {
+      transcription,
+      entry
+    };
   }
 );

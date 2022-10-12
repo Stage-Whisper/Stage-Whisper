@@ -1,8 +1,10 @@
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RunWhisperResponse } from '../../../electron/types/channels';
+import { Entry } from 'knex/types/tables';
+import { RunWhisperResponse } from '../../../electron/handlers/runWhisper/runWhisper';
+
 // import { RunWhisperResponse } from '../../../electron/types/channels';
-import { entry } from '../../../electron/types/types';
+
 import { WhisperArgs } from '../../../electron/types/whisperTypes';
 import { RootState } from '../../redux/store';
 
@@ -12,7 +14,7 @@ import { RootState } from '../../redux/store';
 export type WhisperState = {
   // Represents the current whisper that is processing, used for async logic
   transcription_uuid?: string; // Id of the completed transcription
-  entry?: entry; // Entry that requested the transcription
+  entry?: Entry; // Entry that requested the transcription
   status: 'idle' | 'loading' | 'succeeded' | 'failed'; // Status of the transcription
 };
 
@@ -25,12 +27,12 @@ const initialState: WhisperState = {
 export const passToWhisper = createAsyncThunk(
   // A promise that will be resolved when the transcription is complete
   'whisper/passToWhisper',
-  async ({ entry, args }: { entry: entry; args?: WhisperArgs }): Promise<RunWhisperResponse> => {
+  async ({ entry, args }: { entry: Entry; args?: WhisperArgs }): Promise<RunWhisperResponse> => {
     // If no arguments are passed, use the audio path as the input
     // Other arguments will be set to default values in the electron handler
     if (!args) {
       args = {
-        inputPath: entry.audio.path
+        inputPath: entry.audio_path
       };
     }
 
@@ -66,7 +68,7 @@ export const whisperSlice = createSlice({
       showNotification({
         id: 'transcribing',
         title: `Transcribing`,
-        message: `Transcribing audio ${action.meta.arg.entry.audio.name}`,
+        message: `Transcribing audio ${action.meta.arg.entry.audio_name}`,
         disallowClose: true,
         autoClose: false,
         color: 'blue',
@@ -83,7 +85,7 @@ export const whisperSlice = createSlice({
       updateNotification({
         id: 'transcribing',
         title: `Transcription complete!`,
-        message: `Transcription complete for ${state.entry?.audio.name}`,
+        message: `Transcription complete for ${state.entry?.audio_name}`,
         disallowClose: false,
         color: 'green',
         loading: false,

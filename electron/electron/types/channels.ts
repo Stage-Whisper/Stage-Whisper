@@ -37,14 +37,6 @@ export type NewEntryResponse = {
   entry: Entry;
 };
 
-// Response type for the run-whisper channel
-export type RunWhisperResponse = {
-  transcription_uuid: string;
-  outputDir: string;
-  entry: Entry;
-  transcribedOn: number;
-};
-
 // Response type for the whisper-complete channel
 export type WhisperCompleteResponse = {
   outputDir: string;

@@ -8,13 +8,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { Entry } from 'knex/types/tables';
 import db from '../../database/database';
 import { Channels, NewEntryResponse } from '../../types/channels';
-import { entryAudioParams, entryConfig } from '../../types/types';
 
 // Create new entry and add it to the database
 export type newEntryArgs = {
-  filePath: string;
-  audio: Omit<entryAudioParams, 'path' | 'addedOn' | 'fileLength'>;
-  config: Omit<entryConfig, 'created' | 'inQueue' | 'queueWeight' | 'activeTranscription' | 'uuid'>;
+  filePath: Entry['audio_path'];
+  name: Entry['name'];
+  description: Entry['description'];
+  audio_type: Entry['audio_type'];
+  audio_language: Entry['audio_language'];
+  audio_name: Entry['audio_name'];
 };
 
 export default ipcMain.handle(
@@ -30,16 +32,16 @@ export default ipcMain.handle(
     // Create Sqlite entry
     const entry: Entry = {
       uuid: uuid,
-      name: args.config.name,
-      description: args.config.description,
+      name: args.name,
+      description: args.description,
       created: Date.now(),
       inQueue: false,
       queueWeight: 0,
       activeTranscription: null,
-      audio_type: args.audio.type,
-      audio_path: join(audioPath, args.audio.name),
-      audio_name: args.audio.name,
-      audio_language: args.audio.language,
+      audio_type: args.audio_type,
+      audio_path: join(audioPath, args.audio_name),
+      audio_name: args.audio_name,
+      audio_language: args.audio_language,
       audio_fileLength: 0,
       audio_addedOn: Date.now()
     };

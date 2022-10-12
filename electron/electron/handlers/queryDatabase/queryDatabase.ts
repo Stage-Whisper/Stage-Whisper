@@ -1,104 +1,25 @@
-import { ipcMain, IpcMainInvokeEvent as invoke } from 'electron';
+import { ipcMain, IpcMainInvokeEvent as invoke, IpcMainInvokeEvent } from 'electron';
 
 // DB
 import db from '../../database/database';
 
 // Types
 import { Entry, Line, Transcription } from 'knex/types/tables';
+import { QUERY, QueryArgs, QueryReturn } from '../../types/queries';
 
 // README
 // This file is very long and has a lot of types. This is to allow for communication via IPC between the main process and the renderer process.
 // Inputs, outputs, and types are all defined here. This file is also responsible for the actual querying of the database and handling of the data.
 
-// Query Channel Enums
-export enum QUERY {
-  ADD_ENTRY = 'addEntry', // Add an entry to the database
-  ADD_LINE = 'addLine', // Add a line to a transcription
-  ADD_TRANSCRIPTION = 'addTranscription', // Add a transcription to an entry
-  REMOVE_ENTRY = 'removeEntry', // Remove an entry from the database and all associated lines and transcriptions
-  REMOVE_LINE = 'removeLine', // Remove a line from a transcription (just marks it as deleted)
-  REMOVE_TRANSCRIPTION = 'removeTranscription', // Remove a transcription from an entry and all lines associated with it
-  RESTORE_LINE = 'restoreLine', // Restore a line from the trash
-  UPDATE_ENTRY = 'updateEntry', // Update an entry in the database
-  UPDATE_LINE = 'updateLine', // Update a line in a transcription
-  UPDATE_TRANSCRIPTION = 'updateTranscription', // Update a transcription in an entry
-  GET_ENTRY = 'getEntry', // Get an entry from the database
-  GET_ENTRY_COUNT = 'getEntryCount', // Get the number of entries in the database
-  GET_LINE = 'getLine', // Get a line from a transcription
-  GET_LINE_COUNT = 'getLineCount', // Get the number of lines in a transcription
-  GET_TRANSCRIPTION = 'getTranscription', // Get a transcription from an entry
-  GET_TRANSCRIPTION_COUNT = 'getTranscriptionCount', // Get the total number of transcriptions
-  GET_TRANSCRIPTION_COUNT_FOR_ENTRY = 'getTranscriptionCountForEntry', // Get the number of transcriptions in an entry
-  GET_ALL_ENTRIES = 'getAllEntries', // Get all entries from the database
-  GET_ALL_LINES = 'getAllLines', // Get all lines for a transcription
-  GET_LATEST_LINES = 'getLatestLines', // Get the latest lines for a transcription
-  GET_ALL_TRANSCRIPTIONS = 'getAllTranscriptions', // Get all transcriptions
-  GET_ALL_TRANSCRIPTIONS_FOR_ENTRY = 'getAllTranscriptionsForEntry', // Get all transcriptions for an entry
-  GET_ALL_ENTRIES_WITH_TRANSCRIPTIONS = 'getAllEntriesWithTranscriptions', // Get all entries with transcriptions
-  GET_ALL_ENTRIES_WITH_LINES_AND_TRANSCRIPTIONS = 'getAllEntriesWithLinesAndTranscriptions' // Get all entries with lines and transcriptions
-}
+console.log('queryDatabase.ts: Loading...');
 
-// Query Arguments for each query
-export type QueryArgs = {
-  [QUERY.ADD_ENTRY]: { entry: Entry };
-  [QUERY.ADD_LINE]: { line: Line };
-  [QUERY.ADD_TRANSCRIPTION]: { transcription: Transcription };
-  [QUERY.REMOVE_ENTRY]: { entryId: string };
-  [QUERY.REMOVE_LINE]: { index: number; transcriptionId: string };
-  [QUERY.REMOVE_TRANSCRIPTION]: { transcriptionId: string };
-  [QUERY.RESTORE_LINE]: { index: number; transcriptionId: string };
-  [QUERY.UPDATE_ENTRY]: { entry: Entry };
-  [QUERY.UPDATE_LINE]: { lineId: number; transcriptionId: string; line: Line };
-  [QUERY.UPDATE_TRANSCRIPTION]: { transcription: Transcription };
-  [QUERY.GET_ENTRY]: { entryId: string };
-  [QUERY.GET_ENTRY_COUNT]: null;
-  [QUERY.GET_LINE]: { lineId: number };
-  [QUERY.GET_LINE_COUNT]: { transcriptionId: string };
-  [QUERY.GET_TRANSCRIPTION]: { transcriptionId: string };
-  [QUERY.GET_TRANSCRIPTION_COUNT]: null;
-  [QUERY.GET_TRANSCRIPTION_COUNT_FOR_ENTRY]: { entryId: string };
-  [QUERY.GET_ALL_ENTRIES]: null;
-  [QUERY.GET_ALL_LINES]: { transcriptionId: string };
-  [QUERY.GET_LATEST_LINES]: { transcriptionId: string };
-  [QUERY.GET_ALL_TRANSCRIPTIONS]: null;
-  [QUERY.GET_ALL_TRANSCRIPTIONS_FOR_ENTRY]: { entryId: string };
-  [QUERY.GET_ALL_ENTRIES_WITH_TRANSCRIPTIONS]: null;
-  [QUERY.GET_ALL_ENTRIES_WITH_LINES_AND_TRANSCRIPTIONS]: null;
-};
-
-// Query Return Types for each query
-export type QueryReturn = {
-  [QUERY.ADD_ENTRY]: Promise<Entry>;
-  [QUERY.ADD_LINE]: Promise<Line>;
-  [QUERY.ADD_TRANSCRIPTION]: Promise<Transcription>;
-  [QUERY.REMOVE_ENTRY]: Promise<boolean>;
-  [QUERY.REMOVE_LINE]: Promise<boolean>;
-  [QUERY.REMOVE_TRANSCRIPTION]: Promise<boolean>;
-  [QUERY.RESTORE_LINE]: Promise<Line>;
-  [QUERY.UPDATE_ENTRY]: Promise<Entry>;
-  [QUERY.UPDATE_LINE]: Promise<Line>;
-  [QUERY.UPDATE_TRANSCRIPTION]: Promise<Transcription>;
-  [QUERY.GET_ENTRY]: Promise<Entry>;
-  [QUERY.GET_ENTRY_COUNT]: Promise<number>;
-  [QUERY.GET_LINE]: Promise<Line>;
-  [QUERY.GET_LINE_COUNT]: Promise<number>;
-  [QUERY.GET_TRANSCRIPTION]: Promise<Transcription>;
-  [QUERY.GET_TRANSCRIPTION_COUNT]: Promise<number>;
-  [QUERY.GET_TRANSCRIPTION_COUNT_FOR_ENTRY]: Promise<number>;
-  [QUERY.GET_ALL_ENTRIES]: Promise<Entry[]>;
-  [QUERY.GET_ALL_LINES]: Promise<Line[]>;
-  [QUERY.GET_LATEST_LINES]: Promise<Line[]>;
-  [QUERY.GET_ALL_TRANSCRIPTIONS]: Promise<Transcription[]>;
-  [QUERY.GET_ALL_TRANSCRIPTIONS_FOR_ENTRY]: Promise<Transcription[]>;
-  [QUERY.GET_ALL_ENTRIES_WITH_TRANSCRIPTIONS]: Promise<Entry[]>;
-  [QUERY.GET_ALL_ENTRIES_WITH_LINES_AND_TRANSCRIPTIONS]: Promise<Entry[]>;
-};
 // CRUD Functions
 // ---- CREATE ----
 // Add Entry
+
 ipcMain.handle(
   QUERY.ADD_ENTRY,
-  async (_event: invoke, args: QueryArgs[QUERY.ADD_ENTRY]): QueryReturn[QUERY.ADD_ENTRY] => {
+  async (_event: IpcMainInvokeEvent, args: QueryArgs[QUERY.ADD_ENTRY]): QueryReturn[QUERY.ADD_ENTRY] => {
     const { entry } = args;
     const insertedEntry = (await db('entries').insert(entry).returning('*').first()) as Entry;
     return insertedEntry;
@@ -112,7 +33,18 @@ ipcMain.handle(QUERY.ADD_LINE, async (_event: invoke, args: QueryArgs[QUERY.ADD_
   return insertedLine;
 });
 
+// Add Lines
+ipcMain.handle(
+  QUERY.ADD_LINES,
+  async (_event: invoke, args: QueryArgs[QUERY.ADD_LINES]): QueryReturn[QUERY.ADD_LINES] => {
+    const { lines } = args;
+    const insertedLines = (await db('lines').insert(lines).returning('*')) as Line[];
+    return insertedLines;
+  }
+);
+
 // Add Transcription
+
 ipcMain.handle(
   QUERY.ADD_TRANSCRIPTION,
   async (_event: invoke, args: QueryArgs[QUERY.ADD_TRANSCRIPTION]): QueryReturn[QUERY.ADD_TRANSCRIPTION] => {
@@ -265,12 +197,12 @@ ipcMain.handle(
 ipcMain.handle(
   QUERY.UPDATE_LINE,
   async (_event: invoke, args: QueryArgs[QUERY.UPDATE_LINE]): QueryReturn[QUERY.UPDATE_LINE] => {
-    const { line, transcriptionId, lineId } = args;
+    const { line } = args;
 
     // Get the line from the database
     const dbLine = (await db('lines')
-      .where({ uuid: lineId })
-      .where({ transcription: transcriptionId })
+      .where({ uuid: line.uuid })
+      .where({ transcription: line.transcription })
       .first()) as Line;
 
     // Create a new line object with the updated values and a higher version number
@@ -323,5 +255,7 @@ ipcMain.handle(
     return true;
   }
 );
+
+console.log('QueryDatabase.ts: loaded');
 
 export default ipcMain;
