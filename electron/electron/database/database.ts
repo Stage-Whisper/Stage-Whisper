@@ -1,10 +1,7 @@
-import { whisperModels } from './../types/whisperTypes';
+import { whisperModels } from '../types/whisperTypes';
 import { app } from 'electron';
 import knex from 'knex';
 import path from 'path';
-
-// Types
-import { transcriptionStatus } from '../types/types';
 import { WhisperArgs, whisperLanguages } from '../types/whisperTypes';
 
 const rootPath = app.getPath('userData'); // Path to the top level of the data folder
@@ -18,7 +15,48 @@ const db = knex({
   },
   useNullAsDefault: true
 });
-// Types
+
+/// ---------------------- Types ---------------------- ///
+
+// Valid Audio Types
+const audioTypes = [
+  'mp3',
+  'mpeg',
+  'wav',
+  'ogg',
+  'flac',
+  'aac',
+  'm4a',
+  'wma',
+  'ac3',
+  'mp2',
+  'amr',
+  'aiff',
+  'au',
+  'mpc',
+  'opus',
+  'tta',
+  'voc',
+  'wv',
+  'webm'
+];
+
+// List of possible entry statuses
+export enum transcriptionStatus {
+  IDLE = 'idle', // User has added a file to be transcribed but it has not been added to the queue
+  QUEUED = 'queued', // User has indicated they want to transcribe this file
+  PENDING = 'pending', // Transcription has started but its progress is unknown
+  PROCESSING = 'processing', // Transcription is in progress
+  STALLED = 'stalled', // Transcription is taking too long (probably due to a large model)
+  ERROR = 'error', // Transcription has failed
+  PAUSED = 'paused', // Transcription has been paused by the user
+  COMPLETE = 'complete', // Transcription has finished
+  CANCELLED = 'cancelled', // Transcription has been cancelled by the user
+  DELETED = 'deleted', // Transcription has been deleted by the user
+  UNKNOWN = 'unknown' // Transcription status is unknown (probably due to an error talking to the transcriber)
+}
+
+/// ---------------------- Database ---------------------- ///
 declare module 'knex/types/tables' {
   export interface Entry {
     // Config
@@ -71,12 +109,15 @@ declare module 'knex/types/tables' {
   }
 
   export interface Line {
-    uuid: string; // UUID of the transcription
+    uuid: string; // UUID of the line
+    entry: string; // UUID of the entry
+    transcription: string; // UUID of the transcription
     version: number; // Version of the line (used for undo/redo, 0 is the original)
     index: number; // Line number
     text: string; // Text of the line
     start: number; // Start time of the line in seconds
     end: number; // End time of the line in seconds
+    deleted: boolean; // Whether the line has been deleted
   }
 
   export interface Settings {
@@ -88,38 +129,30 @@ declare module 'knex/types/tables' {
     entry: Entry;
     transcription: Transcription;
     line: Line;
+    settings: Settings;
   }
 }
 
-// Valid Audio Types
-const audioTypes = [
-  'mp3',
-  'mpeg',
-  'wav',
-  'ogg',
-  'flac',
-  'aac',
-  'm4a',
-  'wma',
-  'ac3',
-  'mp2',
-  'amr',
-  'aiff',
-  'au',
-  'mpc',
-  'opus',
-  'tta',
-  'voc',
-  'wv',
-  'webm'
-];
-
 // Create the tables
 console.log('Creating tables...');
-db.schema.hasTable('entry').then((exists) => {
+
+db.schema.hasTable('settings').then((exists) => {
   if (!exists) {
     db.schema
-      .createTable('entry', (table) => {
+      .createTable('settings', (table) => {
+        table.boolean('darkMode').defaultTo(false);
+        table.string('language').defaultTo('en');
+      })
+      .then(() => {
+        console.log('Created settings table');
+      });
+  }
+});
+
+db.schema.hasTable('entries').then((exists) => {
+  if (!exists) {
+    db.schema
+      .createTable('entries', (table) => {
         table.string('uuid').primary().unique().notNullable();
         table.string('name').nullable();
         table.string('description').nullable();
@@ -127,7 +160,7 @@ db.schema.hasTable('entry').then((exists) => {
         table.boolean('inQueue').notNullable().defaultTo(false);
         table.integer('queueWeight').notNullable().defaultTo(0);
         table.string('tags').nullable().defaultTo(''); // TODO: Change to an array that works with SQLite (JSON?)
-        table.string('activeTranscription').references('uuid').inTable('transcription').nullable();
+        table.string('activeTranscription').references('uuid').inTable('transcriptions').nullable();
 
         // Audio
         table.string('audio_type').notNullable().checkIn(audioTypes);
@@ -138,19 +171,19 @@ db.schema.hasTable('entry').then((exists) => {
         table.integer('audio_addedOn').notNullable().defaultTo(Date.now());
       })
       .then(() => {
-        console.log('Created table: entry');
+        console.log('Created table: entries');
       })
       .catch((err) => {
-        console.log('Error creating table: entry');
+        console.log('Error creating table: entries');
         console.error(err);
       });
   }
 });
-db.schema.hasTable('transcription').then((exists) => {
+db.schema.hasTable('transcriptions').then((exists) => {
   if (!exists) {
     db.schema
-      .createTable('transcription', (table) => {
-        table.string('entry').references('uuid').inTable('entry').notNullable();
+      .createTable('transcriptions', (table) => {
+        table.string('entries').references('uuid').inTable('entries').notNullable();
         table.string('uuid').primary().unique().notNullable();
         table.integer('transcribedOn').notNullable().defaultTo(Date.now());
         table.string('path').notNullable();
@@ -163,10 +196,10 @@ db.schema.hasTable('transcription').then((exists) => {
         table.integer('completedOn').nullable();
       })
       .then(() => {
-        console.log('Created table: transcription');
+        console.log('Created table: transcriptions');
       })
       .catch((err) => {
-        console.log('Error creating table: transcription');
+        console.log('Error creating table: transcriptions');
         console.error(err);
       });
   }
@@ -174,19 +207,21 @@ db.schema.hasTable('transcription').then((exists) => {
 db.schema.hasTable('line').then((exists) => {
   if (!exists) {
     db.schema
-      .createTableIfNotExists('line', (table) => {
-        table.string('uuid').references('uuid').inTable('transcription').notNullable();
+      .createTableIfNotExists('lines', (table) => {
+        table.string('transcriptions').references('uuid').inTable('transcriptions').notNullable();
+        table.string('uuid').primary().unique().notNullable();
         table.integer('version').notNullable().defaultTo(0);
         table.integer('index').notNullable();
         table.string('text').notNullable();
         table.integer('start').notNullable();
         table.integer('end').notNullable();
+        table.boolean('deleted').notNullable().defaultTo(false);
       })
       .then(() => {
-        console.log('Created table: line');
+        console.log('Created table: lines');
       })
       .catch((err) => {
-        console.log('Error creating table: line');
+        console.log('Error creating table: lines');
         console.error(err);
       });
   }
