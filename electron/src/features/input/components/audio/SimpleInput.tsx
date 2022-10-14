@@ -1,6 +1,7 @@
 import { Card, Group, Stack, Text } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { IconCheckbox, IconUpload, IconX } from '@tabler/icons';
+import { Entry } from 'knex/types/tables';
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
 import { selectAudio, setAudioValid, setSimpleAudioInput } from '../../inputSlice';
@@ -29,7 +30,13 @@ function SimpleInput() {
             // @ts-expect-error FIXME: No idea why i have to do this, but it works
             const file = event.target.files[0];
             if (file) {
-              dispatch(setSimpleAudioInput(file));
+              dispatch(
+                setSimpleAudioInput({
+                  audio_name: file.name,
+                  audio_path: file.path,
+                  audio_type: file.type
+                })
+              );
               dispatch(setAudioValid(true));
             } else {
               dispatch(setAudioValid(false));
@@ -50,9 +57,9 @@ function SimpleInput() {
                 console.log(audioValid);
                 dispatch(
                   setSimpleAudioInput({
-                    name: file.name,
-                    path: file.path,
-                    type: file.type
+                    audio_name: file.name,
+                    audio_path: file.path,
+                    audio_type: file.type as Entry['audio_type']
                   })
                 );
               } else {

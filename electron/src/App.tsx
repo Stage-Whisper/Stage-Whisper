@@ -51,7 +51,7 @@ function EntryList() {
   const entries = useAppSelector(selectEntries);
   const transcribing = useAppSelector(selectTranscribingStatus);
   const dispatch = useAppDispatch();
-  const { entryId } = useParams();
+  const { entryUUID } = useParams();
   return (
     <>
       <Divider mt={'sm'} />
@@ -59,10 +59,10 @@ function EntryList() {
       {entries.map((entry) => {
         return (
           <NavLink
-            key={entry.config.uuid}
-            label={<Text lineClamp={1}>{entry.config.name}</Text>}
+            key={entry.uuid}
+            label={<Text lineClamp={1}>{entry.name}</Text>}
             icon={
-              transcribing.entry?.config.uuid === entry.config.uuid ? (
+              transcribing.entry?.uuid === entry.uuid ? (
                 <Loader size={'sm'} />
               ) : entry.transcriptions[0] ? (
                 <IconFileCheck color="green" />
@@ -71,11 +71,11 @@ function EntryList() {
               )
             }
             component={Link}
-            to={`/entries/${entry.config.uuid}`}
+            to={`/entries/${entry.uuid}`}
             onClick={() => {
               dispatch(setBurgerOpen(false));
             }}
-            active={entry.config.uuid === entryId}
+            active={entry.uuid === entryUUID}
           />
         );
       })}

@@ -1,6 +1,6 @@
-import { AboutType } from './components/about/About';
+import { AboutUtilityType } from './components/about/About';
 import { createSlice } from '@reduxjs/toolkit';
-import { AudioType } from './components/audio/Audio';
+import { AudioUtilityType } from './components/audio/Audio';
 import { RootState } from '../../redux/store';
 import { WhisperArgs } from '../../../electron/types/whisperTypes';
 
@@ -12,11 +12,11 @@ export type inputState = {
 
   // Input States
   // These Description of new entry
-  about: AboutType;
+  about: AboutUtilityType;
   aboutValid: boolean;
 
   // These are the audio files for the new entry
-  audio: AudioType;
+  audio: AudioUtilityType;
   audioValid: boolean;
 
   // This is the language of the new entry audio file
@@ -41,15 +41,14 @@ const initialState: inputState = {
   // Input States
   about: {
     name: '',
-    description: '',
-    tags: []
+    description: ''
   },
   aboutValid: false,
 
   audio: {
-    name: undefined,
-    path: undefined,
-    type: undefined
+    audio_name: undefined,
+    audio_path: undefined,
+    audio_type: undefined
   },
   audioValid: false,
 
@@ -73,15 +72,15 @@ const inputSlice = createSlice({
   initialState,
   reducers: {
     // Simple Input Reducers -- These override other checks and assign default values
-    setSimpleAudioInput: (state, action: { payload: AudioType }) => {
+    setSimpleAudioInput: (state, action: { payload: AudioUtilityType }) => {
       // Takes audio file and extracts name, path, and type, then assigns to state
-      const { name, path, type } = action.payload;
-      state.audio = { name, path, type };
-      if (name && path && type) {
+      const { audio_name, audio_path, audio_type } = action.payload;
+      state.audio = { audio_name, audio_path, audio_type };
+      if (audio_name && audio_path && audio_type) {
         state.audioValid = true;
 
         // Set Entry Name to Audio Name
-        state.about.name = name;
+        state.about.name = audio_name;
 
         // Override other checks
         state.audioValid = true;

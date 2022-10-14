@@ -1,18 +1,24 @@
-import { entry } from './../../../electron/types/types';
 import { RootState } from '../../redux/store';
 
 // Transcription Slice
 // This holds the state of the transcriptions and will be updated by electron/node processes
 
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { RunWhisperResponse } from './../../../electron/types/channels';
+
 import { WhisperArgs } from '../../../electron/types/whisperTypes';
+import { Entry, Line, Transcription } from 'knex/types/tables';
+import { RunWhisperResponse } from '../../../electron/handlers/runWhisper/runWhisper';
+
+export interface ReduxEntry extends Entry {
+  transcriptions: Transcription[];
+}
 
 export interface entryState {
-  entries: entry[];
+  entries: ReduxEntry[];
   activeEntry: string | null;
   get_files_status: 'idle' | 'loading' | 'succeeded' | 'failed' | 'not_found';
   trigger_whisper_status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  lines: Line[];
 }
 
 const initialState: entryState = {
@@ -20,19 +26,26 @@ const initialState: entryState = {
   activeEntry: null,
   // Thunk State for accessing local files via electron
   get_files_status: 'idle',
-  trigger_whisper_status: 'idle'
+  trigger_whisper_status: 'idle',
+  lines: []
 };
 
 // Thunk for loading the transcriptions from the database
 export const getLocalFiles = createAsyncThunk(
   'entries/getLocalFiles',
-  async (): Promise<{ entries?: entry[]; error?: string }> => {
+  async (): Promise<{ entries?: ReduxEntry[]; error?: string }> => {
     // Set Input State to loading
-    const result = await window.Main.loadDatabase();
-    console.log('getLocalFiles result', result);
+    const entryResult = (await window.Main.GET_ALL_ENTRIES()) as Entry[];
+    const transResult = (await window.Main.GET_ALL_TRANSCRIPTIONS()) as Transcription[];
 
-    if (result) {
-      return { entries: result.entries };
+    // Attach transcriptions to entries
+    const entries = entryResult.map((entry): ReduxEntry => {
+      const transcriptions = transResult.filter((transcription) => transcription.entry === entry.uuid);
+      return { ...entry, transcriptions };
+    });
+
+    if (entries) {
+      return { entries };
     } else {
       return { error: 'Error loading database' };
     }
@@ -41,9 +54,9 @@ export const getLocalFiles = createAsyncThunk(
 
 export const whisperTranscribe = createAsyncThunk(
   'entries/whisperTranscribe',
-  async (entry: entry): Promise<{ result?: RunWhisperResponse; error?: string }> => {
+  async (entry: ReduxEntry): Promise<{ result?: RunWhisperResponse; error?: string }> => {
     const args: WhisperArgs = {
-      inputPath: entry.audio.path
+      inputPath: entry.audio_path
     };
 
     const result = await window.Main.runWhisper(args, entry);
@@ -62,42 +75,17 @@ export const entrySlice = createSlice({
   name: 'entries',
   initialState,
   reducers: {
-    setActiveEntry: (state, action: PayloadAction<entry | null>) => {
+    setActiveEntry: (state, action: PayloadAction<ReduxEntry | null>) => {
       // This action is called when a entry is opened by the user
 
       if (action.payload) {
-        state.activeEntry = action.payload.config.uuid;
+        state.activeEntry = action.payload.uuid;
       } else {
         state.activeEntry = null;
       }
     },
-
-    addEntry: (state, action: PayloadAction<entry>) => {
-      // This action is called when a entry is added
-      state.entries.push(action.payload);
-    },
-
-    updateEntry: (state, action: PayloadAction<entry>) => {
-      // FIXME: Convert to use electron
-      // This action is called when a entry is updated
-      const index = state.entries.findIndex((entry) => entry.config.uuid === action.payload.config.uuid);
-      if (index !== -1) {
-        state.entries[index] = action.payload;
-      }
-    },
-
-    removeEntry: (state, action: PayloadAction<entry>) => {
-      // FIXME: Convert to use electron to remove from database
-      // This action is called when a entry is removed
-      const index = state.entries.findIndex((entry) => entry.config.uuid === action.payload.config.uuid);
-      if (index !== -1) {
-        state.entries.splice(index, 1);
-      }
-    },
-    test: (state, action) => {
-      // This action is a test action
-      console.log('test');
-      console.log(action.payload);
+    setLines: (state, action: PayloadAction<Line[]>) => {
+      state.lines = action.payload;
     }
   },
   extraReducers(builder) {
@@ -122,12 +110,13 @@ export const entrySlice = createSlice({
   }
 });
 
-export const { addEntry, updateEntry, removeEntry, test, setActiveEntry } = entrySlice.actions;
+export const { setActiveEntry, setLines } = entrySlice.actions;
 
 // Export Entry States
 export const selectEntries = (state: RootState) => state.entries.entries;
 export const selectActiveEntry = (state: RootState) => state.entries.activeEntry;
 export const selectNumberOfEntries = (state: RootState) => state.entries.entries.length;
+export const selectLines = (state: RootState) => state.entries.lines;
 
 // Export the reducer
 export default entrySlice.reducer;

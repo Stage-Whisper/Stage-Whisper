@@ -11,14 +11,7 @@ import isDev from 'electron-is-dev';
 import { existsSync, readFile } from 'fs';
 import { Channels, OpenDirectoryDialogResponse } from './types/channels';
 
-// Import handlers
-import { initializeApp } from './functions/initialize/initializeApp';
-import './handlers/deleteStore/deleteStore'; // Non functional
-import './handlers/fetchAudioFile/fetchAudioFile'; // Fetch audio file from disk
-import './handlers/loadDatabase/loadDatabase'; // Get all entries from database
-import './handlers/newEntry/newEntry'; // Add a new entry to the database
-import './handlers/runWhisper/runWhisper'; // Run whisper model
-import './types/whisperTypes'; // Types for whisper model
+import { initializeApp } from './app/initializeApp';
 
 // Electron Defaults
 const height = 600;
@@ -97,7 +90,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
-ipcMain.handle(Channels.openDirectoryDialog, async (): Promise<OpenDirectoryDialogResponse> => {
+ipcMain.handle(Channels.OPEN_DIR_DIALOG, async (): Promise<OpenDirectoryDialogResponse> => {
   // Trigger electron directory picker and return the selected directory
   const directory = await dialog.showOpenDialog({
     properties: ['openDirectory']
@@ -107,3 +100,15 @@ ipcMain.handle(Channels.openDirectoryDialog, async (): Promise<OpenDirectoryDial
     path: directory.canceled ? null : directory.filePaths[0]
   };
 });
+
+// Import handlers
+
+import './database/database'; // Initialize database
+import './handlers/deleteStore/deleteStore'; // Non functional
+import './handlers/fetchAudioFile/fetchAudioFile'; // Fetch audio file from disk
+import './handlers/queryDatabase/queryDatabase'; // Get all entries from database
+import './handlers/newEntry/newEntry'; // Add a new entry to the database
+import './handlers/runWhisper/runWhisper'; // Run whisper model
+import './types/whisperTypes'; // Types for whisper model
+import './handlers/deleteStore/deleteStore'; // Non functional for the moment
+import './handlers/queryDatabase/queryDatabase'; // Handle database functions
