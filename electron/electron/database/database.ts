@@ -190,7 +190,13 @@ db.schema.hasTable('transcriptions').then((exists) => {
   if (!exists) {
     db.schema
       .createTable('transcriptions', (table) => {
-        table.string('entry').references('uuid').inTable('entries').notNullable();
+        table
+          .string('entry')
+          .references('uuid')
+          .inTable('entries')
+          .notNullable()
+          .onDelete('CASCADE')
+          .onUpdate('CASCADE');
         table.string('uuid').primary().unique().notNullable();
         table.integer('transcribedOn').notNullable();
         table.string('path').notNullable();
@@ -218,8 +224,20 @@ db.schema.hasTable('lines').then((exists) => {
     db.schema
       .createTableIfNotExists('lines', (table) => {
         table.string('uuid').primary().notNullable();
-        table.string('entry').references('uuid').inTable('entries').notNullable();
-        table.string('transcription').references('uuid').inTable('transcriptions').notNullable();
+        table
+          .string('entry')
+          .references('uuid')
+          .inTable('entries')
+          .notNullable()
+          .onDelete('CASCADE')
+          .onUpdate('CASCADE');
+        table
+          .string('transcription')
+          .references('uuid')
+          .inTable('transcriptions')
+          .notNullable()
+          .onUpdate('CASCADE')
+          .onDelete('CASCADE');
         table.integer('start').notNullable();
         table.integer('end').notNullable();
         table.string('text').notNullable();
