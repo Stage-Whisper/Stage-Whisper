@@ -1,46 +1,17 @@
 // Components
 
-import {
-  ActionIcon,
-  Affix,
-  Box,
-  Button,
-  Card,
-  Group,
-  Loader,
-  NumberInput,
-  Stack,
-  Text,
-  Textarea,
-  Title
-} from '@mantine/core';
+import { Text } from '@mantine/core';
 
 // import { RichTextEditor } from '@mantine/rte';
-import { DataTable } from 'mantine-datatable';
 // Types
-
-// Packages
-import {
-  IconArrowBack,
-  IconCheck,
-  IconEdit,
-  IconPlayerPause,
-  IconPlayerPlay,
-  IconPlayerStop,
-  IconTrash,
-  IconX
-} from '@tabler/icons';
 
 import { Howl } from 'howler';
 import { Entry, Line, Transcription } from 'knex/types/tables';
-import { useParams } from 'react-router-dom';
-import strings from '../../localization';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { selectAudioPadding } from '../settings/settingsSlice';
-import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
-import { getLocalFiles, ReduxEntry, selectEntries } from './entrySlice';
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import EntryTable from './components/EntryTable';
+import { selectLines, setLines } from './entrySlice';
 // import {  Transcription, Line }  from
 
 // Convert an internal audio path to a url that can be used by howler
@@ -112,12 +83,13 @@ async function GetEntry({ entryUUID }: { entryUUID: string }): Promise<Entry> {
 }
 
 function EntryEditor() {
+  const dispatch = useAppDispatch();
   // Params
-  const { entryUUID } = useParams<{ entryUUID: string }>();
 
+  const { entryUUID } = useParams<{ entryUUID: string }>();
   const [entry, setEntry] = useState<Entry | null>(null);
   const [transcription, setTranscription] = useState<Transcription | null>(null);
-  const [lines, setLines] = useState<Line[] | null>(null);
+  const lines = useAppSelector(selectLines);
   const [audioURL, setAudioURL] = useState<string | null>(null);
   const [audioPlayer, setAudioPlayer] = useState<Howl | null>(null);
   const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
@@ -135,7 +107,7 @@ function EntryEditor() {
           console.log(transcription);
           GetLines({ transcriptionUUID: transcription.uuid })
             .then((lines) => {
-              setLines(lines);
+              dispatch(setLines(lines));
               console.log('3: Lines Set');
               console.log(lines);
             })
@@ -179,14 +151,10 @@ function EntryEditor() {
     }
   }, [audioPlayer]);
 
-  if (!entry) {
-    return <Text>No entry found...</Text>;
-  }
-
   if (entry && transcription && lines && audioURL && audioPlayer) {
-    return <EntryTable audioPlayer={audioPlayer} lines={lines} />;
+    return <EntryTable audioPlayer={audioPlayer} />;
   } else {
-    return <Text>Loading...</Text>;
+    return <Text>temporary loading</Text>;
   }
 }
 

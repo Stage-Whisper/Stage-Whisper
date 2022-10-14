@@ -249,6 +249,37 @@ ipcMain.handle(
   }
 );
 
+// Restore line
+ipcMain.handle(
+  QUERY.RESTORE_LINE,
+  async (_event: invoke, args: QueryArgs[QUERY.RESTORE_LINE]): QueryReturn[QUERY.RESTORE_LINE] => {
+    const { line } = args;
+    // Get the lines from the database
+    const dbLines = (await db('lines')
+      .where({ transcription: line.transcription })
+      .where({ index: line.index })) as Line[];
+
+    // Get the line with the lowest version number
+    const lowestVersionLine = dbLines.reduce((acc: Line, line: Line) => {
+      if (acc.version > line.version) {
+        return line;
+      } else {
+        return acc;
+      }
+    }, dbLines[0]);
+
+    // Set the deleted flag to false
+    const updatedLine = {
+      ...lowestVersionLine,
+      deleted: false
+    };
+
+    // Update the line in the database and return it
+    const newLine = (await db('lines').where({ uuid: updatedLine.uuid }).update(updatedLine).returning('*')) as Line[];
+    return newLine[0];
+  }
+);
+
 // Update Transcription
 ipcMain.handle(
   QUERY.UPDATE_TRANSCRIPTION,

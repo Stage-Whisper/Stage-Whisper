@@ -4,19 +4,18 @@ import { Howl } from 'howler';
 import { Line } from 'knex/types/tables';
 import { DataTable } from 'mantine-datatable';
 import React, { useEffect, useState } from 'react';
-import { useAppSelector } from '../../../redux/hooks';
+import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { selectAudioPadding } from '../../settings/settingsSlice';
+import { selectLines, setLines } from '../entrySlice';
 
-function EntryTable({ audioPlayer, lines }: { audioPlayer: Howl; lines: Line[] }) {
+function EntryTable({ audioPlayer }: { audioPlayer: Howl }) {
   // Data Table States
   // const [pageSize, setPageSize] = useState(20);
   const pageSize = 20;
   const [page, setPage] = useState(1);
-  const [records, setRecords] = useState<Line[] | null>(null);
 
   // Audio
   const [currentLine, setCurrentLine] = useState<Line | null>(null);
-  // const [audioControls, setAudioControls] = useState<JSX.Element | null>(null);
   const [timeOutList, setTimeOutList] = useState<Array<NodeJS.Timeout>>([]);
   const [lineAudioProgress, setLineAudioProgress] = useState<number>(0);
   const [intervalNode, setIntervalNode] = useState<NodeJS.Timeout | null>(null);
@@ -26,24 +25,30 @@ function EntryTable({ audioPlayer, lines }: { audioPlayer: Howl; lines: Line[] }
   const [editingLine, setEditingLine] = useState<Line | null>(null);
   const [editText, setEditText] = useState('');
 
-  // Set Records with UseEffect
-  useEffect(() => {
-    setRecords(lines);
-  }, [lines]);
+  // Fetch Lines from redux store
+  const dispatch = useAppDispatch();
+  const lines = useAppSelector(selectLines);
+  const [localLines, setLocalLines] = useState<Line[]>([]);
 
   // Generate a data table using Mantine-DataTable
-  if (records) {
+  useEffect(() => {
+    // Get the lines from the store
+    // Set the lines in local state for data table
+    setLocalLines(lines);
+  }, [lines]);
+
+  if (localLines) {
     return (
       <Box>
         <DataTable
           withBorder
           withColumnBorders
           striped
-          totalRecords={lines.length}
+          totalRecords={localLines.length}
           recordsPerPage={pageSize}
           page={page}
           onPageChange={(p) => setPage(p)}
-          records={records} // {}type formattedVTTLine = {key: string;start: number;end: number;duration: number;text: string;};
+          records={localLines} // {}type formattedVTTLine = {key: string;start: number;end: number;duration: number;text: string;};
           columns={[
             // Play button column
             {
@@ -147,7 +152,33 @@ function EntryTable({ audioPlayer, lines }: { audioPlayer: Howl; lines: Line[] }
                   <Group spacing={4} position="right" noWrap>
                     {editingLine === line ? (
                       <>
-                        <ActionIcon color="green" onClick={() => console.log('save edits')}>
+                        <ActionIcon
+                          color="green"
+                          onClick={() => {
+                            console.log('save edits');
+                            if (editText) {
+                              window.Main.UPDATE_LINE({
+                                line: {
+                                  ...line,
+                                  text: editText
+                                }
+                              }).then((res) => {
+                                console.log(res);
+                                dispatch(
+                                  setLines({
+                                    ...lines,
+                                    [line.index]: {
+                                      ...line,
+                                      text: editText
+                                    }
+                                  })
+                                );
+                                setEditingLine(null);
+                                setEditText('');
+                              });
+                            }
+                          }}
+                        >
                           <IconCheck size={16} />
                         </ActionIcon>
 
@@ -166,7 +197,25 @@ function EntryTable({ audioPlayer, lines }: { audioPlayer: Howl; lines: Line[] }
                       <>
                         {line.version > 0 ? (
                           // Reset edits
-                          <ActionIcon color="red" onClick={() => console.log('resetting edits...')}>
+                          <ActionIcon
+                            color="red"
+                            onClick={() => {
+                              console.log('resetting edits...');
+                              window.Main.RESTORE_LINE({ line }).then((res) => {
+                                console.log(res);
+                                console.log(line);
+
+                                dispatch(
+                                  setLines({
+                                    ...lines,
+                                    [line.index]: {
+                                      ...res
+                                    }
+                                  })
+                                );
+                              });
+                            }}
+                          >
                             <IconArrowBack size={16} />
                           </ActionIcon>
                         ) : (
@@ -194,7 +243,7 @@ function EntryTable({ audioPlayer, lines }: { audioPlayer: Howl; lines: Line[] }
               }
             }
           ]}
-          idAccessor="id"
+          idAccessor="uuid"
         />
       </Box>
     );

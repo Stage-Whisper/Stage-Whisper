@@ -37,7 +37,7 @@ export type QueryArgs = {
   [QUERY.REMOVE_ENTRY]: { entryUUID: string };
   [QUERY.REMOVE_LINE]: { index: number; transcriptionUUID: string };
   [QUERY.REMOVE_TRANSCRIPTION]: { transcriptionUUID: string };
-  [QUERY.RESTORE_LINE]: { index: number; transcriptionUUID: string };
+  [QUERY.RESTORE_LINE]: { line: Line };
   [QUERY.UPDATE_ENTRY]: { entry: Entry };
   [QUERY.UPDATE_LINE]: { line: Line };
   [QUERY.UPDATE_TRANSCRIPTION]: { transcription: Transcription };
