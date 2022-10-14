@@ -1,5 +1,5 @@
 import { ipcMain, IpcMainInvokeEvent as invoke, IpcMainInvokeEvent } from 'electron';
-
+import { v4 as uuidv4 } from 'uuid';
 // DB
 import db from '../../database/database';
 
@@ -146,13 +146,46 @@ ipcMain.handle(
   QUERY.GET_LATEST_LINES,
   async (_event: invoke, args: QueryArgs[QUERY.GET_LATEST_LINES]): QueryReturn[QUERY.GET_LATEST_LINES] => {
     const { transcriptionUUID } = args;
-    // Get all lines for a transcription ordered by line index, returning the one with the highest version number
+
+    // Get the lines for a transcription, ordered by index, with only the highest version of each line
     const lines = (await db('lines')
       .where({ transcription: transcriptionUUID })
       .orderBy('index', 'asc')
-      .orderBy('version', 'desc')
-      .select('*')) as Line[];
-    return lines;
+      .orderBy('version', 'desc')) as Line[];
+
+    console.log('line length:' + lines.length);
+
+    // Get the line at each index which has the highest version
+    const latestLines = lines.reduce((acc: Line[], line: Line) => {
+      if (acc.length === 0) {
+        acc.push(line);
+      } else {
+        const lastLine = acc[acc.length - 1];
+        if (lastLine.index === line.index) {
+          if (lastLine.version < line.version) {
+            acc.pop();
+            acc.push(line);
+          }
+        } else {
+          acc.push(line);
+        }
+      }
+      return acc;
+    }, []);
+
+    console.log('latest line length:' + latestLines.length);
+
+    // Remove lines that have been deleted
+    const filteredLinesWithoutDeleted = latestLines.filter((line) => {
+      if (line.deleted) {
+        return false;
+      } else {
+        return true;
+      }
+    });
+
+    console.log('filtered line length:' + filteredLinesWithoutDeleted.length);
+    return filteredLinesWithoutDeleted;
   }
 );
 
@@ -198,14 +231,15 @@ ipcMain.handle(
 
     // Get the line from the database
     const dbLine = (await db('lines')
-      .where({ uuid: line.uuid })
       .where({ transcription: line.transcription })
+      .where({ index: line.index })
       .first()) as Line;
 
     // Create a new line object with the updated values and a higher version number
     const updatedLine = {
       ...dbLine,
       ...line,
+      uuid: uuidv4(),
       version: dbLine.version + 1
     };
 
