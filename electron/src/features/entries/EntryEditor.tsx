@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from 'react';
-
 // Components
 
 import {
@@ -34,13 +32,15 @@ import {
 } from '@tabler/icons';
 
 import { Howl } from 'howler';
-import { Line, Transcription } from 'knex/types/tables';
+import { Entry, Line, Transcription } from 'knex/types/tables';
 import { useParams } from 'react-router-dom';
 import strings from '../../localization';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectAudioPadding } from '../settings/settingsSlice';
 import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
 import { getLocalFiles, ReduxEntry, selectEntries } from './entrySlice';
+import React, { useEffect, useState } from 'react';
+import EntryTable from './components/EntryTable';
 // import {  Transcription, Line }  from
 
 // Convert an internal audio path to a url that can be used by howler
@@ -61,526 +61,133 @@ const filePathToURL = async (filePath: string): Promise<string> => {
   }
 };
 
-/// TODO: Add a way to grab lines from the transcription
-
-// Construct Audio Player -- Required as will need to refresh with new audio player
-function AudioControls(audioPlayer: Howl) {
-  let currentPlaying = false;
-  audioPlayer.on('play', () => {
-    currentPlaying = true;
-  });
-  audioPlayer.on('pause', () => {
-    currentPlaying = false;
-  });
-  audioPlayer.on('end', () => {
-    currentPlaying = false;
-  });
-  return (
-    <>
-      {/* Create a button floating on the bottom right  */}
-
-      <Affix position={{ bottom: 20, right: 20 }}>
-        <Card shadow="md" p="lg">
-          <Group spacing="md">
-            <Button
-              onClick={() => {
-                console.debug('Play');
-                if (currentPlaying) {
-                  audioPlayer.unload();
-                  audioPlayer.play();
-                } else {
-                  audioPlayer.play();
-                }
-              }}
-            >
-              <IconPlayerPlay />
-            </Button>
-            <Button
-              onClick={() => {
-                audioPlayer.pause();
-              }}
-            >
-              <IconPlayerPause />
-            </Button>
-          </Group>
-        </Card>
-      </Affix>
-    </>
-  );
+// Fetch Transcription Lines from the database
+async function GetLines({ transcriptionUUID }: { transcriptionUUID: string }): Promise<Line[]> {
+  const result = (await window.Main.GET_LATEST_LINES({ transcriptionUUID })) as Line[];
+  if (!result) {
+    console.log('No Lines Found');
+    throw new Error('No Lines Found');
+  } else {
+    return result;
+  }
 }
 
-// This is a component that will be used to display the transcription editor when an entry is selected
+// Fetch Transcription from the database
+async function GetTranscription({
+  transcriptionUUID,
+  entryUUID
+}: {
+  transcriptionUUID?: string;
+  entryUUID?: string;
+}): Promise<Transcription> {
+  if (transcriptionUUID) {
+    const result = (await window.Main.GET_TRANSCRIPTION({ transcriptionUUID })) as Transcription;
+    if (!result) {
+      console.log('No Transcription Found');
+      throw new Error('No Transcription Found');
+    } else {
+      return result;
+    }
+  } else if (entryUUID) {
+    const result = (await window.Main.GET_ALL_TRANSCRIPTIONS_FOR_ENTRY({ entryUUID })) as Transcription[];
+    if (!result) {
+      console.log('No Transcription Found');
+      throw new Error('No Transcription Found');
+    } else {
+      return result[result.length - 1];
+    }
+  } else {
+    throw new Error('No parameters given for GetTranscription');
+  }
+}
+
+// Get Entry from the database
+async function GetEntry({ entryUUID }: { entryUUID: string }): Promise<Entry> {
+  const result = (await window.Main.GET_ENTRY({ entryUUID })) as Entry;
+  if (!result) {
+    console.log('No Entry Found');
+    throw new Error('No Entry Found');
+  }
+  return result;
+}
+
 function EntryEditor() {
-  // Redux
-  const dispatch = useAppDispatch();
-  const transcribing = useAppSelector(selectTranscribingStatus);
-  const entries = useAppSelector(selectEntries);
-  const transcribingStatus = useAppSelector(selectTranscribingStatus);
-
   // Params
-  const { entryId } = useParams<{ entryId: string }>();
+  const { entryUUID } = useParams<{ entryUUID: string }>();
 
-  // Get the active entry
-  const entry = entries.find((entry) => entry.uuid === entryId);
-
-  // Set the active transcription
-  const [activeTranscription, setActiveTranscription] = useState<Transcription | undefined>(entry?.transcriptions[0]);
-
-  // Transcription Text States
-  // Empty state to store the formatted VTT lines
-  const [formattedLines, setFormattedLines] = useState<Array<Line>>([]);
-  // Empty state to store the current line
-
-  const [currentLine, setCurrentLine] = useState<Line | null>(null);
-
-  // Set up the audio player state
+  const [entry, setEntry] = useState<Entry | null>(null);
+  const [transcription, setTranscription] = useState<Transcription | null>(null);
+  const [lines, setLines] = useState<Line[] | null>(null);
+  const [audioURL, setAudioURL] = useState<string | null>(null);
   const [audioPlayer, setAudioPlayer] = useState<Howl | null>(null);
-  // Audio Controls
-  const [audioControls, setAudioControls] = useState<JSX.Element | null>(null);
-  //Timeout
-  const [timeOutList, setTimeOutList] = useState<Array<NodeJS.Timeout>>([]);
-  //Progress bar
-  const [
-    ,
-    // lineAudioProgress
-    setLineAudioProgress
-  ] = useState<number>(0);
-  //Intervals
-
-  const [intervalNode, setIntervalNode] = useState<NodeJS.Timeout | null>(null);
-
-  //Get audioPadding from redux
-  const audioPadding = useAppSelector(selectAudioPadding);
-
-  // Data Table States
-  const [pageSize, setPageSize] = useState(20);
-  const [page, setPage] = useState(1);
-  const [records, setRecords] = useState<Line[] | null>(null);
-
-  // Editing States
-  const [editingLine, setEditingLine] = useState<Line | null>(null);
-  const [editText, setEditText] = useState<string>('');
-  const [editStart, setEditStart] = useState<number>(0);
-  const [editEnd, setEditEnd] = useState<number>(0);
-  const [editPending, setEditPending] = useState<boolean>(false); // Whether the submitEdit handler is waiting for a response from the main process
-
-  const submitEdit = async (entry: ReduxEntry, transcription: Transcription, line: Line) => {
-    // Set the loading state
-    setEditPending(true);
-    // Get the index of the line
-    window.Main.UPDATE_LINE({ line })
-      .then(() => {
-        // If the promise resolved then the edit has been applied
-        // Update the redux store
-        dispatch(getLocalFiles()); // HACK: this is loading the entire store again, which is not ideal
-        // Clear the edit state
-        setEditingLine(null);
-        setEditPending(false);
-      })
-
-      .catch((error) => {
-        // If the promise rejected then the edit failed
-        console.warn(error);
-        // Clear the edit state
-        setEditingLine(null);
-        setEditPending(false);
-      });
-  };
+  const [audioPlaying, setAudioPlaying] = useState<boolean>(false);
+  const [audioSeek, setAudioSeek] = useState<number>(0);
 
   useEffect(() => {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize;
-    setRecords(formattedLines.slice(from, to));
-  }, [page, formattedLines, pageSize]);
+    if (entryUUID) {
+      GetEntry({ entryUUID }).then((entry) => {
+        setEntry(entry);
+        console.log('1: Entry Set');
+        console.log(entry);
+        GetTranscription({ entryUUID: entry.uuid }).then((transcription) => {
+          setTranscription(transcription);
+          console.log('2: Transcription Set');
+          console.log(transcription);
+          GetLines({ transcriptionUUID: transcription.uuid })
+            .then((lines) => {
+              setLines(lines);
+              console.log('3: Lines Set');
+              console.log(lines);
+            })
+            .then(() => {
+              if (entry.audio_path) {
+                filePathToURL(entry.audio_path).then((url) => {
+                  setAudioURL(url);
+                  console.log('4: Audio URL Set');
 
-  // Audio Control Use Effect
-  // Update the audio controls when the audio player changes
+                  const newAudioPlayer = new Howl({
+                    src: [url],
+                    html5: true,
+                    format: ['mp3'],
+                    preload: true
+                  });
+                  console.log('5: Audio Player Set');
+                  newAudioPlayer.on('load', () => {
+                    console.log('6: Audio Player Loaded');
+                    setAudioPlayer(newAudioPlayer);
+                  });
+                  newAudioPlayer.once('loaderror', (_id, error) => {
+                    console.log('Audio Player Load Error ', error);
+                  });
+                });
+              } else {
+                console.log('No Audio Path Found');
+                throw new Error('No Audio Path Found');
+              }
+            });
+        });
+      });
+    }
+  }, [entryUUID]);
+
   useEffect(() => {
     // If the audio player is not null
     if (audioPlayer) {
       console.debug('AudioControls: Audio Player Changed');
       // Construct the audio controls
-      setAudioControls(AudioControls(audioPlayer));
+      // setAudioControls(AudioControls(audioPlayer));
     }
   }, [audioPlayer]);
 
-  useEffect(() => {
-    // Reset all the states when the entry changes
-    setFormattedLines([]);
-    setCurrentLine(null);
-
-    audioPlayer?.unload();
-    audioPlayer?.off();
-    setAudioPlayer(null);
-
-    if (intervalNode) {
-      clearInterval(intervalNode);
-    }
-    setIntervalNode(null);
-    setTimeOutList([]);
-    setLineAudioProgress(0);
-
-    // If the entry has a transcription
-    if (entry && entry.transcriptions[0] && entry.transcriptions[0].data) {
-      // Get the transcription data
-      const transcriptionData = entry.transcriptions[0].data;
-      // log the number of nodes
-      console.debug(`EntryEditor: ${transcriptionData.length} Nodes Found`);
-
-      // Generate the formatted lines
-      const formattedLines: Line[] = transcriptionData.map((line: Line) => {
-        return {
-          ...line // TODO: Implement line editing
-        };
-      });
-
-      // Set the formatted lines
-      setFormattedLines(formattedLines);
-      console.log('Got Audio Path: ', entry.audio_path);
-      const audioFilePath = entry.audio_path;
-      // Convert the audio file path to a URL
-      console.log('Converting Audio Path to URL');
-      filePathToURL(audioFilePath).then((audioURL) => {
-        // Create a new Howl object
-        const newAudioPlayer = new Howl({
-          src: [audioURL],
-          html5: true,
-          format: ['mp3'],
-          preload: true
-        });
-        newAudioPlayer.on('load', () => {
-          console.log('Audio Player Loaded');
-          setAudioPlayer(newAudioPlayer);
-        });
-        newAudioPlayer.once('loaderror', (_id, error) => {
-          console.log('Audio Player Load Error ', error);
-        });
-      });
-    } else {
-      // Check what is missing
-      if (!entry) console.warn('EntryEditor: Entry is null');
-      if (entry && !entry?.transcriptions[0]) console.warn('EntryEditor: Transcription is null');
-      if (entry && !entry?.transcriptions[0] && !entry?.transcriptions[0]?.data)
-        console.warn('EntryEditor: Transcription Data is null');
-    }
-  }, [entry]);
-
-  // #region Data Table
-
-  //  Documentation -- remove before prod
-  //  https://icflorescu.github.io/mantine-datatable
-  const dataTable = (formatted: Line[]) => {
-    // Generate a data table using Mantine-Datatable
-    if (records) {
-      return (
-        <Box>
-          <DataTable
-            withBorder
-            withColumnBorders
-            striped
-            totalRecords={formatted.length}
-            recordsPerPage={pageSize}
-            page={page}
-            onPageChange={(p) => setPage(p)}
-            records={records} // {}type formattedVTTLine = {key: string;start: number;end: number;duration: number;text: string;};
-            columns={[
-              // Play button column
-              {
-                title: 'Play',
-                accessor: 'id',
-                width: 50,
-                textAlignment: 'center',
-                render: (line) => {
-                  return (
-                    <ActionIcon
-                      onClick={() => {
-                        if (formatted) {
-                          // If the line is not null
-                          if (!line) return;
-
-                          // If the Audio Player is not null
-                          if (!audioPlayer) return;
-
-                          // If current line is playing then stop it
-                          if (currentLine === line) {
-                            audioPlayer.stop();
-                            setCurrentLine(null);
-                            return;
-                          }
-
-                          // Set the current line
-                          setCurrentLine(line);
-
-                          // The amount of padding to add to the start and end of the line
-                          const playBackPadding = audioPadding as number;
-
-                          // The start time of the line after accounting for padding
-                          const computedLineStart = Math.max(line.start / 1000 - playBackPadding, 0);
-
-                          // The end time of the line after accounting for padding
-                          const computedLineEnd = Math.min(line.end / 1000 + playBackPadding, audioPlayer.duration());
-
-                          // Logging for debugging
-                          console.log('Computed Line Start: ', computedLineStart);
-                          console.log('Computed Line End: ', computedLineEnd);
-
-                          // Cancel timeouts for the current line
-                          timeOutList.forEach((timeout) => {
-                            clearTimeout(timeout);
-                          });
-
-                          // Cancel intervals
-                          if (intervalNode) {
-                            clearInterval(intervalNode);
-                          }
-
-                          setLineAudioProgress(0);
-                          audioPlayer.unload();
-                          audioPlayer.play();
-                          audioPlayer.seek(computedLineStart);
-
-                          //Every time 5% of the line is played update the progress bar setLineAudioProgress
-                          const interval = setInterval(() => {
-                            const currentTime = audioPlayer.seek(); //in seconds
-                            const progress = (currentTime - computedLineStart) / (computedLineEnd - computedLineStart);
-                            setLineAudioProgress(progress * 100);
-                          }, 50);
-                          setIntervalNode(interval);
-
-                          //stop audio after it finishes
-                          const timeout = setTimeout(() => {
-                            audioPlayer.stop();
-                            setCurrentLine(null);
-                            clearInterval(interval);
-                          }, (computedLineEnd - computedLineStart) * 1000);
-                          setTimeOutList([...timeOutList, timeout]);
-                        }
-                      }}
-                    >
-                      {currentLine === line ? <IconPlayerStop /> : <IconPlayerPlay />}
-                    </ActionIcon>
-                  );
-                }
-              },
-              // Text column
-              {
-                accessor: 'text',
-                title: 'Text',
-                render: (line) => {
-                  if (line === editingLine) {
-                    return <Textarea value={editText || ''} onChange={(e) => setEditText(e.target.value)} />;
-                  } else {
-                    return line.edit?.text || line.text;
-                  }
-                }
-              },
-              // Time range column
-              {
-                accessor: 'start',
-                title: 'Time',
-                width: 120,
-                render: ({ start, end }) => {
-                  return (
-                    <Text align="center">
-                      {String(Math.floor(start / 1000 / 60)).padStart(2, '0')}:
-                      {String(Math.floor(start / 1000) % 60).padStart(2, '0')}-
-                      {String(Math.floor(end / 1000 / 60)).padStart(2, '0')}:
-                      {String(Math.floor(end / 1000) % 60).padStart(2, '0')}
-                    </Text>
-                  );
-                }
-              },
-              // Action Buttons Column
-              {
-                accessor: 'actions',
-                title: 'Actions',
-                textAlignment: 'center',
-                width: 80,
-
-                render: (line) => {
-                  return (
-                    <Group spacing={4} position="right" noWrap>
-                      {editingLine === line ? (
-                        <>
-                          <ActionIcon
-                            color="green"
-                            onClick={() => {
-                              console.log('save edits');
-                              if (entry && activeTranscription) {
-                                const newline = {
-                                  ...line,
-                                  edit: {
-                                    text: editText
-                                  }
-                                };
-                                console.log('newline', newline);
-                                submitEdit(entry, activeTranscription, newline);
-                              }
-                            }}
-                          >
-                            <IconCheck size={16} />
-                          </ActionIcon>
-
-                          <ActionIcon
-                            color="red"
-                            onClick={() => {
-                              // Cancel editing
-                              setEditingLine(null);
-                              setEditText('');
-                            }}
-                          >
-                            <IconX size={16} />
-                          </ActionIcon>
-                        </>
-                      ) : (
-                        <>
-                          {line.edit?.text ? (
-                            <ActionIcon // Reset edits
-                              color="red"
-                              onClick={() => {
-                                if (entry && activeTranscription) {
-                                  const newline = {
-                                    ...line,
-                                    edit: null
-                                  };
-                                  console.log('resetting edits...');
-                                  submitEdit(entry, activeTranscription, newline);
-                                }
-                              }}
-                            >
-                              <IconArrowBack size={16} />
-                            </ActionIcon>
-                          ) : (
-                            <>
-                              <ActionIcon
-                                color="blue"
-                                onClick={() => {
-                                  // Set current line
-
-                                  // Check if line has an edit
-                                  if (line.edit) {
-                                    setEditText(line.edit.text || line.text);
-                                    setEditingLine(line);
-                                  } else {
-                                    setEditText(line.text);
-                                    setEditingLine(line);
-                                  }
-                                }}
-                              >
-                                <IconEdit size={16} />
-                              </ActionIcon>
-                              <ActionIcon color="red" onClick={() => console.log('delete')} disabled>
-                                {/* HACK: Delete is disabled until a way to sync changes is complete */}
-                                <IconTrash size={16} />
-                              </ActionIcon>
-                            </>
-                          )}
-                        </>
-                      )}
-                    </Group>
-                  );
-                }
-              }
-            ]}
-            idAccessor="id"
-          />
-        </Box>
-      );
-    }
-  };
-
-  // If an entry has not been passed in
   if (!entry) {
-    return <Text>Entry Not Found</Text>;
+    return <Text>No entry found...</Text>;
   }
 
-  // If the entry has been passed in, but its transcription is currently being run
-  if (entry && transcribingStatus.entry?.config.uuid === entry.uuid && transcribingStatus.status === 'loading') {
-    return (
-      <Stack align={'center'} justify="center" style={{ height: '80%' }}>
-        <Title order={3}>Transcribing</Title>
-        <Loader variant="dots" />
-      </Stack>
-    );
+  if (entry && transcription && lines && audioURL && audioPlayer) {
+    return <EntryTable audioPlayer={audioPlayer} lines={lines} />;
+  } else {
+    return <Text>Loading...</Text>;
   }
-
-  // If an entry has been passed in but it does not have a transcription
-  if (entry && !entry.transcriptions[0]) {
-    return (
-      <Stack align={'center'} justify="center" style={{ height: '80%' }}>
-        <Title order={3}>No Transcription Found</Title>
-        <Button
-          onClick={() => {
-            if (entry) {
-              dispatch(passToWhisper({ entry }));
-            } else {
-              console.warn("No Entry Found, can't pass to whisper");
-              // This should eventually be a modal
-            }
-          }}
-          color="violet"
-          variant="outline"
-          disabled={transcribing.status === 'loading'}
-        >
-          {strings.util.buttons?.transcribe}
-        </Button>
-      </Stack>
-    );
-  }
-
-  // If an entry has been passed in and it has a transcription but the audio player is not ready
-  if (!audioPlayer) {
-    return (
-      <Stack align={'center'} justify="center" style={{ height: '80%' }}>
-        <Title order={3}>Loading</Title>
-        <Loader />
-      </Stack>
-    );
-  }
-
-  // If an entry has been passed in and it has a transcription and the audio player is ready
-  if (entry && entry.transcriptions[0] && entry.transcriptions[0].data) {
-    return (
-      <>
-        <Title mt={'md'} align="center">
-          {entry.name}
-        </Title>
-        <Group position="apart">
-          <NumberInput
-            style={{
-              minWidth: '200px',
-              width: '20%'
-            }}
-            label="Lines Per Page"
-            value={pageSize}
-            onChange={(value) => {
-              value && setPageSize(value);
-            }}
-            min={10}
-            max={120}
-            step={5}
-            mb={'md'}
-          />
-
-          {formattedLines[formattedLines.length - 1].end && (
-            <Text align="center" color="gray">
-              {`Length of Audio: `}
-              <Text span>
-                {String(Math.floor(formattedLines[formattedLines.length - 1].end / 1000 / 60)).padStart(2, '0')}:
-                {String(Math.floor(formattedLines[formattedLines.length - 1].end / 1000) % 60).padStart(2, '0')}
-              </Text>
-            </Text>
-          )}
-        </Group>
-        {records && dataTable(formattedLines)}
-
-        {/* {false && transcriptionTable(formattedVTTLines)} */}
-        {audioControls}
-      </>
-    );
-  }
-
-  return <Text>Entry Not Found</Text>;
 }
 
 export default EntryEditor;

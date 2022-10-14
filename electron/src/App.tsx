@@ -51,7 +51,7 @@ function EntryList() {
   const entries = useAppSelector(selectEntries);
   const transcribing = useAppSelector(selectTranscribingStatus);
   const dispatch = useAppDispatch();
-  const { entryId } = useParams();
+  const { entryUUID } = useParams();
   return (
     <>
       <Divider mt={'sm'} />
@@ -75,7 +75,7 @@ function EntryList() {
             onClick={() => {
               dispatch(setBurgerOpen(false));
             }}
-            active={entry.uuid === entryId}
+            active={entry.uuid === entryUUID}
           />
         );
       })}

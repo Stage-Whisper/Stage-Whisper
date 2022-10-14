@@ -37,7 +37,7 @@ root.render(
               <Route path="/settings" element={<Settings />} />
               <Route path="/about" element={<About />} />
               <Route path="/entries" element={<Entries />} />
-              <Route path="/entries/:entryId" element={<EntryEditor />} />
+              <Route path="/entries/:entryUUID" element={<EntryEditor />} />
 
               <Route path="*" element={<div>404</div>} />
             </Route>

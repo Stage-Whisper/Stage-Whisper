@@ -59,8 +59,8 @@ ipcMain.handle(
 ipcMain.handle(
   QUERY.GET_ENTRY,
   async (_event: invoke, args: QueryArgs[QUERY.GET_ENTRY]): QueryReturn[QUERY.GET_ENTRY] => {
-    const { entryId } = args;
-    const entry = (await db('entries').where({ uuid: entryId }).first()) as Entry;
+    const { entryUUID } = args;
+    const entry = (await db('entries').where({ uuid: entryUUID }).first()) as Entry;
     return entry;
   }
 );
@@ -76,8 +76,8 @@ ipcMain.handle(QUERY.GET_ENTRY_COUNT, async (): QueryReturn[QUERY.GET_ENTRY_COUN
 
 // Get Line
 ipcMain.handle(QUERY.GET_LINE, async (_event: invoke, args: QueryArgs[QUERY.GET_LINE]): QueryReturn[QUERY.GET_LINE] => {
-  const { lineId } = args;
-  const line = (await db('lines').where({ uuid: lineId }).first()) as Line;
+  const { lineUUID } = args;
+  const line = (await db('lines').where({ uuid: lineUUID }).first()) as Line;
   return line;
 });
 
@@ -85,8 +85,8 @@ ipcMain.handle(QUERY.GET_LINE, async (_event: invoke, args: QueryArgs[QUERY.GET_
 ipcMain.handle(
   QUERY.GET_LINE_COUNT,
   async (_event: invoke, args: QueryArgs[QUERY.GET_LINE_COUNT]): QueryReturn[QUERY.GET_LINE_COUNT] => {
-    const { transcriptionId } = args;
-    const lineCount = await db('lines').where({ transcription: transcriptionId }).count('*');
+    const { transcriptionUUID } = args;
+    const lineCount = await db('lines').where({ transcription: transcriptionUUID }).count('*');
     if (typeof lineCount[0].count === 'string') {
       return parseInt(lineCount[0].count, 10);
     }
@@ -98,8 +98,8 @@ ipcMain.handle(
 ipcMain.handle(
   QUERY.GET_TRANSCRIPTION,
   async (_event: invoke, args: QueryArgs[QUERY.GET_TRANSCRIPTION]): QueryReturn[QUERY.GET_TRANSCRIPTION] => {
-    const { transcriptionId } = args;
-    const transcription = (await db('transcriptions').where({ uuid: transcriptionId }).first()) as Transcription;
+    const { transcriptionUUID } = args;
+    const transcription = (await db('transcriptions').where({ uuid: transcriptionUUID }).first()) as Transcription;
     return transcription;
   }
 );
@@ -120,8 +120,8 @@ ipcMain.handle(
     _event: invoke,
     args: QueryArgs[QUERY.GET_TRANSCRIPTION_COUNT_FOR_ENTRY]
   ): QueryReturn[QUERY.GET_TRANSCRIPTION_COUNT_FOR_ENTRY] => {
-    const { entryId } = args;
-    const transcription = await db('transcriptions').where({ entry_id: entryId }).count('*');
+    const { entryUUID } = args;
+    const transcription = await db('transcriptions').where({ entry_id: entryUUID }).count('*');
     if (typeof transcription[0].count === 'string') {
       return parseInt(transcription[0].count, 10);
     }
@@ -145,10 +145,10 @@ ipcMain.handle(QUERY.GET_ALL_LINES, async (): QueryReturn[QUERY.GET_ALL_LINES] =
 ipcMain.handle(
   QUERY.GET_LATEST_LINES,
   async (_event: invoke, args: QueryArgs[QUERY.GET_LATEST_LINES]): QueryReturn[QUERY.GET_LATEST_LINES] => {
-    const { transcriptionId } = args;
+    const { transcriptionUUID } = args;
     // Get all lines for a transcription ordered by line index, returning the one with the highest version number
     const lines = (await db('lines')
-      .where({ transcription: transcriptionId })
+      .where({ transcription: transcriptionUUID })
       .orderBy('index', 'asc')
       .orderBy('version', 'desc')
       .select('*')) as Line[];
@@ -169,8 +169,8 @@ ipcMain.handle(
     _event: invoke,
     args: QueryArgs[QUERY.GET_ALL_TRANSCRIPTIONS_FOR_ENTRY]
   ): QueryReturn[QUERY.GET_ALL_TRANSCRIPTIONS_FOR_ENTRY] => {
-    const { entryId } = args;
-    const transcriptions = (await db('transcriptions').where({ entry: entryId })) as Transcription[];
+    const { entryUUID } = args;
+    const transcriptions = (await db('transcriptions').where({ entry: entryUUID })) as Transcription[];
     return transcriptions;
   }
 );
@@ -234,8 +234,8 @@ ipcMain.handle(
 ipcMain.handle(
   QUERY.REMOVE_ENTRY,
   async (_event: invoke, args: QueryArgs[QUERY.REMOVE_ENTRY]): QueryReturn[QUERY.REMOVE_ENTRY] => {
-    const { entryId } = args;
-    await db('entries').where({ uuid: entryId }).del();
+    const { entryUUID } = args;
+    await db('entries').where({ uuid: entryUUID }).del();
     return true;
   }
 );
@@ -244,10 +244,10 @@ ipcMain.handle(
 ipcMain.handle(
   QUERY.REMOVE_LINE,
   async (_event: invoke, args: QueryArgs[QUERY.REMOVE_LINE]): QueryReturn[QUERY.REMOVE_LINE] => {
-    const { index, transcriptionId } = args;
+    const { index, transcriptionUUID } = args;
 
     // Set deleted flag on all lines with the given index in the given transcription
-    await db('lines').where({ index }).where({ transcription: transcriptionId }).update({ deleted: true });
+    await db('lines').where({ index }).where({ transcription: transcriptionUUID }).update({ deleted: true });
 
     return true;
   }
