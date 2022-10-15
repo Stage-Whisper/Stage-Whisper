@@ -1,17 +1,22 @@
-import { entry, entryAudioParams, entryConfig } from '../../types/types';
+// Packages
 import { app, ipcMain, IpcMainInvokeEvent } from 'electron';
-import { v4 as uuidv4 } from 'uuid';
-import { copyFileSync, mkdirSync, writeFileSync } from 'fs';
+import { copyFileSync } from 'fs';
 import { join } from 'path';
-import { getAudioDurationInSeconds } from 'get-audio-duration';
+import { v4 as uuidv4 } from 'uuid';
+
+// Types
+import { Entry } from 'knex/types/tables';
+import db from '../../database/database';
 import { Channels, NewEntryResponse } from '../../types/channels';
 
-// Create new entry and add it to the store
-
+// Create new entry and add it to the database
 export type newEntryArgs = {
-  filePath: string;
-  audio: Omit<entryAudioParams, 'path' | 'addedOn' | 'fileLength'>;
-  config: Omit<entryConfig, 'created' | 'inQueue' | 'queueWeight' | 'activeTranscription' | 'uuid'>;
+  filePath: Entry['audio_path'];
+  name: Entry['name'];
+  description: Entry['description'];
+  audio_type: Entry['audio_type'];
+  audio_language: Entry['audio_language'];
+  audio_name: Entry['audio_name'];
 };
 
 export default ipcMain.handle(
@@ -19,65 +24,60 @@ export default ipcMain.handle(
   async (_event: IpcMainInvokeEvent, args: newEntryArgs): Promise<NewEntryResponse> => {
     const rootPath = app.getPath('userData'); // Path to the top level of the data folder
     const storePath = join(rootPath, 'store'); // Path to the store folder
-    const dataPath = join(storePath, 'data'); // Path to the data folder
+    const audioPath = join(storePath, 'audio'); // Path to the audio folder
 
     const uuid = uuidv4();
-    console.log('NewEntry: Creating new entry with UUID: ' + uuid);
+    console.log('NewEntry: Creating new entry with UUID: ' + uuid + '...');
 
+    // Create Sqlite entry
+    const entry: Entry = {
+      uuid: uuid,
+      name: args.name,
+      description: args.description,
+      created: Date.now(),
+      inQueue: false,
+      queueWeight: 0,
+      activeTranscription: null,
+      audio_type: args.audio_type,
+      audio_path: join(audioPath, args.audio_name),
+      audio_name: args.audio_name,
+      audio_language: args.audio_language,
+      audio_fileLength: 0,
+      audio_addedOn: Date.now()
+    };
+
+    // Copy audio file to ./store/audio/{file}
     try {
-      console.log('NewEntry: Copying file to data folder');
-
-      const newFilePath = join(dataPath, uuid, 'audio', args.audio.name);
-      console.log('NewEntry: newFilePath', newFilePath);
-      // Create entry
-      const entry: entry = {
-        config: {
-          uuid: uuidv4(),
-          inQueue: false,
-          name: args.config.name,
-          created: new Date().getTime(),
-          queueWeight: 0,
-          tags: args.config.tags,
-          description: args.config.description,
-          activeTranscription: null
-        },
-        audio: {
-          name: args.audio.name,
-          type: args.audio.type,
-          fileLength: await getAudioDurationInSeconds(args.filePath),
-          language: args.audio.language,
-          addedOn: new Date().getTime(),
-          path: newFilePath
-        },
-        path: join(dataPath, uuid),
-        transcriptions: []
-      };
-
-      console.log('NewEntry: Creating Folder Structure');
-      // Make folders
-      const entryPath = join(dataPath, uuid);
-      mkdirSync(join(entryPath)); // Make entry folder
-      const audioPath = join(entryPath, 'audio');
-      mkdirSync(join(audioPath)); // Make audio folder
-      const transcriptionsPath = join(entryPath, 'transcriptions');
-      mkdirSync(join(transcriptionsPath)); // Make transcriptions folder
-
-      // Move file to data folder
-      copyFileSync(args.filePath, newFilePath); // Copy file to new location
-      console.log('NewEntry: File copied to: ' + newFilePath);
-
-      console.log('NewEntry: Writing entry to store');
-      // Make entry config file
-      writeFileSync(join(entryPath, 'entry.json'), JSON.stringify(entry.config, null, 2));
-      // Make Audio Parameters file
-      writeFileSync(join(audioPath, 'audio.json'), JSON.stringify(entry.audio, null, 2));
-
-      console.log('NewEntry: Entry created successfully');
-
-      return { entry };
+      console.log('NewEntry: Copying audio file to store...');
+      copyFileSync(args.filePath, entry.audio_path);
+      console.log('NewEntry: Audio file copied to store.');
     } catch (error) {
-      console.error('NewEntry: Error creating new entry: ' + error);
-      throw error;
+      console.error('NewEntry: Error moving audio file to data folder: ' + error + '!');
+      throw new Error('Error moving audio file to data folder!');
+    }
+
+    // Add entry to database
+    let response: null | Entry = null;
+    try {
+      await db
+        .insert(entry)
+        .into('entries')
+        .then(() => {
+          console.log('NewEntry: Entry added to database!');
+          response = entry;
+        })
+        .catch((error) => {
+          console.error('NewEntry: Error adding entry to database: ' + error + '!');
+          throw new Error('Error adding entry to database!');
+        });
+    } catch (error) {
+      throw new Error('Error adding entry to database' + error + '!');
+    }
+
+    if (response === null) {
+      throw new Error('Error adding entry to database!');
+    } else {
+      return response;
     }
   }
 );

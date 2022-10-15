@@ -8,13 +8,11 @@ import { selectAudio, selectHighlightInvalid, setAudio, setAudioValid } from '..
 
 // Localization
 import strings from '../../../../localization';
+import { Entry } from 'knex/types/tables';
 
 // Types
-export interface AudioType {
-  name: string | undefined;
-  type: string | undefined;
-  path: string | undefined;
-}
+
+export type AudioUtilityType = Partial<Pick<Entry, 'audio_name' | 'audio_path' | 'audio_type'>>;
 
 function Audio() {
   // Redux

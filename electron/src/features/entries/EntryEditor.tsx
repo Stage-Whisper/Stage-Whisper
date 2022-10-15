@@ -1,37 +1,21 @@
-import React, { useEffect, useState } from 'react';
-
 // Components
 
-import {
-  ActionIcon,
-  Affix,
-  Box,
-  Button,
-  Card,
-  Group,
-  Loader,
-  Modal,
-  NumberInput,
-  Stack,
-  Text,
-  Title
-} from '@mantine/core';
+import { Button, Loader, Stack, Title } from '@mantine/core';
 
 // import { RichTextEditor } from '@mantine/rte';
-import { DataTable } from 'mantine-datatable';
 // Types
 
-// Packages
-import { IconEdit, IconPlayerPause, IconPlayerPlay, IconPlayerStop, IconTrash } from '@tabler/icons';
-
 import { Howl } from 'howler';
+import { Entry, Line, Transcription } from 'knex/types/tables';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import strings from '../../localization';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-import { selectAudioPadding } from '../settings/settingsSlice';
 import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
-import { selectEntries } from './entrySlice';
-import { transcriptionLine } from '../../../electron/types/types';
+import EntryTable from './components/EntryTable';
+import { selectActiveLines, setLines } from './entrySlice';
+
+// import {  Transcription, Line }  from
 
 // Convert an internal audio path to a url that can be used by howler
 const filePathToURL = async (filePath: string): Promise<string> => {
@@ -51,382 +35,145 @@ const filePathToURL = async (filePath: string): Promise<string> => {
   }
 };
 
-type formattedVTTLine = {
-  key: string;
-  start: number;
-  end: number;
-  duration: number;
-  text: string;
-};
-
-// Construct Audio Player -- Required as will need to refresh with new audio player
-function AudioControls(audioPlayer: Howl) {
-  let currentPlaying = false;
-  audioPlayer.on('play', () => {
-    currentPlaying = true;
-  });
-  audioPlayer.on('pause', () => {
-    currentPlaying = false;
-  });
-  audioPlayer.on('end', () => {
-    currentPlaying = false;
-  });
-  return (
-    <>
-      {/* Create a button floating on the bottom right  */}
-
-      <Affix position={{ bottom: 20, right: 20 }}>
-        <Card shadow="md" p="lg">
-          <Group spacing="md">
-            <Button
-              onClick={() => {
-                console.debug('Play');
-                if (currentPlaying) {
-                  audioPlayer.unload();
-                  audioPlayer.play();
-                } else {
-                  audioPlayer.play();
-                }
-              }}
-            >
-              <IconPlayerPlay />
-            </Button>
-            <Button
-              onClick={() => {
-                audioPlayer.pause();
-              }}
-            >
-              <IconPlayerPause />
-            </Button>
-          </Group>
-        </Card>
-      </Affix>
-    </>
-  );
+// Fetch Transcription Lines from the database
+async function GetLines({ transcriptionUUID }: { transcriptionUUID: string }): Promise<Line[]> {
+  const result = (await window.Main.GET_LATEST_LINES({ transcriptionUUID })) as Line[];
+  if (!result) {
+    console.log('No Lines Found');
+    throw new Error('No Lines Found');
+  } else {
+    return result;
+  }
 }
 
-// This is a component that will be used to display the transcription editor when an entry is selected
+// Fetch Transcription from the database
+async function GetTranscription({
+  transcriptionUUID,
+  entryUUID
+}: {
+  transcriptionUUID?: string;
+  entryUUID?: string;
+}): Promise<Transcription> {
+  if (transcriptionUUID) {
+    const result = (await window.Main.GET_TRANSCRIPTION({ transcriptionUUID })) as Transcription;
+    if (!result) {
+      console.log('No Transcription Found');
+      throw new Error('No Transcription Found');
+    } else {
+      return result;
+    }
+  } else if (entryUUID) {
+    const result = (await window.Main.GET_ALL_TRANSCRIPTIONS_FOR_ENTRY({ entryUUID })) as Transcription[];
+
+    if (!result) {
+      console.log('No Transcription Found');
+      throw new Error('No Transcription Found');
+    } else {
+      return result[result.length - 1];
+    }
+  } else {
+    throw new Error('No parameters given for GetTranscription');
+  }
+}
+
+// Get Entry from the database
+async function GetEntry({ entryUUID }: { entryUUID: string }): Promise<Entry> {
+  const result = (await window.Main.GET_ENTRY({ entryUUID })) as Entry;
+  if (!result) {
+    console.log('No Entry Found');
+    throw new Error('No Entry Found');
+  }
+  return result;
+}
+
 function EntryEditor() {
-  // Redux
   const dispatch = useAppDispatch();
-  const transcribing = useAppSelector(selectTranscribingStatus);
-  const entries = useAppSelector(selectEntries);
-  const transcribingStatus = useAppSelector(selectTranscribingStatus);
-
   // Params
-  const { entryId } = useParams<{ entryId: string }>();
 
-  // Get the active entry
-  const entry = entries.find((entry) => entry.config.uuid === entryId);
-
-  // Transcription Text States
-  // Empty state to store the formatted VTT lines
-  const [formattedVTTLines, setFormattedVTTLines] = useState<Array<formattedVTTLine>>([]);
-  // Empty state to store the current line
-
-  const [currentLine, setCurrentLine] = useState<formattedVTTLine | null>(null);
-
-  // Set up the audio player state
+  const { entryUUID } = useParams<{ entryUUID: string }>();
+  const [entry, setEntry] = useState<Entry | null>(null);
+  const [transcription, setTranscription] = useState<Transcription | null>(null);
+  const transcribingStatus = useAppSelector(selectTranscribingStatus);
+  const lines = useAppSelector(selectActiveLines);
+  const [audioURL, setAudioURL] = useState<string | null>(null);
   const [audioPlayer, setAudioPlayer] = useState<Howl | null>(null);
-  // Audio Controls
-  const [audioControls, setAudioControls] = useState<JSX.Element | null>(null);
-  //Timeout
-  const [timeOutList, setTimeOutList] = useState<Array<NodeJS.Timeout>>([]);
-  //Progress bar
-  const [
-    ,
-    // lineAudioProgress
-    setLineAudioProgress
-  ] = useState<number>(0);
-  //Intervals
-
-  const [intervalNode, setIntervalNode] = useState<NodeJS.Timeout | null>(null);
-
-  //Get audioPadding from redux
-  const audioPadding = useAppSelector(selectAudioPadding);
-
-  // Data Table States
-  const [pageSize, setPageSize] = useState(20);
-  const [page, setPage] = useState(1);
-  const [records, setRecords] = useState<formattedVTTLine[] | null>(null);
-
-  // Editing States
-  // const [editing, setEditing] = useState<boolean>(false);
-  const [editingLine, setEditingLine] = useState<formattedVTTLine | null>(null);
-  // const [showModal, setShowModal] = useState<boolean>(false);
-  // const [editingText, setEditingText] = useState<string>('');
-  // const [unsavedChanges, setUnsavedChanges] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize;
-    setRecords(formattedVTTLines.slice(from, to));
-  }, [page, formattedVTTLines, pageSize]);
+    setTranscription(null);
+    setLines([]);
+    setAudioPlayer(null);
+    setAudioURL(null);
+    setEntry(null);
 
-  // Audio Control Use Effect
-  // Update the audio controls when the audio player changes
+    setLoading(true);
+
+    if (entryUUID) {
+      GetEntry({ entryUUID })
+        .then((entry) => {
+          setEntry(entry);
+          // console.log('1: Entry Set');
+          GetTranscription({ entryUUID: entry.uuid }).then((transcription) => {
+            if (transcription) {
+              setTranscription(transcription);
+              // console.log('2: Transcription Set');
+              GetLines({ transcriptionUUID: transcription.uuid })
+                .then((lines) => {
+                  dispatch(setLines(lines));
+                  // console.log('3: Lines Set');
+                })
+                .then(() => {
+                  if (entry.audio_path) {
+                    filePathToURL(entry.audio_path).then((url) => {
+                      setAudioURL(url);
+                      // console.log('4: Audio URL Set');
+
+                      const newAudioPlayer = new Howl({
+                        src: [url],
+                        html5: true,
+                        format: ['mp3'],
+                        preload: true
+                      });
+                      // console.log('5: Audio Player Set');
+                      newAudioPlayer.on('load', () => {
+                        // console.log('6: Audio Player Loaded');
+                        setAudioPlayer(newAudioPlayer);
+                      });
+                      newAudioPlayer.once('loaderror', (_id, error) => {
+                        console.log('Audio Player Load Error ', error);
+                      });
+                    });
+                  } else {
+                    console.log('No Audio Path Found');
+                    throw new Error('No Audio Path Found');
+                  }
+                });
+            } else {
+              console.log("No Transcription Found, can't load lines!");
+            }
+          });
+        })
+        .catch((error) => {
+          console.log(error);
+          setLoading(false);
+        });
+    }
+  }, [entryUUID]);
+
   useEffect(() => {
     // If the audio player is not null
     if (audioPlayer) {
       console.debug('AudioControls: Audio Player Changed');
       // Construct the audio controls
-      setAudioControls(AudioControls(audioPlayer));
+      // setAudioControls(AudioControls(audioPlayer));
     }
   }, [audioPlayer]);
 
-  useEffect(() => {
-    // Reset all the states when the entry changes
-    setFormattedVTTLines([]);
-    setCurrentLine(null);
-
-    audioPlayer?.unload();
-    audioPlayer?.off();
-    setAudioPlayer(null);
-
-    if (intervalNode) {
-      clearInterval(intervalNode);
-    }
-    setIntervalNode(null);
-    setTimeOutList([]);
-    setLineAudioProgress(0);
-
-    // If the entry has a transcription
-    if (entry && entry.transcriptions[0] && entry.transcriptions[0].data) {
-      // Get the transcription data
-      const transcriptionData = entry.transcriptions[0].data;
-      // log the number of nodes
-      console.debug(`EntryEditor: ${transcriptionData.length} Nodes Found`);
-
-      // Generate the formatted lines
-      const formattedLines = transcriptionData.map((line: transcriptionLine) => {
-        return {
-          start: line.start,
-          end: line.end,
-          duration: line.end - line.start,
-          text: line.text,
-          key: line.id,
-          index: line.index
-        };
-      });
-
-      // Set the formatted lines
-      setFormattedVTTLines(formattedLines);
-      console.log('Got Audio Path: ', entry.audio.path);
-      const audioFilePath = entry.audio.path;
-      // Convert the audio file path to a URL
-      console.log('Converting Audio Path to URL');
-      filePathToURL(audioFilePath).then((audioURL) => {
-        // Create a new Howl object
-        const newAudioPlayer = new Howl({
-          src: [audioURL],
-          html5: true,
-          format: ['mp3'],
-          preload: true
-        });
-        newAudioPlayer.on('load', () => {
-          console.log('Audio Player Loaded');
-          setAudioPlayer(newAudioPlayer);
-        });
-        newAudioPlayer.once('loaderror', (_id, error) => {
-          console.log('Audio Player Load Error ', error);
-        });
-      });
-    } else {
-      console.log('No Transcription Found');
-    }
-  }, [entry]);
-
-  // #region Data Table
-
-  const editModal = () => {
-    if (editingLine) {
-      return (
-        <Modal
-          opened={editingLine !== null}
-          onClose={() => {
-            console.log('Close');
-          }}
-        >
-          Test
-        </Modal>
-      );
-    }
-  };
-
-  //  Documentation -- remove before prod
-  //  https://icflorescu.github.io/mantine-datatable
-  const dataTable = (formatted: formattedVTTLine[]) => {
-    // Generate a data table using Mantine-Datatable
-    if (records) {
-      return (
-        <Box>
-          <DataTable
-            withBorder
-            withColumnBorders
-            striped
-            totalRecords={formatted.length}
-            recordsPerPage={pageSize}
-            page={page}
-            onPageChange={(p) => setPage(p)}
-            records={records} // {}type formattedVTTLine = {key: string;start: number;end: number;duration: number;text: string;};
-            columns={[
-              // Play button column
-              {
-                title: 'Play',
-                accessor: 'key',
-                width: 50,
-                textAlignment: 'center',
-                render: (line) => {
-                  return (
-                    <ActionIcon
-                      onClick={() => {
-                        if (formatted) {
-                          // If the line is not null
-                          if (!line) return;
-
-                          // If the Audio Player is not null
-                          if (!audioPlayer) return;
-
-                          // If current line is playing then stop it
-                          if (currentLine === line) {
-                            audioPlayer.stop();
-                            setCurrentLine(null);
-                            return;
-                          }
-
-                          // Set the current line
-                          setCurrentLine(line);
-
-                          // The amount of padding to add to the start and end of the line
-                          const playBackPadding = audioPadding as number;
-
-                          // The start time of the line after accounting for padding
-                          const computedLineStart = Math.max(line.start / 1000 - playBackPadding, 0);
-
-                          // The end time of the line after accounting for padding
-                          const computedLineEnd = Math.min(line.end / 1000 + playBackPadding, audioPlayer.duration());
-
-                          // Logging for debugging
-                          console.log('Computed Line Start: ', computedLineStart);
-                          console.log('Computed Line End: ', computedLineEnd);
-
-                          // Cancel timeouts for the current line
-                          timeOutList.forEach((timeout) => {
-                            clearTimeout(timeout);
-                          });
-
-                          // Cancel intervals
-                          if (intervalNode) {
-                            clearInterval(intervalNode);
-                          }
-
-                          setLineAudioProgress(0);
-                          audioPlayer.unload();
-                          audioPlayer.play();
-                          audioPlayer.seek(computedLineStart);
-
-                          //Every time 5% of the line is played update the progress bar setLineAudioProgress
-                          const interval = setInterval(() => {
-                            const currentTime = audioPlayer.seek(); //in seconds
-                            const progress = (currentTime - computedLineStart) / (computedLineEnd - computedLineStart);
-                            setLineAudioProgress(progress * 100);
-                          }, 50);
-                          setIntervalNode(interval);
-
-                          //stop audio after it finishes
-                          const timeout = setTimeout(() => {
-                            audioPlayer.stop();
-                            setCurrentLine(null);
-                            clearInterval(interval);
-                          }, (computedLineEnd - computedLineStart) * 1000);
-                          setTimeOutList([...timeOutList, timeout]);
-                        }
-                      }}
-                    >
-                      {currentLine === line ? <IconPlayerStop /> : <IconPlayerPlay />}
-                    </ActionIcon>
-                  );
-                }
-              },
-              // Title column
-              {
-                accessor: 'text',
-                title: 'Text'
-              },
-              // Time range column
-              {
-                accessor: 'start',
-                title: 'Time',
-                width: 120,
-                render: ({ start, end }) => {
-                  return (
-                    <Text align="center">
-                      {String(Math.floor(start / 1000 / 60)).padStart(2, '0')}:
-                      {String(Math.floor(start / 1000) % 60).padStart(2, '0')}-
-                      {String(Math.floor(end / 1000 / 60)).padStart(2, '0')}:
-                      {String(Math.floor(end / 1000) % 60).padStart(2, '0')}
-                    </Text>
-                  );
-                }
-              },
-              // Duration Columns
-              {
-                accessor: 'duration',
-                title: 'Length',
-                textAlignment: 'center',
-                width: 70,
-
-                render: ({ duration }) => {
-                  return (
-                    <Text>
-                      {/* {String(Math.floor(duration / 1000 / 60)).padStart(2, '0')}: */}
-                      {String(Math.floor(duration / 1000) % 60)}s
-                    </Text>
-                  );
-                }
-              },
-              // Action Column
-              {
-                accessor: 'actions',
-                title: 'Actions',
-                textAlignment: 'center',
-                width: 80,
-
-                render: (line) => {
-                  return (
-                    <Group spacing={4} position="right" noWrap>
-                      <ActionIcon
-                        color="blue"
-                        onClick={() => {
-                          setEditingLine(line);
-                          editModal();
-                        }}
-                      >
-                        <IconEdit size={16} />
-                      </ActionIcon>
-                      <ActionIcon color="red" onClick={() => console.log('delete')} disabled>
-                        {/* HACK: Delete is disabled until a way to sync changes is complete */}
-                        <IconTrash size={16} />
-                      </ActionIcon>
-                    </Group>
-                  );
-                }
-              }
-            ]}
-            idAccessor="key"
-          />
-        </Box>
-      );
-    }
-  };
-
-  // If an entry has not been passed in
-  if (!entry) {
-    return <Text>Entry Not Found</Text>;
+  if (entry && transcription && lines && audioURL && audioPlayer) {
+    return <EntryTable entry={entry} audioPlayer={audioPlayer} />;
   }
 
-  // If the entry has been passed in, but its transcription is currently being run
-  if (entry && transcribingStatus.entry?.config.uuid === entry.config.uuid && transcribingStatus.status === 'loading') {
+  if (entry && transcribingStatus.entry?.uuid === entry.uuid && transcribingStatus.status === 'loading') {
     return (
       <Stack align={'center'} justify="center" style={{ height: '80%' }}>
         <Title order={3}>Transcribing</Title>
@@ -435,8 +182,7 @@ function EntryEditor() {
     );
   }
 
-  // If an entry has been passed in but it does not have a transcription
-  if (entry && !entry.transcriptions[0]) {
+  if (entry && !transcription) {
     return (
       <Stack align={'center'} justify="center" style={{ height: '80%' }}>
         <Title order={3}>No Transcription Found</Title>
@@ -451,7 +197,7 @@ function EntryEditor() {
           }}
           color="violet"
           variant="outline"
-          disabled={transcribing.status === 'loading'}
+          disabled={transcribingStatus.status === 'loading'}
         >
           {strings.util.buttons?.transcribe}
         </Button>
@@ -459,55 +205,42 @@ function EntryEditor() {
     );
   }
 
-  // If an entry has been passed in and it has a transcription but the audio player is not ready
-  if (!audioPlayer) {
+  // Fallback States if something goes wrong
+  if (!entry && !loading) {
     return (
       <Stack align={'center'} justify="center" style={{ height: '80%' }}>
-        <Title order={3}>Loading</Title>
-        <Loader />
+        <Title order={3}>No Entry Found</Title>
       </Stack>
     );
-  }
-
-  // If an entry has been passed in and it has a transcription and the audio player is ready
-  if (entry && entry.transcriptions[0] && entry.transcriptions[0].data) {
+  } else if (!transcription && !loading) {
     return (
-      <>
-        <Title mt={'md'} align="center">
-          {entry.config.name}
-        </Title>
-        <Group position="apart">
-          <NumberInput
-            style={{
-              minWidth: '200px',
-              width: '20%'
-            }}
-            label="Lines Per Page"
-            value={pageSize}
-            onChange={(value) => {
-              value && setPageSize(value);
-            }}
-            min={10}
-            max={120}
-            step={5}
-            mb={'md'}
-          />
-
-          {formattedVTTLines[formattedVTTLines.length - 1].end && (
-            <Text align="center" color="gray">
-              {`Length of Audio: `}
-              <Text span>
-                {String(Math.floor(formattedVTTLines[formattedVTTLines.length - 1].end / 1000 / 60)).padStart(2, '0')}:
-                {String(Math.floor(formattedVTTLines[formattedVTTLines.length - 1].end / 1000) % 60).padStart(2, '0')}
-              </Text>
-            </Text>
-          )}
-        </Group>
-        {records && dataTable(formattedVTTLines)}
-
-        {/* {false && transcriptionTable(formattedVTTLines)} */}
-        {audioControls}
-      </>
+      <Stack align={'center'} justify="center" style={{ height: '80%' }}>
+        <Title order={3}>Transcription Not Found</Title>
+      </Stack>
+    );
+  } else if (!lines && !loading) {
+    return (
+      <Stack align={'center'} justify="center" style={{ height: '80%' }}>
+        <Title order={3}>Lines Not Found</Title>
+      </Stack>
+    );
+  } else if (!audioURL && !loading) {
+    return (
+      <Stack align={'center'} justify="center" style={{ height: '80%' }}>
+        <Title order={3}>Audio URL Not Found</Title>
+      </Stack>
+    );
+  } else if (!audioPlayer && !loading) {
+    return (
+      <Stack align={'center'} justify="center" style={{ height: '80%' }}>
+        <Title order={3}>Audio Player Not Found</Title>
+      </Stack>
+    );
+  } else {
+    return (
+      <Stack align={'center'} justify="center" style={{ height: '80%' }}>
+        <Loader variant="dots" />
+      </Stack>
     );
   }
 }

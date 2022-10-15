@@ -5,15 +5,15 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Redux
-import { entry } from '../../../../electron/types/types';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 
 // Localization
 import strings from '../../../localization';
 
 import { passToWhisper, selectTranscribingStatus } from '../../whisper/whisperSlice';
+import { ReduxEntry } from '../entrySlice';
 
-function TranscriptionCard({ entry }: { entry: entry }) {
+function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
@@ -30,16 +30,16 @@ function TranscriptionCard({ entry }: { entry: entry }) {
       <>
         <Button
           onClick={() => {
-            navigate(`/entries/${entry.config.uuid}`);
+            console.log('export button');
           }}
-          color="green"
+          color="green.6"
           variant="outline"
         >
           {strings.util.buttons?.export}
         </Button>
         <Button
           onClick={() => {
-            navigate(`/entries/${entry.config.uuid}`);
+            navigate(`/entries/${entry.uuid}`);
           }}
           color="primary"
           variant="outline"
@@ -53,7 +53,7 @@ function TranscriptionCard({ entry }: { entry: entry }) {
           }}
           color="red"
           variant="outline"
-          disabled={transcribing.status === 'loading' && transcribing.entry?.config.uuid === entry.config.uuid}
+          disabled={transcribing.status === 'loading' && transcribing.entry?.uuid === entry.uuid}
         >
           {strings.util.buttons?.delete}
         </Button>
@@ -71,7 +71,7 @@ function TranscriptionCard({ entry }: { entry: entry }) {
         >
           {strings.util.buttons?.transcribe}
         </Button>
-        {transcribing.status === 'loading' && transcribing.entry?.config.uuid === entry.config.uuid ? (
+        {transcribing.status === 'loading' && transcribing.entry?.uuid === entry.uuid ? (
           // Cancel button
           <Button
             onClick={() => {
@@ -79,7 +79,7 @@ function TranscriptionCard({ entry }: { entry: entry }) {
             }}
             color="red"
             variant="outline"
-            disabled={transcribing.status === 'loading' && transcribing.entry?.config.uuid !== entry.config.uuid}
+            disabled={transcribing.status === 'loading' && transcribing.entry?.uuid !== entry.uuid}
           >
             {strings.util.buttons?.cancel}
           </Button>
@@ -91,7 +91,7 @@ function TranscriptionCard({ entry }: { entry: entry }) {
             }}
             color="red"
             variant="outline"
-            disabled={transcribing.status === 'loading' && transcribing.entry?.config.uuid === entry.config.uuid}
+            disabled={transcribing.status === 'loading' && transcribing.entry?.uuid === entry.uuid}
           >
             {strings.util.buttons?.delete}
           </Button>
@@ -100,7 +100,7 @@ function TranscriptionCard({ entry }: { entry: entry }) {
     );
 
   const icon =
-    transcribing?.entry?.config.uuid === entry.config.uuid ? (
+    transcribing?.entry?.uuid === entry?.uuid ? (
       <Loader /> // If the entry is currently being transcribed, show a loading icon
     ) : entry.transcriptions.length > 0 ? (
       <IconFileCheck color={'green'} size={40} />
@@ -115,24 +115,19 @@ function TranscriptionCard({ entry }: { entry: entry }) {
       <Grid grow align={'center'}>
         <Grid.Col span={isMobile ? 12 : 8} style={{ height: '100%' }}>
           <Stack justify={'center'}>
-            <Group>
+            <Group noWrap>
               {icon}
               {/* Loader */}
 
               {/* Title */}
               <Stack>
-                <Text
-                  size={'lg'}
-                  weight={700}
-                  style={{ textOverflow: 'ellipsis', wordBreak: 'break-all', overflow: 'hidden' }}
-                >
-                  {entry.config.name}
+                <Text size={'lg'} weight={700} style={{ wordBreak: 'break-word', overflow: 'clip' }}>
+                  {entry.name}
                 </Text>
                 {/* Added */}
 
                 <Text span weight={500}>
-                  {new Date(entry.config.created).toDateString()} -{' '}
-                  {new Date(entry.config.created).toLocaleTimeString()}
+                  {new Date(entry.created).toDateString()} - {new Date(entry.created).toLocaleTimeString()}
                 </Text>
               </Stack>
             </Group>

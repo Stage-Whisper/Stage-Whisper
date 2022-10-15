@@ -25,7 +25,11 @@ function Debug() {
   const darkMode = useAppSelector(selectDarkMode);
 
   const handleDeleteStore = async () => {
-    window.Main.deleteStore();
+    try {
+      await window.Main.deleteStore();
+    } catch (e) {
+      console.error(e);
+    }
   };
   const showMenu = useAppSelector(selectDebugMenu);
 

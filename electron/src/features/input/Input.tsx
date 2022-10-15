@@ -4,7 +4,7 @@ import React from 'react';
 
 // Components
 // import Model from './components/model/Model';
-import Audio, { AudioType } from './components/audio/Audio';
+import Audio, { AudioUtilityType } from './components/audio/Audio';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
@@ -26,10 +26,10 @@ import { useNavigate } from 'react-router-dom';
 
 import strings from '../../localization';
 import { getLocalFiles } from '../entries/entrySlice';
-import About, { AboutType } from './components/about/About';
+import About, { AboutUtilityType } from './components/about/About';
 import { WhisperArgs } from '../../../electron/types/whisperTypes';
 import SimpleInput from './components/audio/SimpleInput';
-import { entryAudioParams } from '../../../electron/types/types';
+import { Entry } from 'knex/types/tables';
 
 function Input() {
   // Redux
@@ -54,31 +54,26 @@ function Input() {
     audio,
     language
   }: {
-    about: AboutType;
-    audio: AudioType;
+    about: AboutUtilityType;
+    audio: AudioUtilityType;
     language: WhisperArgs['language'];
   }) => {
-    if (audio.path && audio.name && language && about.name) {
+    if (audio.audio_path && audio.audio_name && language && about.name) {
       console.log('Input: All selections made');
       dispatch(setHighlightInvalid(false));
       dispatch(setSubmitting(true));
 
       // Convert audio type string to valid entryAudioParams type
-      const audioType = audio.type?.split('/')[1] as entryAudioParams['type'];
+      const audioType = audio.audio_type?.split('/')[1] as Entry['audio_type'];
 
       await window.Main.newEntry({
         // TODO: #51 Convert to redux action
-        filePath: audio.path,
-        audio: {
-          name: audio.name,
-          type: audioType,
-          language: language
-        },
-        config: {
-          name: about.name,
-          description: about.description || '',
-          tags: about.tags || []
-        }
+        filePath: audio.audio_path,
+        name: about.name,
+        audio_name: audio.audio_name,
+        description: about.description,
+        audio_type: audioType,
+        audio_language: language
       })
         .then((result) => {
           // If the submission was successful

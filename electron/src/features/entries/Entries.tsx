@@ -1,4 +1,4 @@
-import { Card, Stack } from '@mantine/core';
+import { Stack } from '@mantine/core';
 import React, { useState } from 'react';
 
 // Redux
@@ -21,7 +21,7 @@ function Entries() {
       <FilterSettings entries={entries} setEntries={setSortedEntries}></FilterSettings>
 
       {sortedEntries.map((entry) => {
-        return <EntryCard key={entry.config.uuid} entry={entry} />;
+        return <EntryCard key={entry.uuid} entry={entry} />;
       })}
     </Stack>
   );
