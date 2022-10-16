@@ -38,8 +38,9 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
           color="green.6"
           variant="outline"
         >
-          Desktop
-          {strings.util.buttons?.export}
+          Export to Desktop
+          {/* Desktop */}
+          {/* {strings.util.buttons?.export} */}
         </Button>
         <Button
           onClick={() => {
@@ -127,7 +128,7 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
     transcribing?.entry?.uuid === entry?.uuid ? (
       <Loader /> // If the entry is currently being transcribed, show a loading icon
     ) : entry.transcriptions.length > 0 ? (
-      <IconFileCheck color={'green'} size={40} />
+      <IconFileCheck size={40} />
     ) : (
       // If the entry has no transcriptions, show a
       <IconFileDescription size={40} /> // If the entry has transcriptions, show a file description icon
@@ -164,7 +165,7 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
         <Grid.Col span={isMobile ? 12 : 3}>
           {/* Buttons */}
           <Center style={{ width: '100%' }}>
-            {isMobile ? <Group>{buttons}</Group> : <Stack style={{ width: '90%' }}>{buttons}</Stack>}
+            {isMobile ? <Group noWrap>{buttons}</Group> : <Stack style={{ width: '90%' }}>{buttons}</Stack>}
           </Center>
         </Grid.Col>
       </Grid>
