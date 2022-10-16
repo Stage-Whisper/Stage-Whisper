@@ -19,7 +19,7 @@ import asap_italic from './assets/fonts/asap/asap-v24-latin-ext_latin-italic.wof
 // electron/src/assets/fonts/asap/asap-v24-latin-ext_latin-regular.woff2
 import asap from './assets/fonts/asap/asap-v24-latin-ext_latin-regular.woff2';
 
-function StyleOverride() {
+function Styling() {
   return (
     <Global
       styles={[
@@ -92,4 +92,4 @@ function StyleOverride() {
   );
 }
 
-export default StyleOverride;
+export default Styling;

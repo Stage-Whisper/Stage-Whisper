@@ -7,6 +7,7 @@ import { WhisperArgs } from './types/whisperTypes';
 
 import { RunWhisperResponse } from './handlers/runWhisper/runWhisper';
 import { QUERY, QueryArgs, QueryReturn } from './types/queries';
+import { ExportTranscriptionResponse } from './handlers/exportTranscription/exportTranscription';
 
 declare global {
   interface Window {
@@ -27,6 +28,20 @@ const api = {
       return audioUint8Array;
     } catch (error) {
       throw new Error(`Preload: Error reading audio file: ${error}`);
+    }
+  },
+
+  // Export Transcription to file
+  exportTranscription: async (
+    transcriptionUUID: string,
+    entry: Entry,
+    outputDir?: string
+  ): Promise<ExportTranscriptionResponse> => {
+    try {
+      const result = await ipcRenderer.invoke(Channels.exportTranscription, transcriptionUUID, entry, outputDir);
+      return result;
+    } catch (error) {
+      throw new Error(`Preload: Error exporting transcription: ${error}`);
     }
   },
 

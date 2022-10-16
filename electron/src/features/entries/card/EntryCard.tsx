@@ -22,7 +22,7 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
   const transcribing = useAppSelector(selectTranscribingStatus);
 
   // Detect mobile view
-  const isMobile = useMediaQuery('(max-width: 600px)');
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const buttons =
     entry.transcriptions.length > 0 ? (
@@ -30,11 +30,14 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
       <>
         <Button
           onClick={() => {
-            console.log('export button');
+            // Get the latest transcription
+            const transcription = entry.transcriptions[entry.transcriptions.length - 1];
+            window.Main.exportTranscription(transcription.uuid, entry);
           }}
           color="green.6"
           variant="outline"
         >
+          Desktop
           {strings.util.buttons?.export}
         </Button>
         <Button

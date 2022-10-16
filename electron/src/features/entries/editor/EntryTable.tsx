@@ -139,13 +139,24 @@ function EntryTable({ audioPlayer, entry }: { audioPlayer: Howl; entry: Entry })
             // Time range column
             {
               accessor: 'start',
-              title: 'Time',
-              width: 120,
-              render: ({ start, end }) => {
+              title: 'Start',
+              width: 80,
+              render: ({ start }) => {
                 return (
                   <Text align="center">
                     {String(Math.floor(start / 1000 / 60)).padStart(2, '0')}:
-                    {String(Math.floor(start / 1000) % 60).padStart(2, '0')}-
+                    {String(Math.floor(start / 1000) % 60).padStart(2, '0')}
+                  </Text>
+                );
+              }
+            },
+            {
+              accessor: 'start',
+              title: 'End',
+              width: 80,
+              render: ({ end }) => {
+                return (
+                  <Text align="center">
                     {String(Math.floor(end / 1000 / 60)).padStart(2, '0')}:
                     {String(Math.floor(end / 1000) % 60).padStart(2, '0')}
                   </Text>

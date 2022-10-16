@@ -1,7 +1,7 @@
 import { Card, Center, Divider, Group, Stack, Text, Title } from '@mantine/core';
 import React from 'react';
 import strings from '../../localization';
-import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { useAppSelector } from '../../redux/hooks';
 import { selectEntries } from '../entries/entrySlice';
 import { selectTranscribingStatus } from '../whisper/whisperSlice';
 
