@@ -11,6 +11,10 @@ import { QUERY, QueryArgs, QueryReturn } from '../../types/queries';
 // This file is very long and has a lot of types. This is to allow for communication via IPC between the main process and the renderer process.
 // Inputs, outputs, and types are all defined here. This file is also responsible for the actual querying of the database and handling of the data.
 
+// README 2
+// This file has many functions that aren't all used. This is to allow for future expansion of the database and queries.
+// Some of the functionality is being handled in dedicated handler files, a decision will be made later on whether to keep this or not.
+
 console.log('queryDatabase.ts: Loading...');
 
 // CRUD Functions
