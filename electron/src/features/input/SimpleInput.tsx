@@ -3,8 +3,8 @@ import { Dropzone } from '@mantine/dropzone';
 import { IconCheckbox, IconUpload, IconX } from '@tabler/icons';
 import { Entry } from 'knex/types/tables';
 import React from 'react';
-import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
-import { selectAudio, setAudioValid, setSimpleAudioInput } from '../../inputSlice';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import { selectAudio, setAudioValid, setSimpleAudioInput } from './inputSlice';
 // Card with file picker that allows user to select a file from their computer
 function SimpleInput() {
   // Redux

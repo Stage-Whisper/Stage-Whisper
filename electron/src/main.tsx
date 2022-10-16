@@ -13,8 +13,8 @@ import { Provider } from 'react-redux';
 import { setupStore } from './redux/store';
 
 import About from './features/about/About';
-import Entries from './features/entries/Entries';
-import EntryEditor from './features/entries/EntryEditor';
+import Entries from './features/entries/EntryList';
+import EntryEditor from './features/entries/editor/EntryEditor';
 import Settings from './features/settings/Settings';
 import { ModalsProvider } from '@mantine/modals';
 

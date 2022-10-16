@@ -5,8 +5,8 @@ import React, { useState } from 'react';
 import { useAppSelector } from '../../redux/hooks';
 
 // Components
-import EntryCard from './components/EntryCard';
-import FilterSettings from './components/FilterSettings';
+import EntryCard from './card/EntryCard';
+import FilterSettings from './card/FilterSettings';
 import { selectEntries } from './entrySlice';
 
 // Component for displaying entry progress / results

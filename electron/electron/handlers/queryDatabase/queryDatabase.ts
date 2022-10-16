@@ -11,6 +11,10 @@ import { QUERY, QueryArgs, QueryReturn } from '../../types/queries';
 // This file is very long and has a lot of types. This is to allow for communication via IPC between the main process and the renderer process.
 // Inputs, outputs, and types are all defined here. This file is also responsible for the actual querying of the database and handling of the data.
 
+// README 2
+// This file has many functions that aren't all used. This is to allow for future expansion of the database and queries.
+// Some of the functionality is being handled in dedicated handler files, a decision will be made later on whether to keep this or not.
+
 console.log('queryDatabase.ts: Loading...');
 
 // CRUD Functions
@@ -76,9 +80,11 @@ ipcMain.handle(QUERY.GET_ENTRY_COUNT, async (): QueryReturn[QUERY.GET_ENTRY_COUN
 
 // Get Line
 ipcMain.handle(QUERY.GET_LINE, async (_event: invoke, args: QueryArgs[QUERY.GET_LINE]): QueryReturn[QUERY.GET_LINE] => {
-  const { lineUUID } = args;
-  const line = (await db('lines').where({ uuid: lineUUID }).first()) as Line;
-  return line;
+  const { index, transcriptionUUID } = args;
+  const line = (await db('lines').where({ index, transcription: transcriptionUUID })) as Line[];
+
+  // Return the line with the highest version number
+  return line.reduce((prev, curr) => (prev.version > curr.version ? prev : curr));
 });
 
 // Get Line Count
@@ -153,8 +159,6 @@ ipcMain.handle(
       .orderBy('index', 'asc')
       .orderBy('version', 'desc')) as Line[];
 
-    console.log('line length:' + lines.length);
-
     // Get the line at each index which has the highest version
     const latestLines = lines.reduce((acc: Line[], line: Line) => {
       if (acc.length === 0) {
@@ -173,8 +177,6 @@ ipcMain.handle(
       return acc;
     }, []);
 
-    console.log('latest line length:' + latestLines.length);
-
     // Remove lines that have been deleted
     const filteredLinesWithoutDeleted = latestLines.filter((line) => {
       if (line.deleted) {
@@ -184,7 +186,6 @@ ipcMain.handle(
       }
     });
 
-    console.log('filtered line length:' + filteredLinesWithoutDeleted.length);
     return filteredLinesWithoutDeleted;
   }
 );
@@ -204,6 +205,7 @@ ipcMain.handle(
   ): QueryReturn[QUERY.GET_ALL_TRANSCRIPTIONS_FOR_ENTRY] => {
     const { entryUUID } = args;
     const transcriptions = (await db('transcriptions').where({ entry: entryUUID })) as Transcription[];
+
     return transcriptions;
   }
 );
@@ -267,6 +269,23 @@ ipcMain.handle(
         return acc;
       }
     }, dbLines[0]);
+
+    // Remove lines with version number higher than the lowest version number
+    const linesToDelete = dbLines.filter((line) => {
+      if (line.version > lowestVersionLine.version) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+    // Delete the lines
+    await db('lines')
+      .whereIn(
+        'uuid',
+        linesToDelete.map((line) => line.uuid)
+      )
+      .del();
 
     // Set the deleted flag to false
     const updatedLine = {

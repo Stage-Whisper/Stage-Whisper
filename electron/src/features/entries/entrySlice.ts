@@ -5,9 +5,17 @@ import { RootState } from '../../redux/store';
 
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { WhisperArgs } from '../../../electron/types/whisperTypes';
 import { Entry, Line, Transcription } from 'knex/types/tables';
 import { RunWhisperResponse } from '../../../electron/handlers/runWhisper/runWhisper';
+import { WhisperArgs } from '../../../electron/types/whisperTypes';
+
+export interface ReduxEntry extends Entry {
+  transcriptions: Transcription[];
+}
+
+export interface ReduxEntry extends Entry {
+  transcriptions: Transcription[];
+}
 
 export interface ReduxEntry extends Entry {
   transcriptions: Transcription[];
@@ -18,7 +26,7 @@ export interface entryState {
   activeEntry: string | null;
   get_files_status: 'idle' | 'loading' | 'succeeded' | 'failed' | 'not_found';
   trigger_whisper_status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  lines: Line[];
+  activeLines: Line[];
 }
 
 const initialState: entryState = {
@@ -27,7 +35,7 @@ const initialState: entryState = {
   // Thunk State for accessing local files via electron
   get_files_status: 'idle',
   trigger_whisper_status: 'idle',
-  lines: []
+  activeLines: []
 };
 
 // Thunk for loading the transcriptions from the database
@@ -37,7 +45,6 @@ export const getLocalFiles = createAsyncThunk(
     // Set Input State to loading
     const entryResult = (await window.Main.GET_ALL_ENTRIES()) as Entry[];
     const transResult = (await window.Main.GET_ALL_TRANSCRIPTIONS()) as Transcription[];
-
     // Attach transcriptions to entries
     const entries = entryResult.map((entry): ReduxEntry => {
       const transcriptions = transResult.filter((transcription) => transcription.entry === entry.uuid);
@@ -48,6 +55,22 @@ export const getLocalFiles = createAsyncThunk(
       return { entries };
     } else {
       return { error: 'Error loading database' };
+    }
+  }
+);
+
+export const fetchLineAsync = createAsyncThunk(
+  'entries/fetchLine',
+  async (args: { line: Line }): Promise<{ line: Line }> => {
+    const { line } = args;
+    const lineResult = (await window.Main.GET_LINE({
+      index: line.index,
+      transcriptionUUID: line.transcription
+    })) as Line;
+    if (lineResult) {
+      return { line: lineResult };
+    } else {
+      throw new Error('Error loading line');
     }
   }
 );
@@ -85,27 +108,37 @@ export const entrySlice = createSlice({
       }
     },
     setLines: (state, action: PayloadAction<Line[]>) => {
-      state.lines = action.payload;
+      state.activeLines = action.payload;
     }
   },
   extraReducers(builder) {
     // Thunk for loading the transcriptions from the database
     builder.addCase(getLocalFiles.pending, (state) => {
-      console.log('Getting Local Files: Pending');
       state.get_files_status = 'loading';
     });
     builder.addCase(getLocalFiles.fulfilled, (state, action) => {
-      console.log('Getting Local Files: Fulfilled');
-      console.log('action.payload', action.payload);
       if (action.payload.entries) {
         state.entries = action.payload.entries;
-        console.log('state.entries', state.entries);
       }
       state.get_files_status = 'succeeded';
     });
     builder.addCase(getLocalFiles.rejected, (state) => {
-      console.log('Getting Local Files: Rejected');
       state.get_files_status = 'idle';
+    });
+
+    // Get Line Cases
+    builder.addCase(fetchLineAsync.pending, () => {
+      console.log('fetchLine: Pending');
+    });
+    builder.addCase(fetchLineAsync.fulfilled, (state, action) => {
+      console.log('fetchLine: Fulfilled');
+
+      const { line } = action.payload;
+      const lineIndex = state.activeLines.findIndex((l) => l.index === line.index);
+      if (lineIndex !== -1) {
+        const arrayIndex = state.activeLines.findIndex((l) => l.index === line.index);
+        state.activeLines[arrayIndex] = line;
+      }
     });
   }
 });
@@ -116,7 +149,7 @@ export const { setActiveEntry, setLines } = entrySlice.actions;
 export const selectEntries = (state: RootState) => state.entries.entries;
 export const selectActiveEntry = (state: RootState) => state.entries.activeEntry;
 export const selectNumberOfEntries = (state: RootState) => state.entries.entries.length;
-export const selectLines = (state: RootState) => state.entries.lines;
+export const selectActiveLines = (state: RootState) => state.entries.activeLines;
 
 // Export the reducer
 export default entrySlice.reducer;

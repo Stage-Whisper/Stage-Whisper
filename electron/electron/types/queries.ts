@@ -43,7 +43,7 @@ export type QueryArgs = {
   [QUERY.UPDATE_TRANSCRIPTION]: { transcription: Transcription };
   [QUERY.GET_ENTRY]: { entryUUID: string };
   [QUERY.GET_ENTRY_COUNT]: null;
-  [QUERY.GET_LINE]: { lineUUID: number };
+  [QUERY.GET_LINE]: { index: number; transcriptionUUID: string };
   [QUERY.GET_LINE_COUNT]: { transcriptionUUID: string };
   [QUERY.GET_TRANSCRIPTION]: { transcriptionUUID: string };
   [QUERY.GET_TRANSCRIPTION_COUNT]: null;

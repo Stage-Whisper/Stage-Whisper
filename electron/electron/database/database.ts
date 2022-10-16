@@ -41,7 +41,16 @@ export const validAudioTypes = [
   'tta',
   'voc',
   'wv',
-  'webm'
+  'webm',
+  'x-m4a',
+  'x-ms-wma',
+  'x-wav',
+  'x-flac',
+  'x-matroska',
+  'x-mpegurl',
+  'x-ms-asf',
+  'x-ms-wax',
+  'x-ms-wvx'
 ];
 
 // List of possible entry statuses

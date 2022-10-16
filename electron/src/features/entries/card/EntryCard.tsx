@@ -11,7 +11,8 @@ import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import strings from '../../../localization';
 
 import { passToWhisper, selectTranscribingStatus } from '../../whisper/whisperSlice';
-import { ReduxEntry } from '../entrySlice';
+import { getLocalFiles, ReduxEntry } from '../entrySlice';
+import { Entry } from 'knex/types/tables';
 
 function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
   const dispatch = useAppDispatch();
@@ -22,7 +23,7 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
   const transcribing = useAppSelector(selectTranscribingStatus);
 
   // Detect mobile view
-  const isMobile = useMediaQuery('(max-width: 600px)');
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const buttons =
     entry.transcriptions.length > 0 ? (
@@ -30,12 +31,16 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
       <>
         <Button
           onClick={() => {
-            navigate(`/entries/${entry.uuid}`);
+            // Get the latest transcription
+            const transcription = entry.transcriptions[entry.transcriptions.length - 1];
+            window.Main.exportTranscription(transcription.uuid, entry);
           }}
-          color="green"
+          color="green.6"
           variant="outline"
         >
-          {strings.util.buttons?.export}
+          Export to Desktop
+          {/* Desktop */}
+          {/* {strings.util.buttons?.export} */}
         </Button>
         <Button
           onClick={() => {
@@ -48,8 +53,18 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
         </Button>
 
         <Button
-          onClick={() => {
-            console.log('Delete');
+          onClick={async () => {
+            try {
+              const normalizedEntry = (await window.Main.GET_ENTRY({ entryUUID: entry.uuid })) as Entry;
+              if (!normalizedEntry) throw new Error('Entry not found');
+              await window.Main.deleteEntry(normalizedEntry).then(() => {
+                console.log('Deleted: Reloading local files');
+                dispatch(getLocalFiles());
+              });
+            } catch (e) {
+              console.log('Error deleting entry', e);
+              console.log(e);
+            }
           }}
           color="red"
           variant="outline"
@@ -86,8 +101,18 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
         ) : (
           // Delete button
           <Button
-            onClick={() => {
-              console.log('Delete');
+            onClick={async () => {
+              try {
+                const normalizedEntry = (await window.Main.GET_ENTRY({ entryUUID: entry.uuid })) as Entry;
+                if (!normalizedEntry) throw new Error('Entry not found');
+                await window.Main.deleteEntry(normalizedEntry).then(() => {
+                  console.log('Deleted: Reloading local files');
+                  dispatch(getLocalFiles());
+                });
+              } catch (e) {
+                console.log('Error deleting entry', e);
+                console.log(e);
+              }
             }}
             color="red"
             variant="outline"
@@ -103,7 +128,7 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
     transcribing?.entry?.uuid === entry?.uuid ? (
       <Loader /> // If the entry is currently being transcribed, show a loading icon
     ) : entry.transcriptions.length > 0 ? (
-      <IconFileCheck color={'green'} size={40} />
+      <IconFileCheck size={40} />
     ) : (
       // If the entry has no transcriptions, show a
       <IconFileDescription size={40} /> // If the entry has transcriptions, show a file description icon
@@ -115,17 +140,13 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
       <Grid grow align={'center'}>
         <Grid.Col span={isMobile ? 12 : 8} style={{ height: '100%' }}>
           <Stack justify={'center'}>
-            <Group>
+            <Group noWrap>
               {icon}
               {/* Loader */}
 
               {/* Title */}
               <Stack>
-                <Text
-                  size={'lg'}
-                  weight={700}
-                  style={{ textOverflow: 'ellipsis', wordBreak: 'break-all', overflow: 'hidden' }}
-                >
+                <Text size={'lg'} weight={700} style={{ wordBreak: 'break-word', overflow: 'clip' }}>
                   {entry.name}
                 </Text>
                 {/* Added */}
@@ -144,7 +165,7 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
         <Grid.Col span={isMobile ? 12 : 3}>
           {/* Buttons */}
           <Center style={{ width: '100%' }}>
-            {isMobile ? <Group>{buttons}</Group> : <Stack style={{ width: '90%' }}>{buttons}</Stack>}
+            {isMobile ? <Group noWrap>{buttons}</Group> : <Stack style={{ width: '90%' }}>{buttons}</Stack>}
           </Center>
         </Grid.Col>
       </Grid>

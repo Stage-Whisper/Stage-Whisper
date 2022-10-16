@@ -10,8 +10,15 @@ import { app, BrowserWindow, dialog, ipcMain } from 'electron';
 import isDev from 'electron-is-dev';
 import { existsSync, readFile } from 'fs';
 import { Channels, OpenDirectoryDialogResponse } from './types/channels';
-
 import { initializeApp } from './app/initializeApp';
+
+// Icons
+
+const macIcon = join(__dirname, 'assets/icons/color/Icon - AppSVG.svg');
+const otherIcon = join(__dirname, 'assets/icons/color/Icon - Full Colour512.png');
+
+console.log('Starting Electron...');
+console.log(__dirname);
 
 // Electron Defaults
 const height = 600;
@@ -49,7 +56,22 @@ function createWindow() {
     fullscreenable: true,
     webPreferences: {
       preload: join(__dirname, 'preload.js')
-    }
+    },
+
+    // Check if on a mac or other OS
+    icon: (() => {
+      // TODO: This requires building before changes are reflected, will need to be tested
+      if (process.platform === 'darwin') {
+        console.log("~I'm a mac~");
+        return macIcon;
+      } else if (process.platform === 'win32') {
+        console.log("~I'm a pc~");
+        return otherIcon;
+      } else {
+        console.log("~I'm a linux (probably)~");
+        return otherIcon;
+      }
+    })()
   });
 
   const port = process.env.PORT || 3000;
@@ -112,3 +134,5 @@ import './handlers/runWhisper/runWhisper'; // Run whisper model
 import './types/whisperTypes'; // Types for whisper model
 import './handlers/deleteStore/deleteStore'; // Non functional for the moment
 import './handlers/queryDatabase/queryDatabase'; // Handle database functions
+import './handlers/exportTranscription/exportTranscription'; // Export transcription to file
+import './handlers/deleteEntry/deleteEntry'; // Delete entry from database
