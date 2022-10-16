@@ -135,3 +135,4 @@ import './types/whisperTypes'; // Types for whisper model
 import './handlers/deleteStore/deleteStore'; // Non functional for the moment
 import './handlers/queryDatabase/queryDatabase'; // Handle database functions
 import './handlers/exportTranscription/exportTranscription'; // Export transcription to file
+import './handlers/deleteEntry/deleteEntry'; // Delete entry from database

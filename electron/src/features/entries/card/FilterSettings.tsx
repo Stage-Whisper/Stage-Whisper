@@ -45,19 +45,19 @@ function FilterSettings({
       });
     }
     if (!filter.showCompleted) {
-      console.log('hide completed');
+      // console.log('hide completed');
       filteredEntries = filteredEntries.filter((entry) => {
         return entry.transcriptions.length === 0;
       });
     }
     if (!filter.showNotStarted) {
-      console.log('hide not started');
+      // console.log('hide not started');
       filteredEntries = filteredEntries.filter((entry) => {
         return entry.transcriptions.length > 0;
       });
     }
     if (filter.sortBy === 'time') {
-      console.log('sort by time');
+      // console.log('sort by time');
       filteredEntries = filteredEntries.sort((a, b) => {
         return filter.asc ? a.created - b.created : b.created - a.created;
       });

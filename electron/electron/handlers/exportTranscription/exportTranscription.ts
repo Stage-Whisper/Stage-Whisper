@@ -12,7 +12,7 @@ export type ExportTranscriptionResponse = {
 
 // Take a transcription, get its lines, format them and write them to a file
 export default ipcMain.handle(
-  Channels.exportTranscription,
+  Channels.EXPORT_TRANSCRIPTION,
   async (
     _event: IpcMainInvokeEvent,
     transcriptionUUID: string,

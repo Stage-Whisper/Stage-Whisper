@@ -15,10 +15,16 @@ declare global {
     ipcRenderer: typeof ipcRenderer;
   }
 }
-console.log('preload.ts');
+
 const api = {
   // Delete Store -- Used for debugging or if the user wants to reset the app
   deleteStore: () => ipcRenderer.invoke(Channels.DELETE_STORE),
+
+  // Delete Entry
+  deleteEntry: async (entry: Entry): Promise<void> => {
+    await ipcRenderer.invoke(Channels.DELETE_ENTRY, entry);
+    return;
+  },
 
   // Audio file fetcher
   fetchAudioFile: async (audioPath: string): Promise<Uint8Array> => {
@@ -38,7 +44,7 @@ const api = {
     outputDir?: string
   ): Promise<ExportTranscriptionResponse> => {
     try {
-      const result = await ipcRenderer.invoke(Channels.exportTranscription, transcriptionUUID, entry, outputDir);
+      const result = await ipcRenderer.invoke(Channels.EXPORT_TRANSCRIPTION, transcriptionUUID, entry, outputDir);
       return result;
     } catch (error) {
       throw new Error(`Preload: Error exporting transcription: ${error}`);
@@ -74,7 +80,7 @@ const api = {
 
   newEntry: async (args: newEntryArgs): Promise<NewEntryResponse> => {
     // TODO: Switch this to the below methods
-    return (await ipcRenderer.invoke(Channels.newEntry, args)) as NewEntryResponse;
+    return (await ipcRenderer.invoke(Channels.NEW_ENTRY, args)) as NewEntryResponse;
   },
 
   // Database functions using knex
@@ -200,9 +206,6 @@ const api = {
     }
 };
 
-console.log('preload.ts: loaded');
-
-console.log('preload.ts: exposing context   ');
 contextBridge.exposeInMainWorld('Main', api);
 /**
  * Using the ipcRenderer directly in the browser through the contextBridge ist not really secure.

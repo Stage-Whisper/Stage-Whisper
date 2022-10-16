@@ -20,7 +20,7 @@ export type newEntryArgs = {
 };
 
 export default ipcMain.handle(
-  Channels.newEntry,
+  Channels.NEW_ENTRY,
   async (_event: IpcMainInvokeEvent, args: newEntryArgs): Promise<NewEntryResponse> => {
     const rootPath = app.getPath('userData'); // Path to the top level of the data folder
     const storePath = join(rootPath, 'store'); // Path to the store folder
@@ -56,28 +56,22 @@ export default ipcMain.handle(
       throw new Error('Error moving audio file to data folder!');
     }
 
-    // Add entry to database
-    let response: null | Entry = null;
-    try {
-      await db
-        .insert(entry)
-        .into('entries')
-        .then(() => {
-          console.log('NewEntry: Entry added to database!');
-          response = entry;
-        })
-        .catch((error) => {
-          console.error('NewEntry: Error adding entry to database: ' + error + '!');
-          throw new Error('Error adding entry to database!');
-        });
-    } catch (error) {
-      throw new Error('Error adding entry to database' + error + '!');
-    }
+    const response = await db
+      .insert(entry)
+      .into('entries')
+      .then(() => {
+        console.log('NewEntry: Entry added to database!');
+        return { success: true, entry: entry } as { success: boolean; entry: Entry };
+      })
+      .catch((error) => {
+        console.error('NewEntry: Error adding entry to database: ' + error + '!');
+        throw new Error('Error adding entry to database!');
+      });
 
     if (response === null) {
       throw new Error('Error adding entry to database!');
     } else {
-      return response;
+      return { entry: response.entry };
     }
   }
 );

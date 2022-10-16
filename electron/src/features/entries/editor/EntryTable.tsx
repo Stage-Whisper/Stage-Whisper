@@ -151,7 +151,7 @@ function EntryTable({ audioPlayer, entry }: { audioPlayer: Howl; entry: Entry })
               }
             },
             {
-              accessor: 'start',
+              accessor: 'end',
               title: 'End',
               width: 80,
               render: ({ end }) => {

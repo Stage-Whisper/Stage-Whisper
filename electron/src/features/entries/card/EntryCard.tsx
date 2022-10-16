@@ -11,7 +11,8 @@ import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import strings from '../../../localization';
 
 import { passToWhisper, selectTranscribingStatus } from '../../whisper/whisperSlice';
-import { ReduxEntry } from '../entrySlice';
+import { getLocalFiles, ReduxEntry } from '../entrySlice';
+import { Entry } from 'knex/types/tables';
 
 function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
   const dispatch = useAppDispatch();
@@ -51,8 +52,18 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
         </Button>
 
         <Button
-          onClick={() => {
-            console.log('Delete');
+          onClick={async () => {
+            try {
+              const normalizedEntry = (await window.Main.GET_ENTRY({ entryUUID: entry.uuid })) as Entry;
+              if (!normalizedEntry) throw new Error('Entry not found');
+              await window.Main.deleteEntry(normalizedEntry).then(() => {
+                console.log('Deleted: Reloading local files');
+                dispatch(getLocalFiles());
+              });
+            } catch (e) {
+              console.log('Error deleting entry', e);
+              console.log(e);
+            }
           }}
           color="red"
           variant="outline"
@@ -89,8 +100,18 @@ function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
         ) : (
           // Delete button
           <Button
-            onClick={() => {
-              console.log('Delete');
+            onClick={async () => {
+              try {
+                const normalizedEntry = (await window.Main.GET_ENTRY({ entryUUID: entry.uuid })) as Entry;
+                if (!normalizedEntry) throw new Error('Entry not found');
+                await window.Main.deleteEntry(normalizedEntry).then(() => {
+                  console.log('Deleted: Reloading local files');
+                  dispatch(getLocalFiles());
+                });
+              } catch (e) {
+                console.log('Error deleting entry', e);
+                console.log(e);
+              }
             }}
             color="red"
             variant="outline"

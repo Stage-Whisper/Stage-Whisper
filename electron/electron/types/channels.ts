@@ -10,8 +10,9 @@ export enum Channels {
 
   // Database channels
   QUERY_DATABASE = 'query-database', // Loads all entries from the database and returns them
-  newEntry = 'new-entry', // Creates a new entry in the database and returns it
-  exportTranscription = 'export-transcription', // Exports a transcription to a file
+  NEW_ENTRY = 'new-entry', // Creates a new entry in the database and returns it
+  EXPORT_TRANSCRIPTION = 'export-transcription', // Exports a transcription to a file
+  DELETE_ENTRY = 'delete-entry', // Deletes an entry, its transcriptions and lines from the database
 
   // Whisper channels
   runWhisper = 'run-whisper', // Runs the whisper model with given arguments and returns the entry

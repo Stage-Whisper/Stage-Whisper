@@ -106,18 +106,15 @@ export const entrySlice = createSlice({
   extraReducers(builder) {
     // Thunk for loading the transcriptions from the database
     builder.addCase(getLocalFiles.pending, (state) => {
-      console.log('Getting Local Files: Pending');
       state.get_files_status = 'loading';
     });
     builder.addCase(getLocalFiles.fulfilled, (state, action) => {
-      console.log('Getting Local Files: Fulfilled');
       if (action.payload.entries) {
         state.entries = action.payload.entries;
       }
       state.get_files_status = 'succeeded';
     });
     builder.addCase(getLocalFiles.rejected, (state) => {
-      console.log('Getting Local Files: Rejected');
       state.get_files_status = 'idle';
     });
 
