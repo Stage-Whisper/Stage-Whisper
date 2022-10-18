@@ -5,7 +5,7 @@ import { Channels } from '../../types/channels';
 // Take a given audio file path, and return a Uint8Array of the audio file
 
 export default ipcMain.handle(
-  Channels.fetchAudioFile,
+  Channels.FETCH_AUDIO_FILE,
   async (_event: IpcMainInvokeEvent, audioPath: string): Promise<Uint8Array> => {
     try {
       // Get the audio file and convert it to a buffer

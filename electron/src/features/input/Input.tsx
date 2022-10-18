@@ -1,10 +1,10 @@
-import { Alert, Button, Center, LoadingOverlay, Modal, SimpleGrid, Stack, Title } from '@mantine/core';
+import { Alert, Button, Center, LoadingOverlay, Modal, Stack, Title } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import React from 'react';
 
 // Components
 // import Model from './components/model/Model';
-import Audio, { AudioType } from './components/audio/Audio';
+import Audio, { AudioUtilityType } from './components/audio/Audio';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
@@ -24,12 +24,13 @@ import {
 // Localization
 import { useNavigate } from 'react-router-dom';
 
+import { Entry } from 'knex/types/tables';
+import { WhisperArgs } from '../../../electron/types/whisperTypes';
 import strings from '../../localization';
 import { getLocalFiles } from '../entries/entrySlice';
-import About, { AboutType } from './components/about/About';
-import { WhisperArgs } from '../../../electron/types/whisperTypes';
-import SimpleInput from './components/audio/SimpleInput';
-import { entryAudioParams } from '../../../electron/types/types';
+import { passToWhisper, selectTranscribingStatus } from '../whisper/whisperSlice';
+import About, { AboutUtilityType } from './components/about/About';
+import SimpleInput from './SimpleInput';
 
 function Input() {
   // Redux
@@ -39,10 +40,15 @@ function Input() {
   const { about } = useAppSelector(selectAbout);
   const useSimpleInput = useAppSelector(selectUseSimpleInput);
   const navigate = useNavigate();
-  const isMobile = useMediaQuery('(max-width: 600px)');
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  // Temporary state for created entry
+  const [createdEntry, setCreatedEntry] = React.useState<Entry | null>(null);
 
   // Modal
   const { submitting, error, submitted } = useAppSelector(selectSubmittingState);
+
+  const transcribing = useAppSelector(selectTranscribingStatus);
 
   // On page load reset inputs to default
   React.useEffect(() => {
@@ -54,48 +60,53 @@ function Input() {
     audio,
     language
   }: {
-    about: AboutType;
-    audio: AudioType;
+    about: AboutUtilityType;
+    audio: AudioUtilityType;
     language: WhisperArgs['language'];
-  }) => {
-    if (audio.path && audio.name && language && about.name) {
+  }): Promise<Entry> => {
+    if (audio.audio_path && audio.audio_name && language && about.name) {
       console.log('Input: All selections made');
       dispatch(setHighlightInvalid(false));
       dispatch(setSubmitting(true));
 
       // Convert audio type string to valid entryAudioParams type
-      const audioType = audio.type?.split('/')[1] as entryAudioParams['type'];
+      const audioType = audio.audio_type?.split('/')[1] as Entry['audio_type'];
 
-      await window.Main.newEntry({
+      const newEntry = await window.Main.newEntry({
         // TODO: #51 Convert to redux action
-        filePath: audio.path,
-        audio: {
-          name: audio.name,
-          type: audioType,
-          language: language
-        },
-        config: {
-          name: about.name,
-          description: about.description || '',
-          tags: about.tags || []
-        }
+        filePath: audio.audio_path,
+        name: about.name,
+        audio_name: audio.audio_name,
+        description: about.description,
+        audio_type: audioType,
+        audio_language: language
       })
         .then((result) => {
           // If the submission was successful
           if (result) {
+            console.log(result);
+            setCreatedEntry(result.entry);
             console.log('New entry created', result, 'Showing modal');
             dispatch(setSubmitting(false));
             dispatch(setSubmitted(true));
+
             console.log('Getting local files');
             dispatch(getLocalFiles());
+
+            console.log('CreatedEntry' + createdEntry);
+            return result.entry;
           }
         })
         .catch((error) => {
           // If the submission failed
           console.log('Error creating new entry: ' + error);
         });
+
+      if (!newEntry) throw new Error('Error creating new entry');
+      return newEntry;
     } else {
       dispatch(setHighlightInvalid(true));
+      throw new Error('Input: Missing selections');
     }
   };
 
@@ -109,44 +120,67 @@ function Input() {
           centered
           opened={submitted}
           fullScreen={isMobile}
-          onClose={() => dispatch(resetInput())}
+          onClose={() => {
+            setCreatedEntry(null);
+            dispatch(resetInput());
+          }}
         >
           <Stack>
             <Alert color="green" title={`${strings.input?.modal?.success_add}`}>
-              <SimpleGrid cols={2} spacing={10}>
+              <Stack>
+                <Button
+                  variant="filled"
+                  color={'violet'}
+                  disabled={transcribing.status !== 'idle'}
+                  onClick={() => {
+                    if (transcribing.status === 'idle') {
+                      const entry = createdEntry;
+                      if (entry) {
+                        dispatch(
+                          passToWhisper({
+                            entry
+                          })
+                        )
+                          .then(() => {
+                            setCreatedEntry(null);
+                            dispatch(resetInput());
+                          })
+                          .catch((error) => {
+                            // Add error handling and feedback to user
+                            console.log('Error passing entry to whisper: ' + error);
+                          });
+
+                        if (!createdEntry) console.log('No entry, cannot pass to whisper');
+                      }
+                    } else {
+                      console.log('Transcribing already in progress');
+                    }
+                  }}
+                >
+                  Begin Transcription
+                </Button>
+
                 {/* Add another file  */}
-                <Button onClick={() => dispatch(resetInput())} variant="default">
+                <Button onClick={() => dispatch(resetInput())} variant="filled" color={'green'}>
                   {strings.input?.modal?.add_another}
                 </Button>
-                {/* View Queue */}
-                <Button
-                  disabled
-                  onClick={() => {
-                    dispatch(setSubmitted(false));
-                    dispatch(resetInput());
-                    navigate('/queue');
-                  }}
-                  variant="default"
-                >
-                  {strings.input?.modal?.view_queue}
-                </Button>
+
                 {/* View entries */}
                 <Button
                   onClick={() => {
                     dispatch(setSubmitted(false));
                     dispatch(resetInput());
+                    setCreatedEntry(null);
                     navigate('/entries');
                   }}
-                  variant="default"
+                  variant="filled"
+                  color={'blue'}
                 >
                   {strings.input?.modal?.view_entries}
                 </Button>
-                {/* Add to queue */}
-                {/* Button that goes green when the job is added, keeps modal open, user can then choose to add another file or go to entries */}
-                <Button variant="default" disabled>
-                  {strings.input?.modal?.add_queue}
-                </Button>
-              </SimpleGrid>
+              </Stack>
+              {/* Add to queue */}
+              {/* Button that goes green when the job is added, keeps modal open, user can then choose to add another file or go to entries */}
             </Alert>
           </Stack>
         </Modal>
@@ -183,6 +217,8 @@ function Input() {
                     language,
                     audio,
                     about
+                  }).then((entry) => {
+                    setCreatedEntry(entry);
                   });
                 } else {
                   // eslint-disable-next-line no-alert

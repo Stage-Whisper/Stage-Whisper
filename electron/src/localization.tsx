@@ -250,6 +250,7 @@ export const strings = new LocalizedStrings(
         title: 'Settings',
         subtitle: 'Manage your account settings',
         dark_mode: 'Dark Mode',
+        toggle_dark_mode: 'Toggle dark mode',
         debug_menu: 'Debug Menu',
         language: {
           title: 'Language',
