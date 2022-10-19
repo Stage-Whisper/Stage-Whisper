@@ -211,19 +211,31 @@ function EntryTable({ audioPlayer, entry }: { audioPlayer: Howl; entry: Entry })
                       <>
                         {line.version > 0 ? (
                           // Reset edits
-                          <ActionIcon
-                            color="red"
-                            onClick={() => {
-                              setEditingLine(null);
-                              setEditText('');
-                              console.log('resetting edits...');
-                              window.Main.RESTORE_LINE({ line }).then(() => {
-                                dispatch(fetchLineAsync({ line }));
-                              });
-                            }}
-                          >
-                            <IconArrowBack size={16} />
-                          </ActionIcon>
+                          <>
+                            <ActionIcon
+                              color="blue"
+                              onClick={() => {
+                                // Edit this line
+                                setEditText(line.text);
+                                setEditingLine(line);
+                              }}
+                            >
+                              <IconEdit size={16} />
+                            </ActionIcon>
+                            <ActionIcon
+                              color="red"
+                              onClick={() => {
+                                setEditingLine(null);
+                                setEditText('');
+                                console.log('resetting edits...');
+                                window.Main.RESTORE_LINE({ line }).then(() => {
+                                  dispatch(fetchLineAsync({ line }));
+                                });
+                              }}
+                            >
+                              <IconArrowBack size={16} />
+                            </ActionIcon>
+                          </>
                         ) : (
                           <>
                             <ActionIcon
