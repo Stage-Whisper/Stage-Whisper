@@ -4,7 +4,7 @@ import { join } from 'path';
 import isDev from 'electron-is-dev';
 
 // Packages
-import { spawn } from 'child_process';
+import { ChildProcess, spawn } from 'child_process';
 import { existsSync, mkdirSync, readFileSync } from 'fs';
 import { NodeCue, parseSync } from 'subtitle';
 import { v4 as uuidv4 } from 'uuid';
@@ -14,10 +14,6 @@ import { Entry, Line, Transcription } from 'knex/types/tables';
 import db, { transcriptionStatus } from '../../database/database';
 import { Channels } from '../../types/channels';
 import { WhisperArgs } from '../../types/whisperTypes';
-
-// Node
-import { ChildProcess, spawn } from 'child_process';
-import { writeFileSync } from 'fs';
 
 export type RunWhisperResponse = {
   transcription: Transcription;
