@@ -4,7 +4,7 @@ import { join } from 'path';
 import isDev from 'electron-is-dev';
 
 // Packages
-import { ChildProcess, spawn } from 'child_process';
+import { spawn } from 'child_process';
 import { existsSync, mkdirSync, readFileSync } from 'fs';
 import { NodeCue, parseSync } from 'subtitle';
 import { v4 as uuidv4 } from 'uuid';
@@ -65,7 +65,6 @@ export default ipcMain.handle(
 
     // Generate output path
     const outputDir = join(whisperPath, uuid);
-    console.log('RunWhisper: outputDir', outputDir);
 
     // ------------------  Construct the input array for the whisper script ------------------ //
     const inputArray = []; // Array to hold the input arguments for the whisper script
@@ -94,23 +93,36 @@ export default ipcMain.handle(
     console.log('RunWhisper: Running model with args', inputArray);
 
     // Spawn the whisper script
-    let childProcess : ChildProcess;
+    let childProcessArgs: [string, string[]?, object?];
     if (isDev) {
-      childProcess = spawn(
-        'poetry run stagewhisper',
-        inputArray,
-        { stdio: 'inherit', cwd: join(__dirname, '../../../../backend/') }
-      );
+      const backendDir = join(__dirname, '../../../../backend/');
+      childProcessArgs = [
+        'poetry',
+        ['run', 'stagewhisper', ...inputArray],
+        {
+          stdio: 'inherit',
+          cwd: backendDir
+        }
+      ];
     } else {
-      console.error('Production mode not supported yet');
+      childProcessArgs = ['echo', ['"Production backend not yet implemented"']];
     }
+    const childProcess = spawn(...childProcessArgs);
 
     const transcription = await new Promise<Transcription>((resolve, reject) => {
-      childProcess.on('data', (data: string) => {
+      childProcess.on('error', (error: Error) => {
+        console.log(`RunWhisper: Failed to start subprocess: ${error}`);
+      });
+
+      // If the stdio/out/err streams are available, read them to the console
+      childProcess.stdout?.on('data', (data: string) => {
         console.log(`stdout: ${data}`);
       });
-      childProcess.on('error', (error: Error) => {
-        console.log(`stderr: ${error.message}`);
+      childProcess.stdin?.on('data', (data: string) => {
+        console.log(`stdin: ${data}`);
+      });
+      childProcess.stderr?.on('data', (data: string) => {
+        console.log(`stderr: ${data}`);
       });
 
       // ------------------  Listen for the child process to exit and generate a transcription.json file ------------------ //
