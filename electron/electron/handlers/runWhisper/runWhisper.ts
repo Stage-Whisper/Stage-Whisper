@@ -1,6 +1,7 @@
 // Electron
 import { app, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { join } from 'path';
+import isDev from 'electron-is-dev';
 
 // Packages
 import { spawn } from 'child_process';
@@ -13,6 +14,10 @@ import { Entry, Line, Transcription } from 'knex/types/tables';
 import db, { transcriptionStatus } from '../../database/database';
 import { Channels } from '../../types/channels';
 import { WhisperArgs } from '../../types/whisperTypes';
+
+// Node
+import { ChildProcess, spawn } from 'child_process';
+import { writeFileSync } from 'fs';
 
 export type RunWhisperResponse = {
   transcription: Transcription;
@@ -86,14 +91,23 @@ export default ipcMain.handle(
     if (device) inputArray.push('--device', device);
 
     // Add the input path
-    inputArray.push(inputPath);
+    inputArray.push('--input', inputPath);
 
     // ---------------------------------  Run the whisper script --------------------------------- //
 
     console.log('RunWhisper: Running model with args', inputArray);
 
     // Spawn the whisper script
-    const childProcess = spawn('whisper', inputArray, { stdio: 'inherit' });
+    let childProcess : ChildProcess;
+    if (isDev) {
+      childProcess = spawn(
+        'poetry run stagewhisper',
+        inputArray,
+        { stdio: 'inherit', cwd: join(__dirname, '../../../../backend/') }
+      );
+    } else {
+      console.error('Production mode not supported yet');
+    }
 
     const transcription = await new Promise<Transcription>((resolve, reject) => {
       childProcess.on('data', (data: string) => {
