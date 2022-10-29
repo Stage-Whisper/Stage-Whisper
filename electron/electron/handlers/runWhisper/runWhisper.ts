@@ -115,6 +115,8 @@ export default ipcMain.handle(
       });
 
       // If the stdio/out/err streams are available, read them to the console
+      // Note: if `stdio` is set to anything but `"pipe"` in the `spawn` opts,
+      // then these will be undefined and these events will never fire.
       childProcess.stdout?.on('data', (data: string) => {
         console.log(`stdout: ${data}`);
       });
