@@ -1,6 +1,6 @@
 # Stage-Whisper
 
-The main repo for Stage Whisper, our easy to use AI transcriber, powered by OpenAI's Whisper
+This is the main repo for Stage Whisper — a free, open-source, and easy-to-use audio transcription app. Stage Whisper uses OpenAI's Whisper machine learning model to produce very accurate transcriptions of audio files, and also allows users to store and edit transcriptions using a simple and intuitive graphical user interface.
 
 ## Quickstart
 
@@ -11,7 +11,7 @@ Stage Whisper consists of two connected components:
 
 ### Prerequisites
 
-You will need the following installed on your machine to develop Stage Whisper. For the moment it is possible to separately work on the Electron interface or the Python backend--if you are planning to only work on one or the other, you can install the requirements specific to that component.
+The eventual 1.0 release of Stage Whisper will (ideally) not require any additional software. For now, though, you will need the following installed on your machine to develop Stage Whisper. It is currently possible to separately work on the Electron interface or the Python backend, so f you are planning to only work on one or the other, you only have to install the requirements specific to that component.
 
 * [Node](https://nodejs.org/en/) (required for Electron)
 * [Yarn](https://yarnpkg.com/) (required for Electron)
@@ -58,11 +58,11 @@ yarn dev
 
 ### ⚠️ Integration Incomplete ⚠️
 
-For the moment these components are not integrated! The eventual plan is for the Electron app to use the Python backend for transcription. Until that integration is complete, you will need to separately install [Whisper](https://github.com/openai/whisper) in order to use the Electron app to complete a transcription.
+For the moment, these components are not integrated! The eventual plan is for the Electron app to use the Python backend for transcription. Until that integration is complete, you will need to separately install [Whisper](https://github.com/openai/whisper) in order to use the Electron app to complete a transcription.
 
 ## Goal
 
-[OpenAI](https://openai.com/blog/whisper/) recently released [Whisper](https://github.com/openai/whisper), its automatic speech recognition (ASR) system that is trained on "680,000 hours of multilingual and multitask supervised data collected from the web." You can learn more by [reading the paper](https://cdn.openai.com/papers/whisper.pdf) [PDF] or looking at the [examples](https://openai.com/blog/whisper/) on OpenAI's website.
+Earlier this year, [OpenAI](https://openai.com/blog/whisper/) released [Whisper](https://github.com/openai/whisper), its automatic speech recognition (ASR) system that is trained on "680,000 hours of multilingual and multitask supervised data collected from the web." You can learn more by [reading the paper](https://cdn.openai.com/papers/whisper.pdf) [PDF] or looking at the [examples](https://openai.com/blog/whisper/) on OpenAI's website.
 
 As Dan Nguyen [noted on Twitter](https://twitter.com/dancow/status/1572749731704573957), this could be a "godsend for newsrooms."
 
@@ -80,7 +80,7 @@ We'd love to collaborate with anyone who has ideas about how we could more easil
 
 ## Project Status
 
-The project is currently in the early stages of development. We have a working prototype that uses the [Electron](https://www.electronjs.org/) and [Mantine](https://mantine.dev/) frameworks to create an app that allows users to upload audio files, transcribe them using Whisper, and then manage the transcriptions. The app will be available for MacOS, Windows, and Linux. We are currently working on implementing major improvements and will be releasing a beta version soon.
+The project is currently in the early stages of development. We have a working prototype that uses the [Electron](https://www.electronjs.org/) and [Mantine](https://mantine.dev/) frameworks to create an app that allows users to input audio files, transcribe them using Whisper, and then manage and edit the resulting transcriptions. The app will be available for MacOS, Windows, and Linux. We are currently working on implementing major improvements and hope to release a beta version soon.
 
 - [Request features or ask questions](https://github.com/Stage-Whisper/Stage-Whisper/discussions) on the project discussions on GitHub.
 - Find a bug? [Open an issue](https://github.com/Stage-Whisper/Stage-Whisper/issues/choose) so that we can see how we can fix it.

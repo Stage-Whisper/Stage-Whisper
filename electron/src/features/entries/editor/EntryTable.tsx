@@ -211,6 +211,7 @@ function EntryTable({ audioPlayer, entry }: { audioPlayer: Howl; entry: Entry })
                       <>
                         {line.version > 0 ? (
                           // Reset edits
+
                           <ActionIcon
                             color="red"
                             onClick={() => {
@@ -224,6 +225,7 @@ function EntryTable({ audioPlayer, entry }: { audioPlayer: Howl; entry: Entry })
                           >
                             <IconArrowBack size={16} />
                           </ActionIcon>
+
                         ) : (
                           <>
                             <ActionIcon
