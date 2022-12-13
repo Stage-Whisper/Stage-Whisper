@@ -43,7 +43,7 @@ jobs:
       - run: yarn install --frozen-lockfile # optional, --immutable
 
       - name: Lint Electron App
-        run: yarn lint
+        run: yarn lint:ci
 
       - name: Publish Test Report
         uses: mikepenz/action-junit-report@v3
