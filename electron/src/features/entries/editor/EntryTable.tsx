@@ -225,7 +225,6 @@ function EntryTable({ audioPlayer, entry }: { audioPlayer: Howl; entry: Entry })
                           >
                             <IconArrowBack size={16} />
                           </ActionIcon>
-
                         ) : (
                           <>
                             <ActionIcon
