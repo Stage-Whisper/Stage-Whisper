@@ -1,3 +1,5 @@
+name: Integration
+
 on:
   push:
     branches:
@@ -6,9 +8,13 @@ on:
     branches:
       - main
 
+permissions:
+  checks: write
+  contents: write
+
 jobs:
-  electron-build:
-    name: Build and Test Electron App
+  electron-install:
+    name: Install and Test Electron App
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -39,30 +45,18 @@ jobs:
           cache: "yarn"
           cache-dependency-path: "electron/yarn.lock"
       - run: yarn install --frozen-lockfile # optional, --immutable
-      - run: yarn test
 
-  electron-run-linters:
-    name: Run Electron Linters
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: electron
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: 17
-
-      # ESLint and Prettier must be in `package.json`
-      - name: Install Node.js dependencies
-        run: yarn install --frozen-lockfile
+      - name: Lint Electron App
+        run: yarn lint
 
       - name: Run linters
         uses: wearerequired/lint-action@v2
         with:
+          auto_fix: true
+          eslint_dir: electron
           eslint: true
+          prettier_dir: electron
           prettier: true
+
+      # - name: Test Electron App
+      # run: yarn test
