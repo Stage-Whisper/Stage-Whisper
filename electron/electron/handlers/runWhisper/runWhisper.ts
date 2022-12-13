@@ -1,4 +1,3 @@
-import { writeFileSync } from 'fs';
 import * as readline from 'node:readline';
 // Electron
 import { app, ipcMain, IpcMainInvokeEvent } from 'electron';
