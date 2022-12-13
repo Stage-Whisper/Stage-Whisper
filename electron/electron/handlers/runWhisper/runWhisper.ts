@@ -4,7 +4,6 @@ import * as readline from 'node:readline';
 import { app, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { join } from 'path';
 import isDev from 'electron-is-dev';
-import isDev from 'electron-is-dev';
 
 // Packages
 import { spawn } from 'child_process';
