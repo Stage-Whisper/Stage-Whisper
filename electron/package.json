@@ -28,7 +28,8 @@
     "clean": "rimraf dist main src/out",
     "type-check": "tsc",
     "lint": "eslint . --ext js,jsx,ts,tsx",
-    "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix"
+    "lint:fix": "eslint . --ext js,jsx,ts,tsx --fix",
+    "lint:ci": "eslint . --ext js,jsx,ts,tsx  --max-warnings 0 --format junit --output-file reports/eslint.xml"
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
