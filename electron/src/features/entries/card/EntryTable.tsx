@@ -6,7 +6,7 @@ import { DataTable } from 'mantine-datatable';
 import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { selectAudioPadding } from '../../settings/settingsSlice';
-import { selectLines, setLines } from '../entrySlice';
+import { selectActiveLines, setLines } from '../entrySlice';
 
 function EntryTable({ audioPlayer }: { audioPlayer: Howl }) {
   // Data Table States
@@ -27,7 +27,7 @@ function EntryTable({ audioPlayer }: { audioPlayer: Howl }) {
 
   // Fetch Lines from redux store
   const dispatch = useAppDispatch();
-  const lines = useAppSelector(selectLines);
+  const lines = useAppSelector(selectActiveLines);
   const [localLines, setLocalLines] = useState<Line[]>([]);
 
   // Generate a data table using Mantine-DataTable
