@@ -12,7 +12,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     defaults:
       run:
-        working-directory: ./electron
+        working-directory: electron
     strategy:
       matrix:
         os:
@@ -37,6 +37,7 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
           cache: "yarn"
+          cache-dependency-path: "electron/yarn.lock"
       - run: yarn install --frozen-lockfile # optional, --immutable
       - run: yarn test
 
@@ -45,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./electron
+        working-directory: electron
 
     steps:
       - name: Check out Git repository
