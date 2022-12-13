@@ -106,7 +106,6 @@ export default ipcMain.handle(
         'poetry',
         ['run', 'stagewhisper', ...inputArray],
         {
-          // stdio: 'pipe',
           env,
           cwd: backendDir
         }
@@ -127,7 +126,6 @@ export default ipcMain.handle(
       // Create a line reader to read the output of the whisper script
       const lineReader = readline.createInterface({
         input: childProcess.stdout,
-        output: childProcess.stdin,
         terminal: false
       });
 
