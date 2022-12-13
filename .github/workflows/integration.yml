@@ -53,9 +53,9 @@ jobs:
         uses: wearerequired/lint-action@v2
         with:
           auto_fix: true
-          eslint_dir: electron
+          eslint_dir: electron/
           eslint: true
-          prettier_dir: electron
+          prettier_dir: electron/
           prettier: true
 
       # - name: Test Electron App
