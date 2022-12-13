@@ -3,6 +3,7 @@ import torch
 import whisper
 import os
 import warnings
+from whisper.utils import write_vtt
 
 @click.command()
 @click.option(
@@ -84,9 +85,9 @@ def cli(input, model, device, output_dir, verbose, task, language):
     # with open(os.path.join(output_dir, audio_basename + ".txt"), "w", encoding="utf-8") as txt:
     #     print(result["text"], file=txt)
 
-    # # save VTT
-    # with open(os.path.join(output_dir, audio_basename + ".vtt"), "w", encoding="utf-8") as vtt:
-    #     write_vtt(result["segments"], file=vtt)
+    # save VTT
+    with open(os.path.join(output_dir, audio_basename + ".vtt"), "w", encoding="utf-8") as vtt:
+        write_vtt(result["segments"], file=vtt)
     
     print(result["text"])
 
