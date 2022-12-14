@@ -1,2 +1,3 @@
 electron/database.db
 electron/reports
+node_modules

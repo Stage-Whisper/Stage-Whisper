@@ -1,5 +1,5 @@
 {
-  "name": "stagewhisper",
+  "name": "stagewhisper-electron",
   "version": "0.1.0",
   "license": "MIT",
   "private": true,
@@ -41,7 +41,7 @@
     "cross-env": "7.0.3",
     "electron": "22.0.0",
     "electron-builder": "23.6.0",
-    "eslint": "8.29.0",
+    "eslint": "^8.29.0",
     "eslint-plugin-vue": "9.8.0",
     "happy-dom": "8.1.0",
     "lint-staged": "^13.1.0",
