@@ -56,10 +56,6 @@ yarn
 yarn dev
 ```
 
-### ⚠️ Integration Incomplete ⚠️
-
-For the moment, these components are not integrated! The eventual plan is for the Electron app to use the Python backend for transcription. Until that integration is complete, you will need to separately install [Whisper](https://github.com/openai/whisper) in order to use the Electron app to complete a transcription.
-
 ## Goal
 
 Earlier this year, [OpenAI](https://openai.com/blog/whisper/) released [Whisper](https://github.com/openai/whisper), its automatic speech recognition (ASR) system that is trained on "680,000 hours of multilingual and multitask supervised data collected from the web." You can learn more by [reading the paper](https://cdn.openai.com/papers/whisper.pdf) [PDF] or looking at the [examples](https://openai.com/blog/whisper/) on OpenAI's website.
