@@ -11,7 +11,7 @@ Stage Whisper consists of two connected components:
 
 ### Prerequisites
 
-The eventual 1.0 release of Stage Whisper will (ideally) not require any additional software. For now, though, you will need the following installed on your machine to develop Stage Whisper. It is currently possible to separately work on the Electron interface or the Python backend, so f you are planning to only work on one or the other, you only have to install the requirements specific to that component.
+The eventual 1.0 release of Stage Whisper will (ideally) not require any additional software. For now, though, you will need the following installed on your machine to develop Stage Whisper. It is currently possible to separately work on the Electron interface or the Python backend, so if you are planning to only work on one or the other, you only have to install the requirements specific to that component.
 
 * [Node](https://nodejs.org/en/) (required for Electron)
 * [Yarn](https://yarnpkg.com/) (required for Electron)
