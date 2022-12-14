@@ -1,6 +1,8 @@
+import * as readline from 'node:readline';
 // Electron
 import { app, ipcMain, IpcMainInvokeEvent } from 'electron';
 import { join } from 'path';
+import isDev from 'electron-is-dev';
 
 // Packages
 import { spawn } from 'child_process';
@@ -64,10 +66,9 @@ export default ipcMain.handle(
 
     // Generate output path
     const outputDir = join(whisperPath, uuid);
-    console.log('RunWhisper: outputDir', outputDir);
 
     // ------------------  Construct the input array for the whisper script ------------------ //
-    const inputArray = []; // Array to hold the input arguments for the whisper script
+    const inputArray = ['--verbose', 'true']; // Array to hold the input arguments for the whisper script
 
     inputArray.push('--output_dir', outputDir); // Add the output directory
 
@@ -86,24 +87,53 @@ export default ipcMain.handle(
     if (device) inputArray.push('--device', device);
 
     // Add the input path
-    inputArray.push(inputPath);
+    inputArray.push('--input', inputPath);
 
     // ---------------------------------  Run the whisper script --------------------------------- //
 
     console.log('RunWhisper: Running model with args', inputArray);
 
+    // Create a new env that has PythonUnbuffered set to true
+    // This will allow the child process to output to the console
+    const env = Object.create(process.env);
+    env.PYTHONUNBUFFERED = '1';
+
     // Spawn the whisper script
-    const childProcess = spawn('whisper', inputArray, { stdio: 'inherit' });
-
+    let childProcessArgs: [string, string[]?, object?];
+    if (isDev) {
+      const backendDir = join(__dirname, '../../../../backend/');
+      childProcessArgs = [
+        'poetry',
+        ['run', 'stagewhisper', ...inputArray],
+        {
+          env,
+          cwd: backendDir
+        }
+      ];
+    } else {
+      childProcessArgs = ['echo', ['"Production backend not yet implemented"']];
+    }
     const transcription = await new Promise<Transcription>((resolve, reject) => {
-      childProcess.on('data', (data: string) => {
-        console.log(`stdout: ${data}`);
-      });
-      childProcess.on('error', (error: Error) => {
-        console.log(`stderr: ${error.message}`);
+      const childProcess = spawn(...childProcessArgs);
+
+      // Detect if parent node process is killed
+      process.on('SIGINT', () => {
+        console.log('RunWhisper: Parent process killed, killing child process');
+        childProcess.kill();
+        process.exit();
       });
 
-      // ------------------  Listen for the child process to exit and generate a transcription.json file ------------------ //
+      // Create a line reader to read the output of the whisper script
+      const lineReader = readline.createInterface({
+        input: childProcess.stdout,
+        terminal: false
+      });
+
+      // When a line is read, handle it
+      lineReader.on('line', (line: Buffer) => {
+        console.log('RunWhisper: Line read', line.toString());
+      });
+
       childProcess.on('close', async (code: number) => {
         console.log(`RunWhisper: Child process closed with code ${code}`);
         if (code === 0) {
@@ -218,6 +248,8 @@ export default ipcMain.handle(
         }
       });
     });
+
+    console.log('RunWhisper: Transcription', transcription);
 
     return {
       transcription,

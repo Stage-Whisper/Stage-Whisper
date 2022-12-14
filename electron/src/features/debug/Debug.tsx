@@ -2,14 +2,12 @@ import { ActionIcon, Affix, Button, Card, Group, Notification, Stack, Title } fr
 
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
-// import { createDebugEntries } from '../features/entries/entrySlice';
-import { IconBug, IconBugOff, IconMoonStars, IconSun } from '@tabler/icons';
+import { IconBug, IconBugOff } from '@tabler/icons';
 import { v4 as uuidv4 } from 'uuid';
 import { selectDebugMenu, toggleDebugMenu } from '../../appSlice';
-import { getLocalFiles } from '../entries/entrySlice';
-import { toggleDarkMode } from '../settings/settingsSlice';
 import strings from '../../localization';
-import { selectDarkMode } from '../settings/settingsSlice';
+import { getLocalFiles } from '../entries/entrySlice';
+
 function Debug() {
   interface notificationType {
     id: string;
@@ -22,7 +20,7 @@ function Debug() {
 
   const dispatch = useAppDispatch();
 
-  const darkMode = useAppSelector(selectDarkMode);
+  // const darkMode = useAppSelector(selectDarkMode);
 
   const handleDeleteStore = async () => {
     try {
