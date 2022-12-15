@@ -55,3 +55,12 @@ if (import.meta.env.PROD) {
     .then(({autoUpdater}) => autoUpdater.checkForUpdatesAndNotify())
     .catch(e => console.error('Failed check updates:', e));
 }
+
+// Handler Imports
+import './handlers/newEntry';
+import './handlers/deleteEntry';
+import './handlers/deleteStore';
+import './handlers/exportTranscription';
+import './handlers/fetchAudioFile';
+import './handlers/queryDatabase';
+import './handlers/runWhisper';
