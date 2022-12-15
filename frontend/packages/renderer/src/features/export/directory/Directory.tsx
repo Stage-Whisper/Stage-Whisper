@@ -1,5 +1,5 @@
+import * as React from 'react';
 import {Text, Card, Input, Stack, Title} from '@mantine/core';
-import React from 'react';
 
 // Redux
 // import { useAppDispatch, useAppSelector } from '../../../redux/hooks';

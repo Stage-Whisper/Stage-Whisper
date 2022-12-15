@@ -1,6 +1,9 @@
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
+
+// Types
 import type {PreloadedState} from '@reduxjs/toolkit';
-// Redux reducers
+
+// Redux Reducers
 import inputReducer from './inputSlice';
 import settingsReducer from './settingsSlice';
 import appReducer from '../appSlice';
@@ -28,3 +31,5 @@ export const setupStore = (preloadedState?: PreloadedState<RootState>) => {
 export type RootState = ReturnType<typeof rootReducer>;
 export type AppStore = ReturnType<typeof setupStore>;
 export type AppDispatch = AppStore['dispatch'];
+
+console.debug('Loaded Store');

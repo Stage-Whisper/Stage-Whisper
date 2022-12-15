@@ -7,7 +7,7 @@ import {useNavigate} from 'react-router-dom';
 import type {AudioUtilityType} from './components/audio/Audio';
 import Audio from './components/audio/Audio';
 import About from './components/about/About';
-import SimpleInput from './SimpleInput';
+import SimpleInput from './components/simple/Simple';
 
 // Redux
 import {useAppDispatch, useAppSelector} from '../../redux/hooks';
@@ -227,7 +227,7 @@ function Input() {
             <Button
               onClick={async () => {
                 console.log('Input values: ' + language, audio);
-                if (window.Main) {
+                if (window) {
                   handleNewEntry({
                     language,
                     audio,
@@ -238,7 +238,7 @@ function Input() {
                 } else {
                   // eslint-disable-next-line no-alert
                   alert(
-                    'window.Main is undefined, app in dev mode, please view in electron to select an output directory',
+                    'window is undefined, app in dev mode, please view in electron to select an output directory',
                   );
                 }
               }}

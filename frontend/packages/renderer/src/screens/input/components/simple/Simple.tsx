@@ -2,9 +2,10 @@ import {Card, Group, Stack, Text} from '@mantine/core';
 import {Dropzone} from '@mantine/dropzone';
 import {IconCheckbox, IconUpload, IconX} from '@tabler/icons';
 import type {Entry} from 'knex/types/tables';
-import React from 'react';
-import {useAppDispatch, useAppSelector} from '../../redux/hooks';
-import {selectAudio, setAudioValid, setSimpleAudioInput} from '../../redux/inputSlice';
+
+import {useAppDispatch, useAppSelector} from '../../../../redux/hooks';
+import {selectAudio, setAudioValid, setSimpleAudioInput} from '../../../../redux/inputSlice';
+
 // Card with file picker that allows user to select a file from their computer
 function SimpleInput() {
   // Redux
@@ -22,7 +23,7 @@ function SimpleInput() {
       <Stack>{/* <Title order={4}>{strings.input?.audio.title}</Title> */}</Stack>
       <div
         onClick={() => {
-          //Create a filepicker
+          //Create a file picker
           const filePicker = document.createElement('input');
           filePicker.setAttribute('type', 'file');
           filePicker.setAttribute('accept', 'audio/*');
@@ -54,7 +55,7 @@ function SimpleInput() {
           useFsAccessApi={false}
           onDrop={files => {
             const file = files[0];
-            console.log(file);
+            console.debug('file', file);
             if (file) {
               if (file.name && file.path && file.type) {
                 console.log(audioValid);

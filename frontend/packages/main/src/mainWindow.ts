@@ -1,8 +1,10 @@
 import {app, BrowserWindow} from 'electron';
 import {join} from 'path';
 import {URL} from 'url';
-import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
-import * as pc from 'picocolors';
+// import installExtension, {REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS} from 'electron-devtools-installer';
+// import * as pc from 'picocolors';
+
+// TODO: This route needs to be updated and the icons need to be imported again
 const macIcon = join(__dirname, 'assets/icons/color/Icon - AppSVG.svg');
 const otherIcon = join(__dirname, 'assets/icons/color/Icon - Full Colour512.png');
 
@@ -43,23 +45,23 @@ async function createWindow() {
   browserWindow.on('ready-to-show', () => {
     browserWindow?.show();
     if (import.meta.env.DEV) {
-      app
-        .whenReady()
-        .then(() => {
-          installExtension(REDUX_DEVTOOLS).then(name => console.log(`Added Extension:  ${name}`));
-        })
-        .catch(err => console.log(pc.red('An error occurred installing REDUX_DEVTOOLS: ') + err));
+      // app
+      //   .whenReady()
+      //   .then(() => {
+      //     installExtension(REDUX_DEVTOOLS).then(name => console.log(`Added Extension:  ${name}`));
+      //   })
+      //   .catch(err => console.log(pc.red('An error occurred installing REDUX_DEVTOOLS: ') + err));
 
-      app
-        .whenReady()
-        .then(() => {
-          installExtension(REACT_DEVELOPER_TOOLS).then(name =>
-            console.log(`Added Extension:  ${name}`),
-          );
-        })
-        .catch(err =>
-          console.log(pc.red('An error occurred installing REACT_DEVELOPER_TOOLS: ') + err),
-        );
+      // app
+      //   .whenReady()
+      //   .then(() => {
+      //     installExtension(REACT_DEVELOPER_TOOLS).then(name =>
+      //       console.log(`Added Extension:  ${name}`),
+      //     );
+      //   })
+      //   .catch(err =>
+      //     console.log(pc.red('An error occurred installing REACT_DEVELOPER_TOOLS: ') + err),
+      //   );
       browserWindow?.webContents.openDevTools();
     }
   });

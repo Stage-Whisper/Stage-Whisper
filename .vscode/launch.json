@@ -8,6 +8,14 @@
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/frontend\\scripts\\watch.mjs",
       "autoAttachChildProcesses": true
+    },
+    {
+      "name": "Electron Main",
+      "program": "${workspaceFolder}/main.js",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceFolder}/frontend/node_modules/.bin/electron",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
     }
   ]
 }

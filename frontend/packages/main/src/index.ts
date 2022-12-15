@@ -1,10 +1,8 @@
 import {app} from 'electron';
 import './security-restrictions';
 import {restoreOrCreateWindow} from '/@/mainWindow';
-
-console.log('main.index: starting...');
-// console.log(__dirname);
-
+import {initializeApp} from './functions/initializeApp';
+import * as pc from 'picocolors';
 /**
  * Prevent electron from running multiple instances.
  */
@@ -14,6 +12,11 @@ if (!isSingleInstance) {
   process.exit(0);
 }
 app.on('second-instance', restoreOrCreateWindow);
+
+/**
+ * Run initialization code for the application store.
+ */
+initializeApp().catch(e => console.error(pc.red('Failed initialize app:'), e));
 
 /**
  * Disable Hardware Acceleration to save more system resources.
@@ -41,34 +44,6 @@ app
   .whenReady()
   .then(restoreOrCreateWindow)
   .catch(e => console.error('Failed create window:', e));
-
-/**
- * Install Vue.js or any other extension in development mode only.
- * Note: You must install `electron-devtools-installer` manually
- */
-// if (import.meta.env.DEV) {
-//   console.debug('Installing extensions...');
-//   app.whenReady().then(() => {
-//     installExtension(REDUX_DEVTOOLS)
-//       .then(name => console.log(`Added Extension:  ${name}`))
-//       .catch(err => console.log('An error occurred installing ${name}: ', err));
-//   });
-
-//   app.whenReady().then(() => {
-//     installExtension(REACT_DEVELOPER_TOOLS)
-//       .then(name => console.log(`Added Extension:  ${name}`))
-//       .catch(err => console.log('An error occurred installing ${name}: ', err));
-//   });
-// }
-//     .then(({default: installExtension, REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS}) =>
-//       installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], {
-//         loadExtensionOptions: {
-//           allowFileAccess: true,
-//         },
-//       }),
-//     )
-//     .catch(e => console.error('Failed install extension:', e));
-// }
 
 /**
  * Check for new version of the application - production mode only.

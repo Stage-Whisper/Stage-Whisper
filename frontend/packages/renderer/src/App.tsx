@@ -31,6 +31,7 @@ import {
   IconSettings,
   IconSun,
 } from '@tabler/icons';
+import {useMediaQuery} from '@mantine/hooks';
 import Styling from './features/styling';
 
 // Logos / Icons
@@ -42,10 +43,7 @@ import Styling from './features/styling';
 // Localization
 import strings from './features/localization';
 
-// Debug
-
 // Redux
-import {useMediaQuery} from '@mantine/hooks';
 import {selectBurgerOpen, setBurgerOpen} from './appSlice';
 import {
   getLocalFiles,
