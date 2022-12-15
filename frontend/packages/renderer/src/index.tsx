@@ -19,6 +19,15 @@ import {setupStore} from './redux/store';
 import {ModalsProvider} from '@mantine/modals';
 
 export const store = setupStore();
+import type {api} from '../../preload/src/api';
+
+import type {ipcRenderer} from 'electron/renderer';
+declare global {
+  interface Window {
+    Main: typeof api;
+    ipcRenderer: typeof ipcRenderer;
+  }
+}
 
 // Convert from ReactDOM.render to createRoot
 import {AppRoutes} from './routes';

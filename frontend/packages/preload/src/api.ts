@@ -1,16 +1,19 @@
-import type {Entry} from 'knex/types/tables';
+// Packages
 import {ipcRenderer} from 'electron';
+
+// Types
+import type {Entry} from 'knex/types/tables';
 import {QUERY} from '../../../types/queries';
 import type {QueryArgs, QueryReturn} from '../../../types/queries';
-import type {WhisperArgs} from '../../../types/whisperTypes';
+import type {WhisperArgs} from '../../../types/whisper';
 import type {
   ExportTranscriptionResponse,
   newEntryArgs,
-  RunWhisperResponse,
-  NewEntryResponse,
   OpenDirectoryDialogResponse,
 } from '../../../types/handlers';
 import {Channels} from '../../../types/channels';
+import type {RunWhisperResponse} from '../../main/src/handlers/runWhisper';
+import type {NewEntryResponse} from '../../main/src/handlers/newEntry';
 
 // ---------------------- API ---------------------- //
 /**

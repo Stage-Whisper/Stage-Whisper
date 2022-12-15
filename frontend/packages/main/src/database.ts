@@ -1,8 +1,8 @@
 import {knex} from 'knex';
 import {app} from 'electron';
 import {join} from 'path';
-import type {WhisperArgs} from '../../../types/whisperTypes';
-import {whisperLanguages, whisperModels} from '../../../types/whisperTypes';
+import type {WhisperArgs} from '../../../types/whisper';
+import {whisperLanguages, whisperModels} from '../../../types/whisper';
 
 // Set up Knex
 console.log('Initializing Database');

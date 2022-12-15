@@ -10,9 +10,9 @@ import {useAppDispatch, useAppSelector} from '../../../redux/hooks';
 // Localization
 import strings from '../../localization';
 
-import {passToWhisper, selectTranscribingStatus} from '../../whisper/whisperSlice';
-import type { ReduxEntry} from '../entrySlice';
-import {getLocalFiles} from '../entrySlice';
+import {passToWhisper, selectTranscribingStatus} from '../../../redux/whisperSlice';
+import type {ReduxEntry} from '../../../redux/entrySlice';
+import {getLocalFiles} from '../../../redux/entrySlice';
 import type {Entry} from 'knex/types/tables';
 
 function TranscriptionCard({entry}: {entry: ReduxEntry}) {

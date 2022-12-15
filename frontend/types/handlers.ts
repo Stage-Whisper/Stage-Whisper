@@ -1,13 +1,7 @@
-import type {Transcription, Entry} from 'knex/types/tables';
+import type {Entry} from 'knex/types/tables';
 // Response from the export transcription handler
 export type ExportTranscriptionResponse = {
   outputDir: string;
-};
-
-// Response from the whisper handler
-export type RunWhisperResponse = {
-  transcription: Transcription;
-  entry: Entry;
 };
 
 // Create new entry and add it to the database
@@ -20,21 +14,10 @@ export type newEntryArgs = {
   audio_name: Entry['audio_name'];
 };
 
-// Delete Store Response
-export interface DeleteStoreResponse {
-  success?: boolean;
-  message?: string;
-}
-
 // Response type for the openDirectoryDialog channel
 export interface OpenDirectoryDialogResponse {
   path: string | null;
 }
-
-// Response type for the new-entry channel
-export type NewEntryResponse = {
-  entry: Entry;
-};
 
 // Response type for the whisper-complete channel
 export type WhisperCompleteResponse = {

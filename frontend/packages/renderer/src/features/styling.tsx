@@ -4,21 +4,22 @@ import * as React from 'react';
 // Woff2 -- Should be all we need as electron supports it
 // electron/src/assets/fonts/asap/asap-v24-latin-ext_latin-500.woff2
 
-import asap_500 from '../../assets/fonts/asap/asap-v24-latin-ext_latin-500.woff2';
+// import asap_500 from '../../assets/fonts/asap/asap-v24-latin-ext_latin-500.woff2';
+import asap_500 from '../../../../buildResources/assets/fonts/asap/asap-v24-latin-ext_latin-500.woff2';
 // electron/src/assets/fonts/asap/asap-v24-latin-ext_latin-500italic.woff2
-import asap_500_italic from '../../assets/fonts/asap/asap-v24-latin-ext_latin-500italic.woff2';
+import asap_500_italic from '../../../../buildResources/assets/fonts/asap/asap-v24-latin-ext_latin-500italic.woff2';
 // electron/src/assets/fonts/asap/asap-v24-latin-ext_latin-600.woff2
-import asap_600 from '../../assets/fonts/asap/asap-v24-latin-ext_latin-600.woff2';
+import asap_600 from '../../../../buildResources/assets/fonts/asap/asap-v24-latin-ext_latin-600.woff2';
 // electron/src/assets/fonts/asap/asap-v24-latin-ext_latin-600italic.woff2
-import asap_600_italic from '../../assets/fonts/asap/asap-v24-latin-ext_latin-600italic.woff2';
+import asap_600_italic from '../../../../buildResources/assets/fonts/asap/asap-v24-latin-ext_latin-600italic.woff2';
 // electron/src/assets/fonts/asap/asap-v24-latin-ext_latin-700.woff2
-import asap_700 from '../../assets/fonts/asap/asap-v24-latin-ext_latin-700.woff2';
+import asap_700 from '../../../../buildResources/assets/fonts/asap/asap-v24-latin-ext_latin-700.woff2';
 // electron/src/assets/fonts/asap/asap-v24-latin-ext_latin-700italic.woff2
-import asap_700_italic from '../../assets/fonts/asap/asap-v24-latin-ext_latin-700italic.woff2';
+import asap_700_italic from '../../../../buildResources/assets/fonts/asap/asap-v24-latin-ext_latin-700italic.woff2';
 // electron/src/assets/fonts/asap/asap-v24-latin-ext_latin-italic.woff2
-import asap_italic from '../../assets/fonts/asap/asap-v24-latin-ext_latin-italic.woff2';
+import asap_italic from '../../../../buildResources/assets/fonts/asap/asap-v24-latin-ext_latin-italic.woff2';
 // electron/src/assets/fonts/asap/asap-v24-latin-ext_latin-regular.woff2
-import asap from '../../assets/fonts/asap/asap-v24-latin-ext_latin-regular.woff2';
+import asap from '../../../../buildResources/assets/fonts/asap/asap-v24-latin-ext_latin-regular.woff2';
 
 function Styling() {
   return (

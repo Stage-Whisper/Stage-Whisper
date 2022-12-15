@@ -132,13 +132,13 @@ ipcMain.handle(Channels.OPEN_DIR_DIALOG, async (): Promise<OpenDirectoryDialogRe
 // Import handlers
 
 import './database/database'; // Initialize database
-import './handlers/deleteStore/deleteStore'; // Non functional
-import './handlers/fetchAudioFile/fetchAudioFile'; // Fetch audio file from disk
-import './handlers/queryDatabase/queryDatabase'; // Get all entries from database
-import './handlers/newEntry/newEntry'; // Add a new entry to the database
-import './handlers/runWhisper/runWhisper'; // Run whisper model
+import '../../frontend/packages/main/src/handlers/deleteStore/deleteStore'; // Non functional
+import '../../frontend/packages/main/src/handlers/fetchAudioFile/fetchAudioFile'; // Fetch audio file from disk
+import '../../frontend/packages/main/src/handlers/queryDatabase/queryDatabase'; // Get all entries from database
+import '../../frontend/packages/main/src/handlers/newEntry/newEntry'; // Add a new entry to the database
+import '../../frontend/packages/main/src/handlers/runWhisper/runWhisper'; // Run whisper model
 import './types/whisperTypes'; // Types for whisper model
-import './handlers/deleteStore/deleteStore'; // Non functional for the moment
-import './handlers/queryDatabase/queryDatabase'; // Handle database functions
-import './handlers/exportTranscription/exportTranscription'; // Export transcription to file
-import './handlers/deleteEntry/deleteEntry'; // Delete entry from database
+import '../../frontend/packages/main/src/handlers/deleteStore/deleteStore'; // Non functional for the moment
+import '../../frontend/packages/main/src/handlers/queryDatabase/queryDatabase'; // Handle database functions
+import '../../frontend/packages/main/src/handlers/exportTranscription/exportTranscription'; // Export transcription to file
+import '../../frontend/packages/main/src/handlers/deleteEntry/deleteEntry'; // Delete entry from database

@@ -1,0 +1,7 @@
+{
+  "jest.rootPath": "frontend",
+  "vitest.enable": true,
+  "vitest.showFailMessages": true,
+  // "vitest.commandLine": "yarn --cwd frontend run test --",
+  "vitest.include": ["frontend/test/**/*.{test,spec}.{js,ts}"]
+}

@@ -1,11 +1,11 @@
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import type {PreloadedState} from '@reduxjs/toolkit';
 // Redux reducers
-import inputReducer from '../features/input/inputSlice';
-import settingsReducer from '../features/settings/settingsSlice';
+import inputReducer from './inputSlice';
+import settingsReducer from './settingsSlice';
 import appReducer from '../appSlice';
-import entriesReducer from '../features/entries/entrySlice';
-import whisperReducer from '../features/whisper/whisperSlice';
+import entriesReducer from './entrySlice';
+import whisperReducer from './whisperSlice';
 
 // Combine reducers to create a root reducer
 const rootReducer = combineReducers({

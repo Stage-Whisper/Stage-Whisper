@@ -1,13 +1,13 @@
-import { newEntryArgs } from './handlers/newEntry/newEntry';
+import { newEntryArgs } from '../../frontend/packages/main/src/handlers/newEntry/newEntry';
 import { Entry } from 'knex/types/tables';
 import { contextBridge, ipcRenderer } from 'electron';
 import { Channels, NewEntryResponse, OpenDirectoryDialogResponse } from './types/channels';
 
 import { WhisperArgs } from './types/whisperTypes';
 
-import { RunWhisperResponse } from './handlers/runWhisper/runWhisper';
+import { RunWhisperResponse } from '../../frontend/packages/main/src/handlers/runWhisper/runWhisper';
 import { QUERY, QueryArgs, QueryReturn } from './types/queries';
-import { ExportTranscriptionResponse } from './handlers/exportTranscription/exportTranscription';
+import { ExportTranscriptionResponse } from '../../frontend/packages/main/src/handlers/exportTranscription/exportTranscription';
 
 declare global {
   interface Window {

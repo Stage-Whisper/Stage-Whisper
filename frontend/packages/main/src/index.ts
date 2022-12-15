@@ -2,6 +2,9 @@ import {app} from 'electron';
 import './security-restrictions';
 import {restoreOrCreateWindow} from '/@/mainWindow';
 
+console.log('main.index: starting...');
+// console.log(__dirname);
+
 /**
  * Prevent electron from running multiple instances.
  */
@@ -44,13 +47,26 @@ app
  * Note: You must install `electron-devtools-installer` manually
  */
 // if (import.meta.env.DEV) {
-//   app.whenReady()
-//     .then(() => import('electron-devtools-installer'))
-//     .then(({default: installExtension, VUEJS3_DEVTOOLS}) => installExtension(VUEJS3_DEVTOOLS, {
-//       loadExtensionOptions: {
-//         allowFileAccess: true,
-//       },
-//     }))
+//   console.debug('Installing extensions...');
+//   app.whenReady().then(() => {
+//     installExtension(REDUX_DEVTOOLS)
+//       .then(name => console.log(`Added Extension:  ${name}`))
+//       .catch(err => console.log('An error occurred installing ${name}: ', err));
+//   });
+
+//   app.whenReady().then(() => {
+//     installExtension(REACT_DEVELOPER_TOOLS)
+//       .then(name => console.log(`Added Extension:  ${name}`))
+//       .catch(err => console.log('An error occurred installing ${name}: ', err));
+//   });
+// }
+//     .then(({default: installExtension, REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS}) =>
+//       installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS], {
+//         loadExtensionOptions: {
+//           allowFileAccess: true,
+//         },
+//       }),
+//     )
 //     .catch(e => console.error('Failed install extension:', e));
 // }
 

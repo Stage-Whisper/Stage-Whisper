@@ -1,17 +1,11 @@
-// import {MainScreen, AboutScreen, SearchScreen} from './screens';
-
-import {Input} from '@mantine/core';
 import {HashRouter, Route, Routes} from 'react-router-dom';
 import App from './App';
-import About from './features/about/About';
-import Dashboard from './features/dashboard/Dashboard';
-import EntryEditor from './features/entries/editor/EntryEditor';
-import Entries from './features/entries/EntryList';
-import Settings from './features/settings/Settings';
-// import Entries from './features/entries/EntryList';
-// import EntryEditor from './features/entries/editor/EntryEditor';
-// import Settings from './features/settings/Settings';
-// import Dashboard from './features/dashboard/Dashboard';
+import About from './screens/about/About';
+import Dashboard from './screens/dashboard/Dashboard';
+import EntryEditor from './screens/transcription/EntryEditor';
+import Entries from './screens/list/EntryList';
+import Input from './screens/input/Input';
+import Settings from './screens/settings/Settings';
 
 export function AppRoutes() {
   console.log('AppRoutes');

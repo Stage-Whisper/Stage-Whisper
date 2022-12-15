@@ -1,5 +1,6 @@
 // React
-import React, {useEffect} from 'react';
+import * as React from 'react';
+import {useEffect} from 'react';
 import {Link, Outlet, useLocation, useParams} from 'react-router-dom';
 
 // Mantine / Styling
@@ -52,13 +53,9 @@ import {
   selectEntries,
   selectNumberOfEntries,
   setActiveEntry,
-} from './features/entries/entrySlice';
-import {
-  selectDarkMode,
-  selectDisplayLanguage,
-  toggleDarkMode,
-} from './features/settings/settingsSlice';
-import {selectTranscribingStatus} from './features/whisper/whisperSlice';
+} from './redux/entrySlice';
+import {selectDarkMode, selectDisplayLanguage, toggleDarkMode} from './redux/settingsSlice';
+import {selectTranscribingStatus} from './redux/whisperSlice';
 import {useAppDispatch, useAppSelector} from './redux/hooks';
 
 // Entries list - Shows all entries

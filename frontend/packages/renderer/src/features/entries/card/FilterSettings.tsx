@@ -1,7 +1,7 @@
-import { Button, Chip, Group, Select, TextInput } from '@mantine/core';
-import { IconSearch, IconSortAscending, IconSortDescending } from '@tabler/icons';
-import React, { useEffect, useState } from 'react';
-import type { ReduxEntry } from '../entrySlice';
+import {Button, Chip, Group, Select, TextInput} from '@mantine/core';
+import {IconSearch, IconSortAscending, IconSortDescending} from '@tabler/icons';
+import React, {useEffect, useState} from 'react';
+import type {ReduxEntry} from '../../../redux/entrySlice';
 
 function FilterSettings({
   entries,
@@ -21,38 +21,38 @@ function FilterSettings({
   });
 
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFilter({ ...filter, query: event.target.value });
+    setFilter({...filter, query: event.target.value});
   };
   const handleShowNotStartedChange = (event: React.MouseEvent<HTMLInputElement>) => {
-    setFilter({ ...filter, showNotStarted: event.currentTarget.checked });
+    setFilter({...filter, showNotStarted: event.currentTarget.checked});
   };
   const handleShowCompletedChange = (event: React.MouseEvent<HTMLInputElement>) => {
-    setFilter({ ...filter, showCompleted: event.currentTarget.checked });
+    setFilter({...filter, showCompleted: event.currentTarget.checked});
   };
   const handleSortByChange = (value: string) => {
-    setFilter({ ...filter, sortBy: value as sortConfig['sortBy'] });
+    setFilter({...filter, sortBy: value as sortConfig['sortBy']});
   };
   const handleSortDirectionChange = () => {
-    setFilter({ ...filter, asc: !filter.asc });
+    setFilter({...filter, asc: !filter.asc});
   };
 
   //Filter the entries based on the current filter
   useEffect(() => {
     let filteredEntries = [...entries];
     if (filter.query !== '') {
-      filteredEntries = filteredEntries.filter((entry) => {
+      filteredEntries = filteredEntries.filter(entry => {
         return entry.name.toLowerCase().includes(filter.query.toLowerCase());
       });
     }
     if (!filter.showCompleted) {
       // console.log('hide completed');
-      filteredEntries = filteredEntries.filter((entry) => {
+      filteredEntries = filteredEntries.filter(entry => {
         return entry.transcriptions.length === 0;
       });
     }
     if (!filter.showNotStarted) {
       // console.log('hide not started');
-      filteredEntries = filteredEntries.filter((entry) => {
+      filteredEntries = filteredEntries.filter(entry => {
         return entry.transcriptions.length > 0;
       });
     }
@@ -77,7 +77,12 @@ function FilterSettings({
         grow={false}
       >
         <TextInput
-          icon={<IconSearch size={18} stroke={1.5} />}
+          icon={
+            <IconSearch
+              size={18}
+              stroke={1.5}
+            />
+          }
           radius="xl"
           size="md"
           onChange={handleQueryChange}
@@ -89,11 +94,21 @@ function FilterSettings({
           <Switch label="Show in Progress" onChange={handleShowInProgressChange} defaultChecked></Switch>
           <Switch label="Show Not Started" onChange={handleShowNotStartedChange} defaultChecked></Switch> */}
           {/* Use Chips to represent the above  */}
-          <Chip.Group position="center" multiple defaultValue={['transcribed', 'notstarted']}>
-            <Chip value="transcribed" onClick={handleShowCompletedChange}>
+          <Chip.Group
+            position="center"
+            multiple
+            defaultValue={['transcribed', 'notstarted']}
+          >
+            <Chip
+              value="transcribed"
+              onClick={handleShowCompletedChange}
+            >
               Transcribed?
             </Chip>
-            <Chip value="notstarted" onClick={handleShowNotStartedChange}>
+            <Chip
+              value="notstarted"
+              onClick={handleShowNotStartedChange}
+            >
               Not transcribed
             </Chip>
           </Chip.Group>
@@ -102,12 +117,19 @@ function FilterSettings({
             defaultValue={filter.sortBy}
             onChange={handleSortByChange}
             data={[
-              { value: 'time', label: 'Sort by Creation Date' },
-              { value: 'alphabetically', label: 'Sort Alphabetically' },
+              {value: 'time', label: 'Sort by Creation Date'},
+              {value: 'alphabetically', label: 'Sort Alphabetically'},
             ]}
           />
-          <Button variant="subtle" onClick={handleSortDirectionChange}>
-            {filter.asc ? <IconSortAscending></IconSortAscending> : <IconSortDescending></IconSortDescending>}
+          <Button
+            variant="subtle"
+            onClick={handleSortDirectionChange}
+          >
+            {filter.asc ? (
+              <IconSortAscending></IconSortAscending>
+            ) : (
+              <IconSortDescending></IconSortDescending>
+            )}
           </Button>
         </Group>
       </Group>

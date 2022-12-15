@@ -1,6 +1,6 @@
-import { createSlice } from '@reduxjs/toolkit';
+import {createSlice} from '@reduxjs/toolkit';
 
-import type { RootState } from './redux/store';
+import type {RootState} from './redux/store';
 
 // app Slice
 // This slice is used to store the state of the app shell
@@ -23,13 +23,13 @@ export const appSlice = createSlice({
     setBurgerOpen: (state, action) => {
       state.burgerOpen = action.payload;
     },
-    toggleDebugMenu: (state) => {
+    toggleDebugMenu: state => {
       state.debugMenu = !state.debugMenu;
     },
   },
 });
 
-export const { setBurgerOpen, toggleDebugMenu } = appSlice.actions;
+export const {setBurgerOpen, toggleDebugMenu} = appSlice.actions;
 
 export const selectBurgerOpen = (state: RootState) => state.app.burgerOpen;
 export const selectDebugMenu = (state: RootState) => state.app.debugMenu;
