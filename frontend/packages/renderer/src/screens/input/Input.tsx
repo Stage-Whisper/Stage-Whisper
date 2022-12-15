@@ -1,3 +1,7 @@
+// Preload Imports
+import {api} from '#preload';
+
+// Packages
 import {Alert, Button, Center, LoadingOverlay, Modal, Stack, Title} from '@mantine/core';
 import {useMediaQuery} from '@mantine/hooks';
 import * as React from 'react';
@@ -73,15 +77,16 @@ function Input() {
       // Convert audio type string to valid entryAudioParams type
       const audioType = audio.audio_type?.split('/')[1] as Entry['audio_type'];
 
-      const newEntry = await window.Main.newEntry({
-        // TODO: #51 Convert to redux action
-        filePath: audio.audio_path,
-        name: about.name,
-        audio_name: audio.audio_name,
-        description: about.description,
-        audio_type: audioType,
-        audio_language: language,
-      })
+      const newEntry = await api
+        .newEntry({
+          // TODO: #51 Convert to redux action
+          filePath: audio.audio_path,
+          name: about.name,
+          audio_name: audio.audio_name,
+          description: about.description,
+          audio_type: audioType,
+          audio_language: language,
+        })
         .then(result => {
           // If the submission was successful
           if (result) {
@@ -110,7 +115,7 @@ function Input() {
       throw new Error('Input: Missing selections');
     }
   };
-
+  console.log(window);
   return (
     <Center>
       {/* Modal that reports whether an entry was successfully added and prompts the user to add another file, add the file to the queue or go to the list of entries */}
