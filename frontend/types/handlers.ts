@@ -5,16 +5,6 @@ export type ExportTranscriptionResponse = {
   outputDir: string;
 };
 
-// Create new entry and add it to the database
-export type newEntryArgs = {
-  filePath: Entry['audio_path'];
-  name: Entry['name'];
-  description: Entry['description'];
-  audio_type: Entry['audio_type'];
-  audio_language: Entry['audio_language'];
-  audio_name: Entry['audio_name'];
-};
-
 // Response type for the openDirectoryDialog channel
 export interface OpenDirectoryDialogResponse {
   path: string | null;
