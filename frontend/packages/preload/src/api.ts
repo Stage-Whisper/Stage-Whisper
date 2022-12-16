@@ -140,7 +140,7 @@ export const runWhisper = async ({
  * Trigger an OS level directory picker
  * @returns The path to the selected directory
  */
-export const openDirectoryDialog = async (): Promise<{path: string} | null> => {
+export const openDirectoryDialog = async (): Promise<{path: string}> => {
   console.debug(pc.dim('API: openDirectoryDialog'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -410,6 +410,7 @@ export const restoreLine = async ({
           result instanceof Object && Object.hasOwn(result, 'version'),
           pc.yellow('API: restoreLine: result is not a Line'),
         );
+
         resolve({line: result as Line});
       })
       .catch(error => {
@@ -501,7 +502,11 @@ export const updateTranscription = async ({
  * @param entryUUID - The UUID of the entry to get
  * @returns The entry, or null if it does not exist
  */
-export const getEntry = async ({entryUUID}: {entryUUID: string}): Promise<{entry: Entry}> => {
+export const getEntry = async ({
+  entryUUID,
+}: {
+  entryUUID: string;
+}): Promise<{entry: Entry} | null> => {
   console.debug(pc.dim('API: getEntry'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -511,6 +516,9 @@ export const getEntry = async ({entryUUID}: {entryUUID: string}): Promise<{entry
           result instanceof Object && Object.hasOwn(result, 'inQueue'),
           pc.yellow('API: getEntry: result is not an Entry'),
         );
+
+        if (result === null) resolve(null);
+
         resolve({entry: result as Entry});
       })
       .catch(error => {
@@ -525,7 +533,7 @@ export const getEntry = async ({entryUUID}: {entryUUID: string}): Promise<{entry
  * @param lineUUID - The UUID of the line to get
  * @returns The line, or null if it does not exist
  */
-export const getLine = async ({lineUUID}: {lineUUID: string}): Promise<{line: Line}> => {
+export const getLine = async ({lineUUID}: {lineUUID: string}): Promise<{line: Line} | null> => {
   console.debug(pc.dim('API: getLine'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -535,6 +543,8 @@ export const getLine = async ({lineUUID}: {lineUUID: string}): Promise<{line: Li
           result instanceof Object && Object.hasOwn(result, 'version'),
           pc.yellow('API: getLine: result is not a Line'),
         );
+        if (result === null) resolve(null);
+
         resolve({line: result as Line});
       })
       .catch(error => {
@@ -556,7 +566,7 @@ export const getLineByIndex = async ({
 }: {
   index: number;
   transcriptionUUID: string;
-}): Promise<{line: Line}> => {
+}): Promise<{line: Line} | null> => {
   console.debug(pc.dim('API: getLineByIndex'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -569,6 +579,8 @@ export const getLineByIndex = async ({
           result instanceof Object && Object.hasOwn(result, 'version'),
           pc.yellow('API: getLineByIndex: result is not a Line'),
         );
+
+        if (result === null) resolve(null);
         resolve({line: result as Line});
       })
       .catch(error => {
@@ -588,7 +600,7 @@ export const getTranscription = async ({
   transcriptionUUID,
 }: {
   transcriptionUUID: string;
-}): Promise<{transcription: Transcription}> => {
+}): Promise<{transcription: Transcription} | null> => {
   console.debug(pc.dim('API: getTranscription'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -598,7 +610,8 @@ export const getTranscription = async ({
           result instanceof Object && Object.hasOwn(result, 'transcribedOn'),
           pc.yellow('API: getTranscription: result is not a Transcription'),
         );
-        resolve({transcription: result as Transcription});
+        if (result === null) resolve(null);
+        resolve({transcription: result});
       })
       .catch(error => {
         console.log(pc.red('API:Error in getTranscription: ') + error);
@@ -621,7 +634,8 @@ export const getEntryCount = async (): Promise<{entryCount: number}> => {
           typeof result === 'number',
           pc.yellow('API: getEntryCount: result is not a number'),
         );
-        resolve({entryCount: result as number});
+
+        resolve({entryCount: result});
       })
       .catch(error => {
         console.log(pc.red('API:Error in getEntryCount: ') + error);
@@ -713,7 +727,7 @@ export const getTranscriptionCount = async (): Promise<{transcriptionCount: numb
  * Get all entries from the database
  * @returns An array of all entries
  */
-export const getAllEntries = async (): Promise<{entries: Entry[]}> => {
+export const getAllEntries = async (): Promise<{entries: Entry[]} | null> => {
   console.debug(pc.dim('API: getAllEntries'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -728,6 +742,8 @@ export const getAllEntries = async (): Promise<{entries: Entry[]}> => {
             (result[0] instanceof Object && Object.hasOwn(result[0], 'createdOn')),
           pc.yellow('API: getAllEntries: result is not an array of Entries'),
         );
+
+        if (result === null) resolve(null);
 
         resolve({entries: result as Entry[]});
       })
@@ -748,7 +764,7 @@ export const getAllTranscriptionsForEntry = async ({
   entryUUID,
 }: {
   entryUUID: string;
-}): Promise<{transcriptions: Transcription[]}> => {
+}): Promise<{transcriptions: Transcription[]} | null> => {
   console.debug(pc.dim('API: getAllTranscriptionsForEntry'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -763,6 +779,7 @@ export const getAllTranscriptionsForEntry = async ({
             (result[0] instanceof Object && Object.hasOwn(result[0], 'transcribedOn')),
           pc.yellow('API: getAllTranscriptionsForEntry: result is not an array of Transcriptions'),
         );
+        if (result === null) resolve(null);
 
         resolve({transcriptions: result as Transcription[]});
       })
@@ -782,7 +799,7 @@ export const getAllLinesForTranscription = async ({
   transcriptionUUID,
 }: {
   transcriptionUUID: string;
-}): Promise<{lines: Line[]}> => {
+}): Promise<{lines: Line[]} | null> => {
   console.debug(pc.dim('API: getAllLinesForTranscription'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -798,6 +815,7 @@ export const getAllLinesForTranscription = async ({
             (result[0] instanceof Object && Object.hasOwn(result[0], 'version')),
           pc.yellow('API: getAllLinesForTranscription: result is not an array of Lines'),
         );
+        if (result === null) resolve(null);
 
         resolve({lines: result as Line[]});
       })
@@ -813,7 +831,7 @@ export const getAllLinesForTranscription = async ({
  * Get every line in the database
  * @returns An array of all lines
  */
-export const getAllLines = async (): Promise<{lines: Line[]}> => {
+export const getAllLines = async (): Promise<{lines: Line[]} | null> => {
   console.debug(pc.dim('API: getAllLines'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -829,6 +847,7 @@ export const getAllLines = async (): Promise<{lines: Line[]}> => {
             (result[0] instanceof Object && Object.hasOwn(result[0], 'version')),
           pc.yellow('API: getAllLines: result is not an array of Lines'),
         );
+        if (result === null) resolve(null);
 
         resolve({lines: result as Line[]});
       })
@@ -849,7 +868,7 @@ export const getLatestLines = async ({
   transcriptionUUID,
 }: {
   transcriptionUUID: string;
-}): Promise<{lines: Line[]}> => {
+}): Promise<{lines: Line[]} | null> => {
   return new Promise((resolve, reject) => {
     ipcRenderer
       .invoke(QUERY.GET_LATEST_LINES, transcriptionUUID)
@@ -863,6 +882,7 @@ export const getLatestLines = async ({
             (result[0] instanceof Object && Object.hasOwn(result[0], 'version')),
           pc.yellow('API: getLatestLines: result is not an array of Lines'),
         );
+        if (result === null) resolve(null);
 
         resolve({lines: result as Line[]});
       })
@@ -879,7 +899,7 @@ export const getLatestLines = async ({
  */
 export const getAllTranscriptions = async (): Promise<{
   transcriptions: Transcription[];
-}> => {
+} | null> => {
   console.debug(pc.dim('API: getAllTranscriptions'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -894,6 +914,10 @@ export const getAllTranscriptions = async (): Promise<{
             (result[0] instanceof Object && Object.hasOwn(result[0], 'transcribedOn')),
           pc.yellow('API: getAllTranscriptions: result is not an array of Transcriptions'),
         );
+
+        if (result === null) resolve(null);
+
+        resolve({transcriptions: result as Transcription[]});
       })
       .catch(error => {
         console.log(pc.red('API:Error in getAllTranscriptions: ') + error);
@@ -902,21 +926,13 @@ export const getAllTranscriptions = async (): Promise<{
   });
 };
 
-// export const GET_ALL_ENTRIES_WITH_TRANSCRIPTIONS =
-//   async (): QueryReturn[QUERY.GET_ALL_ENTRIES_WITH_TRANSCRIPTIONS] => {
-//     // Get all entries with transcriptions
-//     return (await ipcRenderer.invoke(
-//       QUERY.GET_ALL_ENTRIES_WITH_TRANSCRIPTIONS,
-//     )) as QueryReturn[QUERY.GET_ALL_ENTRIES_WITH_TRANSCRIPTIONS];
-//   };
-
 /**
  * Get all entries with transcriptions
  * @returns An array of all entries with transcriptions
  */
 export const getAllEntriesWithTranscriptions = async (): Promise<{
   entries: Entry[];
-}> => {
+} | null> => {
   console.debug(pc.dim('API: getAllEntriesWithTranscriptions'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -931,6 +947,7 @@ export const getAllEntriesWithTranscriptions = async (): Promise<{
             (result[0] instanceof Object && Object.hasOwn(result[0], 'inQueue')),
           pc.yellow('API: getAllEntriesWithTranscriptions: result is not an array of Entries'),
         );
+        if (result === null) resolve(null);
 
         resolve({entries: result as Entry[]});
       })
@@ -947,7 +964,7 @@ export const getAllEntriesWithTranscriptions = async (): Promise<{
  */
 export const getAllEntriesWithLinesAndTranscriptions = async (): Promise<{
   entries: Entry[];
-}> => {
+} | null> => {
   console.debug(pc.dim('API: getAllEntriesWithLinesAndTranscriptions'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -964,6 +981,8 @@ export const getAllEntriesWithLinesAndTranscriptions = async (): Promise<{
             'API: getAllEntriesWithLinesAndTranscriptions: result is not an array of Entries',
           ),
         );
+
+        if (result === null) resolve(null);
 
         resolve({entries: result as Entry[]});
       })
