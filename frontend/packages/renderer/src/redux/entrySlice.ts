@@ -1,3 +1,6 @@
+// Api
+import * as api from '#preload';
+
 // Redux
 import type {RootState} from './store';
 
@@ -8,7 +11,6 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 import type {PayloadAction} from '@reduxjs/toolkit';
 import type {Entry, Line, Transcription} from '@prisma/client';
 import type {WhisperArgs} from '../../../../types/whisper';
-import type {RunWhisperResponse} from '../../../main/src/handlers/runWhisper';
 
 export interface ReduxEntry extends Entry {
   transcriptions: Transcription[];
@@ -31,25 +33,37 @@ const initialState: entryState = {
   activeLines: [],
 };
 
-// Thunk for loading the transcriptions from the database
+// Thunk for loading the entries from the database
 export const getLocalFiles = createAsyncThunk(
   'entries/getLocalFiles',
   async (): Promise<{entries?: ReduxEntry[]; error?: string}> => {
     // Set Input State to loading
-    const entryResult = (await window.Main.GET_ALL_ENTRIES()) as Entry[];
-    const transResult = (await window.Main.GET_ALL_TRANSCRIPTIONS()) as Transcription[];
-    // Attach transcriptions to entries
-    const entries = entryResult.map((entry): ReduxEntry => {
-      const transcriptions = transResult.filter(
-        transcription => transcription.entryId === entry.uuid,
-      );
-      return {...entry, transcriptions};
-    });
 
-    if (entries) {
-      return {entries};
-    } else {
+    // Get all entries
+    const entryResult = await api.getAllEntries();
+    // Check if null
+    if (!entryResult) {
       return {error: 'Error loading database'};
+    } else {
+      let reduxEntries: ReduxEntry[] = [];
+      // Get all transcriptions
+      const transcriptionResult = await api.getAllTranscriptions();
+      // Check if null
+      if (transcriptionResult) {
+        entryResult.entries.forEach(entry => {
+          // Get all transcriptions for the entry
+          const transcriptions = transcriptionResult.transcriptions.filter(
+            transcription => transcription.entryId === entry.uuid,
+          );
+          // Add the transcriptions to the entry
+          reduxEntries.push({...entry, transcriptions});
+        });
+      } else {
+        // Add the entries without transcriptions
+        reduxEntries = entryResult.entries.map(entry => ({...entry, transcriptions: []}));
+      }
+      // Return the entries
+      return {entries: reduxEntries};
     }
   },
 );
@@ -58,33 +72,34 @@ export const fetchLineAsync = createAsyncThunk(
   'entries/fetchLine',
   async (args: {line: Line}): Promise<{line: Line}> => {
     const {line} = args;
-    const lineResult = (await window.Main.GET_LINE({
-      index: line.index,
-      transcriptionUUID: line.transcriptionId,
-    })) as Line;
-    if (lineResult) {
-      return {line: lineResult};
-    } else {
+    const lineResult = await api.getLine({lineUUID: line.uuid});
+
+    if (!lineResult) {
       throw new Error('Error loading line');
+    } else {
+      return {line: lineResult.line};
     }
   },
 );
 
 export const whisperTranscribe = createAsyncThunk(
   'entries/whisperTranscribe',
-  async (entry: ReduxEntry): Promise<{result?: RunWhisperResponse; error?: string}> => {
+  async (entry: ReduxEntry): Promise<{result?: Awaited<api.runWhisperReturn>; error?: string}> => {
     const args: WhisperArgs = {
       inputPath: entry.audio_path,
     };
 
-    const result = await window.Main.runWhisper(args, entry);
+    const result = await api.runWhisper({
+      entryUUID: entry.uuid,
+      whisperArgs: args,
+    });
 
     console.log('whisperTranscribe result', result);
 
-    if (result) {
-      return {result};
+    if (!result) {
+      throw new Error('Error running whisper');
     } else {
-      throw {error: 'Error running whisper'};
+      return {result};
     }
   },
 );

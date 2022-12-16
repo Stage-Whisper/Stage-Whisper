@@ -168,7 +168,6 @@ export const openDirectoryDialog = async (): Promise<{path: string}> => {
  * Create a new entry in the database with the given arguments
  * @param args - The arguments to create the entry with
  * @returns The entry that was created
- * @deprecated - Should be replaced with addEntry with entry constructed in the renderer
  */
 export const newEntry = async ({
   filePath,
@@ -185,18 +184,19 @@ export const newEntry = async ({
   audio_language: Entry['audio_language'];
   audio_name: Entry['audio_name'];
 }): Promise<{entry: Entry}> => {
+  console.log({filePath, name, description, audio_type, audio_language, audio_name});
+
   console.debug(pc.dim('API: newEntry'));
   return new Promise((resolve, reject) => {
     ipcRenderer
-      .invoke(
-        Channels.NEW_ENTRY,
+      .invoke(Channels.NEW_ENTRY, {
         filePath,
         name,
         description,
         audio_type,
         audio_language,
         audio_name,
-      )
+      })
       .then(result => {
         console.assert(
           result instanceof Object && Object.hasOwn(result, 'inQueue'),

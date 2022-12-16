@@ -1,6 +1,5 @@
-// Preload Imports
-import {api} from '#preload';
-
+// Functions
+import * as api from '#preload';
 // Packages
 import {Alert, Button, Center, LoadingOverlay, Modal, Stack, Title} from '@mantine/core';
 import {useMediaQuery} from '@mantine/hooks';
@@ -76,6 +75,9 @@ function Input() {
 
       // Convert audio type string to valid entryAudioParams type
       const audioType = audio.audio_type?.split('/')[1] as Entry['audio_type'];
+
+      console.log(audio);
+      console.log(audioType);
 
       const newEntry = await api
         .newEntry({

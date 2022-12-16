@@ -13,9 +13,12 @@ app.on('ready', () => {
     const {
       default: installExtension,
       REDUX_DEVTOOLS,
-      REACT_DEVELOPER_TOOLS,
+      // REACT_DEVELOPER_TOOLS,
     } = require('electron-devtools-installer');
-    installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
+    installExtension([
+      REDUX_DEVTOOLS,
+      // REACT_DEVELOPER_TOOLS
+    ])
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .then((name: any) => console.log(`Added Extension:  ${name}`))
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
