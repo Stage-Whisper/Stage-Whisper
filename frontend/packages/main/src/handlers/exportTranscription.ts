@@ -1,45 +1,45 @@
+import type {
+  exportTranscriptionParams,
+  exportTranscriptionReturn,
+} from './../../../preload/src/index';
 // Database
-import type {Entry, Line} from '@prisma/client';
+import type {Line} from '@prisma/client';
 import {prisma} from '../database';
 
 // Packages
 import {app, ipcMain} from 'electron';
-import {stringifySync} from 'subtitle';
 import {existsSync, mkdirSync, writeFileSync} from 'fs';
+import {stringifySync} from 'subtitle';
 
 // Types
 import type {IpcMainInvokeEvent} from 'electron';
-import {Channels} from '../../../../types/channels';
 import type {NodeList} from 'subtitle';
-
-// Response type
-export type ExportTranscriptionResponse = {
-  outputDir: string;
-};
+import {Channels} from '../../../../types/channels';
 
 // Take a transcription, get its lines, format them and write them to a file
 export default ipcMain.handle(
   Channels.EXPORT_TRANSCRIPTION,
   async (
     _event: IpcMainInvokeEvent,
-    transcriptionUUID: string,
-    entry: Entry,
-    outputPath?: string,
-  ): Promise<ExportTranscriptionResponse> => {
+    args: exportTranscriptionParams,
+  ): Promise<exportTranscriptionReturn> => {
+    // Extract the arguments
+    const {transcriptionUUID} = args[0];
+
+    let dir = args[0].outputDir;
+    // Check if the output directory is provided
+    if (!dir) {
+      console.log('No output directory provided, using desktop directory');
+      dir = app.getPath('desktop');
+    }
+
     try {
       if (!transcriptionUUID) throw new Error('No transcription UUID provided');
-      if (!entry) throw new Error('No entry provided');
 
-      // Get the user desktop directory
-      const outputDir = outputPath || app.getPath('desktop');
-
-      console.log('Exporting transcription', transcriptionUUID, entry.name);
+      console.log('Exporting transcription', transcriptionUUID);
 
       // Get the transcription from the database
       console.log('Getting transcription from database...');
-      // const transcription = (await db('transcriptions')
-      //   .where({uuid: transcriptionUUID})
-      //   .first()) as Transcription;
       const transcription = await prisma.transcription.findUnique({
         where: {uuid: transcriptionUUID},
       });
@@ -47,6 +47,18 @@ export default ipcMain.handle(
       // Check if the transcription exists
       if (!transcription)
         throw new Error(`Transcription with UUID ${transcriptionUUID} does not exist`);
+
+      // Get the entry from the transcription
+      console.log('Getting entry from database...');
+      const entry = await prisma.entry.findUnique({
+        where: {uuid: transcription.entryId},
+      });
+
+      // Check if the entry exists
+      if (!entry)
+        throw new Error(`
+        Entry with UUID ${transcription.entryId} does not exist
+      `);
 
       // Get the lines from the database
       console.log('Getting lines from database...');
@@ -119,31 +131,35 @@ export default ipcMain.handle(
       const vtt = stringifySync(nodes, {format: 'WebVTT'});
 
       // Check if the output directory exists
-      if (!outputDir) throw new Error('No output directory provided');
+      if (!dir) throw new Error('No output directory provided');
 
       // Check if a file with the same name already exists
       const folderName = `${entry.name}`;
       const fileName = `${entry.name}.vtt`;
 
+      let actualFileName = '';
+
       try {
-        if (existsSync(`${outputDir}/${folderName}`)) {
+        if (existsSync(`${dir}/${folderName}`)) {
           console.log('File name clash detected!, renaming folder...');
           // File already exists, add a number to the end of the file name and try again
           let i = 1;
-          while (existsSync(`${outputDir}/${folderName} (${i})`)) {
+          while (existsSync(`${dir}/${folderName} (${i})`)) {
             console.log(`File name clash detected again!, renaming folder with suffix (${i})!...`);
             i++;
             if (i > 100) throw new Error('Too many folder name clashes, aborting!');
           }
           const newFolderName = `${folderName} (${i})`;
           console.log('Writing file to disk...');
-          mkdirSync(`${outputDir}/${newFolderName}`);
-          writeFileSync(`${outputDir}/${newFolderName}/${fileName}`, vtt);
+          mkdirSync(`${dir}/${newFolderName}`);
+          writeFileSync(`${dir}/${newFolderName}/${fileName}`, vtt);
+          actualFileName = `${newFolderName}/${fileName}`;
         } else {
           // Write the file to the output directory
           console.log('Writing file to disk...');
-          mkdirSync(`${outputDir}/${folderName}`);
-          writeFileSync(`${outputDir}/${folderName}/${fileName}`, vtt);
+          mkdirSync(`${dir}/${folderName}`);
+          writeFileSync(`${dir}/${folderName}/${fileName}`, vtt);
+          actualFileName = `${folderName}/${fileName}`;
         }
       } catch (error) {
         console.log('Error writing file!', error);
@@ -151,7 +167,9 @@ export default ipcMain.handle(
       }
 
       console.log('File written to disk!');
-      return {outputDir};
+      return {
+        filePath: `${dir}/${actualFileName}`,
+      };
     } catch (error) {
       console.error('Error exporting transcription: ', error);
       throw error;

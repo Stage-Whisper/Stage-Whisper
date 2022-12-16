@@ -1,13 +1,13 @@
 // Database
-import type {Entry, Transcription} from '@prisma/client';
+import type {Transcription} from '@prisma/client';
 import {prisma, transcriptionStatus} from '../database';
 
 // Packages
-import {app, ipcMain} from 'electron';
-import {join} from 'path';
 import {spawn} from 'child_process';
+import {app, ipcMain} from 'electron';
 import {existsSync, mkdirSync, readFileSync} from 'fs';
 import * as readline from 'node:readline';
+import {join} from 'path';
 import {parseSync} from 'subtitle';
 import {v4 as uuidv4} from 'uuid';
 
@@ -15,23 +15,17 @@ import {v4 as uuidv4} from 'uuid';
 import type {IpcMainInvokeEvent} from 'electron';
 import type {NodeCue} from 'subtitle';
 import {Channels} from '../../../../types/channels';
-import type {WhisperArgs} from '../../../../types/whisper';
-
-// Response type
-export type RunWhisperResponse = {
-  transcription: Transcription;
-  entry: Entry;
-};
+import type {runWhisperParams, runWhisperReturn} from './../../../preload/src/index';
 
 export default ipcMain.handle(
   Channels.runWhisper,
-  async (
-    _event: IpcMainInvokeEvent,
-    args: WhisperArgs,
-    entry: Entry,
-  ): Promise<RunWhisperResponse> => {
-    const {inputPath, language} = args;
-    let {model, device, task} = args;
+  async (_event: IpcMainInvokeEvent, args: runWhisperParams): Promise<runWhisperReturn> => {
+    // Extract the arguments
+    const {inputPath, language} = args[0].whisperArgs;
+    let {model, device, task} = args[0].whisperArgs;
+    const {entryUUID} = args[0];
+
+    // ------------------  Set up the output directory ------------------ //
 
     // Paths
     const rootPath = app.getPath('userData'); // Path to the top level of the data folder
@@ -43,6 +37,18 @@ export default ipcMain.handle(
       existsSync(whisperPath);
     } catch (error) {
       mkdirSync(whisperPath);
+    }
+
+    // ------------------  Get the entry from the database ------------------ //
+
+    // Get the entry from the database
+    console.log('Getting entry from database...');
+    const entry = await prisma.entry.findUnique({
+      where: {uuid: entryUUID},
+    });
+
+    if (!entry) {
+      throw new Error('Entry not found in database');
     }
 
     // Output will be stored in "./store/whisper/{transcription_uuid}/" as an .srt, .vtt, .txt and .json file
@@ -250,7 +256,6 @@ export default ipcMain.handle(
 
     return {
       transcription,
-      entry,
     };
   },
 );

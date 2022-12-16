@@ -1,15 +1,5 @@
 import type {Entry} from '@prisma/client';
 
-// Response from the export transcription handler
-export type ExportTranscriptionResponse = {
-  outputDir: string;
-};
-
-// Response type for the openDirectoryDialog channel
-export interface OpenDirectoryDialogResponse {
-  path: string | null;
-}
-
 // Response type for the whisper-complete channel
 export type WhisperCompleteResponse = {
   outputDir: string;

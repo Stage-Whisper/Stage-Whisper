@@ -313,21 +313,15 @@ export const addTranscription = async ({
 
 /**
  * Remove an entry from the database and all associated lines and transcriptions
- * @param entry - The entry to remove
+ * @param entryUUID - The entry to remove
  * @returns The entry that was removed
  */
-export const removeEntry = async ({entry}: {entry: Entry}): Promise<{entry: Entry}> => {
+export const removeEntry = async ({entryUUID}: {entryUUID: string}): Promise<void> => {
   console.debug(pc.dim('API: removeEntry'));
   return new Promise((resolve, reject) => {
     ipcRenderer
-      .invoke(QUERY.REMOVE_ENTRY, entry)
-      .then(result => {
-        console.assert(
-          result instanceof Object && Object.hasOwn(result, 'inQueue'),
-          pc.yellow('API: removeEntry: result is not an Entry'),
-        );
-        resolve({entry: result as Entry});
-      })
+      .invoke(QUERY.REMOVE_ENTRY, entryUUID)
+      .then(resolve)
       .catch(error => {
         console.log(pc.red('API:Error in removeEntry: ') + error);
         reject(error);

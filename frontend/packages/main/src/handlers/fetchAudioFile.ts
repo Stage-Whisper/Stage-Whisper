@@ -13,7 +13,7 @@ export default ipcMain.handle(
   Channels.FETCH_AUDIO_FILE,
   async (_event: IpcMainInvokeEvent, args: fetchAudioFileParams): Promise<fetchAudioFileReturn> => {
     // As we are using a Parameter Type Guard, we need to extract the value from the array
-    const audioPath = args[0];
+    const {audioPath} = args[0];
 
     try {
       // Get the audio file and convert it to a buffer
