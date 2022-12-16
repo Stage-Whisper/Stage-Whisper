@@ -158,9 +158,16 @@ export const openDirectoryDialog = async (): Promise<{path: string} | null> => {
  * Create a new entry in the database with the given arguments
  * @param args - The arguments to create the entry with
  * @returns The entry that was created
- * @deprecated Use the addEntry function instead
+ * @deprecated - Should be replaced with addEntry with entry constructed in the renderer
  */
-export const newEntry = async (args: {
+export const newEntry = async ({
+  filePath,
+  name,
+  description,
+  audio_type,
+  audio_language,
+  audio_name,
+}: {
   filePath: Entry['audio_path'];
   name: Entry['name'];
   description: Entry['description'];
@@ -171,7 +178,15 @@ export const newEntry = async (args: {
   console.debug(pc.dim('API: newEntry'));
   return new Promise((resolve, reject) => {
     ipcRenderer
-      .invoke(Channels.NEW_ENTRY, args)
+      .invoke(
+        Channels.NEW_ENTRY,
+        filePath,
+        name,
+        description,
+        audio_type,
+        audio_language,
+        audio_name,
+      )
       .then(result => {
         console.assert(
           result instanceof Object && Object.hasOwn(result, 'inQueue'),
@@ -191,7 +206,7 @@ export const newEntry = async (args: {
  * @param entry - The entry to add
  * @returns The entry that was added
  */
-export const addEntry = async (entry: Entry): Promise<{entry: Entry}> => {
+export const addEntry = async ({entry}: {entry: Entry}): Promise<{entry: Entry}> => {
   console.debug(pc.dim('API: addEntry'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -215,7 +230,7 @@ export const addEntry = async (entry: Entry): Promise<{entry: Entry}> => {
  * @param line - The line to add
  * @returns The line that was added
  */
-export const addLine = async (line: Line): Promise<{line: Line}> => {
+export const addLine = async ({line}: {line: Line}): Promise<{line: Line}> => {
   console.debug(pc.dim('API: addLine'));
   return new Promise((resolve, reject) => {
     ipcRenderer
@@ -239,7 +254,7 @@ export const addLine = async (line: Line): Promise<{line: Line}> => {
  * @param lines[] - The lines to add
  * @returns The lines that were added
  */
-export const addLines = async (lines: Line[]): Promise<{lines: Line[]}> => {
+export const addLines = async ({lines}: {lines: Line[]}): Promise<{lines: Line[]}> => {
   console.debug(pc.dim('API: addLines'));
   return new Promise((resolve, reject) => {
     ipcRenderer

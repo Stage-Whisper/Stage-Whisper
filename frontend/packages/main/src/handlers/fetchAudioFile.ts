@@ -1,3 +1,4 @@
+import type {fetchAudioFileParams, fetchAudioFileReturn} from './../../../preload/src/index';
 // Packages
 import {ipcMain} from 'electron';
 import {readFileSync} from 'fs';
@@ -10,7 +11,10 @@ import {Channels} from '../../../../types/channels';
 
 export default ipcMain.handle(
   Channels.FETCH_AUDIO_FILE,
-  async (_event: IpcMainInvokeEvent, audioPath: string): Promise<Uint8Array> => {
+  async (_event: IpcMainInvokeEvent, args: fetchAudioFileParams): Promise<fetchAudioFileReturn> => {
+    // As we are using a Parameter Type Guard, we need to extract the value from the array
+    const audioPath = args[0];
+
     try {
       // Get the audio file and convert it to a buffer
       const audioBuffer = readFileSync(audioPath);
@@ -19,7 +23,7 @@ export default ipcMain.handle(
       const audioUint8Array = new Uint8Array(audioBuffer);
 
       // Convert send it back to the renderer
-      return audioUint8Array;
+      return {audioFile: audioUint8Array};
     } catch (error) {
       throw new Error(`Error reading audio file: ${error}`);
     }
