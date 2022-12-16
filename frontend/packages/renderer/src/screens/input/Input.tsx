@@ -33,7 +33,7 @@ import {passToWhisper, selectTranscribingStatus} from '../../redux/whisperSlice'
 import strings from '../../features/localization';
 
 // Types
-import type {Entry} from 'knex/types/tables';
+import type {Entry} from '@prisma/client';
 import type {WhisperArgs} from '../../../../../types/whisper';
 import type {AboutUtilityType} from './components/about/About';
 

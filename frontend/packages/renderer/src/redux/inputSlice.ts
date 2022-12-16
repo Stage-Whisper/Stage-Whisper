@@ -1,8 +1,13 @@
-import type {AboutUtilityType} from '../screens/input/components/about/About';
-import {createSlice} from '@reduxjs/toolkit';
-import type {AudioUtilityType} from '../screens/input/components/audio/Audio';
+// Redux
 import type {RootState} from './store';
-import type {WhisperArgs} from '../../../electron/types/whisperTypes';
+
+// Packages
+import {createSlice} from '@reduxjs/toolkit';
+
+// Types
+import type {WhisperArgs} from '../../../../types/whisper';
+import type {AboutUtilityType} from '../screens/input/components/about/About';
+import type {AudioUtilityType} from '../screens/input/components/audio/Audio';
 
 // input Slice
 // This slice is used to store the state of the inputs for transcription

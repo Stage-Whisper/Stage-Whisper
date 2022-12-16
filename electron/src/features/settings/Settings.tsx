@@ -11,7 +11,7 @@ import {
   Text,
   Title
 } from '@mantine/core';
-import React from 'react';
+import * as React from 'react';
 
 // Components
 

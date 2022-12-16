@@ -26,7 +26,11 @@
     "typecheck:renderer": "tsc --noEmit -p packages/renderer/tsconfig.json",
     "typecheck": "yarn typecheck:main && yarn typecheck:preload && yarn typecheck:renderer",
     "postinstall": "cross-env ELECTRON_RUN_AS_NODE=1 electron scripts/update-electron-vendors.mjs",
-    "format": "npx prettier --write \"**/*.{js,mjs,cjs,ts,mts,cts,tsx,json}\""
+    "format": "npx prettier --write \"**/*.{js,mjs,cjs,ts,mts,cts,tsx,json}\"",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio",
+    "prisma:db:seed": "ts-node prisma/seed.ts",
+    "prisma:dev": "prisma format && prisma generate && prisma db push --accept-data-loss && yarn prisma:db:seed"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged --cwd frontend  --allow-empty"
@@ -55,6 +59,7 @@
     "lint-staged": "^13.1.0",
     "nano-staged": "0.8.0",
     "playwright": "1.27.1",
+    "prisma": "^4.7.1",
     "simple-git-hooks": "2.8.1",
     "typescript": "4.9.4",
     "unplugin-auto-expose": "0.0.4",
@@ -73,6 +78,7 @@
     "@mantine/notifications": "^5.9.4",
     "@mantine/nprogress": "^5.9.4",
     "@mantine/rte": "^5.9.4",
+    "@prisma/client": "4.7.1",
     "@reduxjs/toolkit": "^1.9.1",
     "@tabler/icons": "^1.117.0",
     "@vitejs/plugin-react": "^3.0.0",
@@ -93,6 +99,7 @@
     "react-router-dom": "^6.4.5",
     "sqlite3": "^5.1.4",
     "subtitle": "^4.2.1",
+    "ts-node": "^10.9.1",
     "uuid": "^9.0.0",
     "vue": "3.2.45"
   }

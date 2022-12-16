@@ -6,8 +6,9 @@ import { Button, Loader, Stack, Title } from '@mantine/core';
 // Types
 
 import { Howl } from 'howler';
-import { Entry, Line, Transcription } from 'knex/types/tables';
-import React, { useEffect, useState } from 'react';
+import { Entry, Line, Transcription } from '@prisma/client';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import strings from '../../../localization';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';

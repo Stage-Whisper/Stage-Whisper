@@ -2,7 +2,6 @@
 import {ipcRenderer} from 'electron';
 
 // Types
-import type {Entry} from 'knex/types/tables';
 import {QUERY} from '../../../types/queries';
 import type {QueryArgs, QueryReturn} from '../../../types/queries';
 import type {WhisperArgs} from '../../../types/whisper';
@@ -14,6 +13,7 @@ import type {
 import {Channels} from '../../../types/channels';
 import type {RunWhisperResponse} from '../../main/src/handlers/runWhisper';
 import type {NewEntryResponse} from '../../main/src/handlers/newEntry';
+import type {Entry} from '@prisma/client';
 
 // ---------------------- API ---------------------- //
 /**

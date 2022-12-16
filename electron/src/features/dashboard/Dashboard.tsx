@@ -1,5 +1,5 @@
 import { Card, Center, Divider, Group, Stack, Text, Title } from '@mantine/core';
-import React from 'react';
+import * as React from 'react';
 import strings from '../../localization';
 import { useAppSelector } from '../../redux/hooks';
 import { selectEntries } from '../entries/entrySlice';

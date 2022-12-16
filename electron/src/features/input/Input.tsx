@@ -1,6 +1,6 @@
 import { Alert, Button, Center, LoadingOverlay, Modal, Stack, Title } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import React from 'react';
+import * as React from 'react';
 
 // Components
 // import Model from './components/model/Model';
@@ -24,7 +24,7 @@ import {
 // Localization
 import { useNavigate } from 'react-router-dom';
 
-import { Entry } from 'knex/types/tables';
+import { Entry } from '@prisma/client';
 import { WhisperArgs } from '../../../electron/types/whisperTypes';
 import strings from '../../localization';
 import { getLocalFiles } from '../entries/entrySlice';

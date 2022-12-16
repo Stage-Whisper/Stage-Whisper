@@ -1,9 +1,10 @@
 import { Text, Box, ActionIcon, Textarea, Group } from '@mantine/core';
 import { IconPlayerStop, IconPlayerPlay, IconCheck, IconX, IconArrowBack, IconEdit, IconTrash } from '@tabler/icons';
 import { Howl } from 'howler';
-import { Line } from 'knex/types/tables';
+import { Line } from '@prisma/client';
 import { DataTable } from 'mantine-datatable';
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../redux/hooks';
 import { selectAudioPadding } from '../../settings/settingsSlice';
 import { selectActiveLines, setLines } from '../entrySlice';

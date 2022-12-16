@@ -1,9 +1,10 @@
+// Packages
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
 
 // Types
 import type {PreloadedState} from '@reduxjs/toolkit';
 
-// Redux Reducers
+// Redux
 import inputReducer from './inputSlice';
 import settingsReducer from './settingsSlice';
 import appReducer from '../appSlice';

@@ -1,5 +1,5 @@
 import { Card, Center, Divider, Stack, Text, Title } from '@mantine/core';
-import React from 'react';
+import * as React from 'react';
 import strings from '../../localization';
 
 function About() {

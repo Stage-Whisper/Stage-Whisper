@@ -1,6 +1,6 @@
 // Format selector and exporter for StageWhisper exports
 
-import React from 'react';
+import * as React from 'react';
 
 function format() {
   // Process into a format that can be exported

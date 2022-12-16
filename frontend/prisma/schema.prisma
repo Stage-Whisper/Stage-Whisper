@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+  // url      = env("DATABASE_URL")
+}
+
+model Entry {
+  uuid                String          @id @default(uuid())
+  name                String // Title of the entry
+  description         String // Description of the entry
+  created             BigInt // Date the entry was created (in milliseconds since 1970)
+  inQueue             Boolean // If the entry is in the queue
+  queueWeight         Int // Absolute value of the queue weight, 0 is the highest priority
+  activeTranscription String? // The active transcription for the entry
+  audio_type          String //Audio files supported by Whisper in the form of an enum
+  audio_path          String // Path to the audio file
+  audio_name          String // Name of the audio file
+  audio_language      String? // Language of the audio file
+  audio_fileLength    BigInt // Length of the audio file in seconds
+  audio_addedOn       BigInt // Date the audio file was added to the entry (in milliseconds since 1970)
+  transcriptions      Transcription[] @relation("TranscriptionEntry")
+}
+
+model Transcription {
+  uuid          String  @id @default(cuid()) // UUID of the transcription
+  entry         Entry   @relation("TranscriptionEntry", fields: [entryId], references: [uuid])
+  entryId       String
+  transcribedOn BigInt
+  path          String
+  model         String
+  language      String
+  status        String
+  progress      Int
+  translated    Boolean
+  error         String?
+  completedOn   BigInt
+  lines         Line[]  @relation("TranscriptionLine")
+}
+
+model Line {
+  uuid            String        @id @default(cuid()) // UUID of the line
+  transcription   Transcription @relation("TranscriptionLine", fields: [transcriptionId], references: [uuid])
+  transcriptionId String
+  version         Int // Version of the line (used for undo/redo, 0 is the original)
+  index           Int // Line number
+  text            String // Text of the line
+  start           Int // Start time of the line in seconds
+  end             Int // End time of the line in seconds
+  deleted         Boolean // Whether the line has been deleted
+}
+
+model Settings {
+  uuid     String  @id @default(cuid())
+  darkMode Boolean // Whether dark mode is enabled
+  language String // Language of the app
+}

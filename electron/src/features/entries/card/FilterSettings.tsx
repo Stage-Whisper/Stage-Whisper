@@ -1,6 +1,6 @@
 import { Button, Chip, Group, Select, TextInput } from '@mantine/core';
 import { IconSearch, IconSortAscending, IconSortDescending } from '@tabler/icons';
-import React, { useEffect, useState } from 'react';
+import * as React  from 'react'; import { useEffect, useState } from 'react';
 import { ReduxEntry } from '../entrySlice';
 
 function FilterSettings({

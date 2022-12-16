@@ -1,5 +1,6 @@
 // Database
-import db from '../database';
+import type {Entry, Line} from '@prisma/client';
+import {prisma} from '../database';
 
 // Packages
 import {app, ipcMain} from 'electron';
@@ -8,7 +9,6 @@ import {existsSync, mkdirSync, writeFileSync} from 'fs';
 
 // Types
 import type {IpcMainInvokeEvent} from 'electron';
-import type {Entry, Line, Transcription} from 'knex/types/tables';
 import {Channels} from '../../../../types/channels';
 import type {NodeList} from 'subtitle';
 
@@ -37,9 +37,12 @@ export default ipcMain.handle(
 
       // Get the transcription from the database
       console.log('Getting transcription from database...');
-      const transcription = (await db('transcriptions')
-        .where({uuid: transcriptionUUID})
-        .first()) as Transcription;
+      // const transcription = (await db('transcriptions')
+      //   .where({uuid: transcriptionUUID})
+      //   .first()) as Transcription;
+      const transcription = await prisma.transcription.findUnique({
+        where: {uuid: transcriptionUUID},
+      });
 
       // Check if the transcription exists
       if (!transcription)
@@ -47,7 +50,8 @@ export default ipcMain.handle(
 
       // Get the lines from the database
       console.log('Getting lines from database...');
-      const lines = (await db('lines').where({transcription: transcriptionUUID})) as Line[];
+      // const lines = (await db('lines').where({transcription: transcriptionUUID})) as Line[];
+      const lines = await prisma.line.findMany({where: {transcription}});
 
       // Check if the lines exist
       if (!lines || lines.length === 0) {

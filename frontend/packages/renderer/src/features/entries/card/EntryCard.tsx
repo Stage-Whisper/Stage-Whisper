@@ -1,7 +1,7 @@
 import {Button, Card, Center, Divider, Grid, Group, Loader, Stack, Text} from '@mantine/core';
 import {useMediaQuery} from '@mantine/hooks';
 import {IconFileCheck, IconFileDescription} from '@tabler/icons';
-import React from 'react';
+import * as React from 'react';
 import {useNavigate} from 'react-router-dom';
 
 // Redux
@@ -13,7 +13,7 @@ import strings from '../../localization';
 import {passToWhisper, selectTranscribingStatus} from '../../../redux/whisperSlice';
 import type {ReduxEntry} from '../../../redux/entrySlice';
 import {getLocalFiles} from '../../../redux/entrySlice';
-import type {Entry} from 'knex/types/tables';
+import type {Entry} from '@prisma/client';
 
 function TranscriptionCard({entry}: {entry: ReduxEntry}) {
   const dispatch = useAppDispatch();
@@ -170,8 +170,8 @@ function TranscriptionCard({entry}: {entry: ReduxEntry}) {
                   span
                   weight={500}
                 >
-                  {new Date(entry.created).toDateString()} -{' '}
-                  {new Date(entry.created).toLocaleTimeString()}
+                  {new Date(Number(entry.created)).toDateString()} -{' '}
+                  {new Date(Number(entry.created)).toLocaleTimeString()}
                 </Text>
               </Stack>
             </Group>

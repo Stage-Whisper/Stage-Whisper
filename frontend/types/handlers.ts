@@ -1,4 +1,5 @@
-import type {Entry} from 'knex/types/tables';
+import type {Entry} from '@prisma/client';
+
 // Response from the export transcription handler
 export type ExportTranscriptionResponse = {
   outputDir: string;

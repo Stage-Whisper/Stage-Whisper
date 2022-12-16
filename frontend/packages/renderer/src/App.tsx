@@ -160,10 +160,33 @@ function App() {
         //  Tiny type, all caps at 9px / 9px
         headings: {
           // fontFamily: 'Asap, sans-serif',
-          h1: {fontSize: 44, lineHeight: 56, fontWeight: 700},
-          h2: {fontSize: 32, lineHeight: 36, fontWeight: 700},
-          h3: {fontSize: 24, lineHeight: 28, fontWeight: 700},
-          h4: {fontSize: 17, lineHeight: 22, fontWeight: 700},
+          sizes: {
+            h1: {
+              fontSize: '44px',
+              lineHeight: '56px',
+              fontWeight: 700,
+            },
+            h2: {
+              fontSize: '32px',
+              lineHeight: '36px',
+              fontWeight: 700,
+            },
+            h3: {
+              fontSize: '24px',
+              lineHeight: '28px',
+              fontWeight: 700,
+            },
+            h4: {
+              fontSize: '17px',
+              lineHeight: '22px',
+              fontWeight: 700,
+            },
+
+            // h1: {fontSize: 44, lineHeight: 56, fontWeight: 700},
+            // h2: {fontSize: 32, lineHeight: 36, fontWeight: 700},
+            // h3: {fontSize: 24, lineHeight: 28, fontWeight: 700},
+            // h4: {fontSize: 17, lineHeight: 22, fontWeight: 700},
+          },
         },
         activeStyles: {
           transform: 'scale(0.95)',

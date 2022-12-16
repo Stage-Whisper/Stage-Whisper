@@ -5,7 +5,7 @@ import { RootState } from '../../redux/store';
 
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { Entry, Line, Transcription } from 'knex/types/tables';
+import { Entry, Line, Transcription } from '@prisma/client';
 import { RunWhisperResponse } from '../../../electron/handlers/runWhisper/runWhisper';
 import { WhisperArgs } from '../../../electron/types/whisperTypes';
 

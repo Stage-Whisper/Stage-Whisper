@@ -1,8 +1,8 @@
 import { Card, Group, Stack, Text } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { IconCheckbox, IconUpload, IconX } from '@tabler/icons';
-import { Entry } from 'knex/types/tables';
-import React from 'react';
+import { Entry } from '@prisma/client';
+import * as React from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/hooks';
 import { selectAudio, setAudioValid, setSimpleAudioInput } from './inputSlice';
 // Card with file picker that allows user to select a file from their computer

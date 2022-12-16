@@ -4,7 +4,7 @@ import {Button, Loader, Stack, Title} from '@mantine/core';
 // Types
 
 import {Howl} from 'howler';
-import type {Entry, Line, Transcription} from 'knex/types/tables';
+import type {Entry, Line, Transcription} from '@prisma/client';
 import * as React from 'react';
 import {useEffect, useState} from 'react';
 import {useParams} from 'react-router-dom';
@@ -176,7 +176,7 @@ function EntryEditor() {
         <Stack>
           <Title order={3}>Transcription</Title>
           <EntryTable
-            entry={entry}
+            // entry={entry}
             audioPlayer={audioPlayer}
           />
         </Stack>

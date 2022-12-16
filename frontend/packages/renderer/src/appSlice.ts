@@ -29,9 +29,12 @@ export const appSlice = createSlice({
   },
 });
 
+// Redux Actions
 export const {setBurgerOpen, toggleDebugMenu} = appSlice.actions;
 
+// Redux Selectors
 export const selectBurgerOpen = (state: RootState) => state.app.burgerOpen;
 export const selectDebugMenu = (state: RootState) => state.app.debugMenu;
 
+// Redux Reducer
 export default appSlice.reducer;

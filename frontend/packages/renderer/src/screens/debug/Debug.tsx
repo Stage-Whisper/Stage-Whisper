@@ -1,12 +1,11 @@
 import {ActionIcon, Affix, Button, Card, Group, Notification, Stack, Title} from '@mantine/core';
-
-import React, {useState} from 'react';
-import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 import {IconBug, IconBugOff} from '@tabler/icons';
+import {useState} from 'react';
 import {v4 as uuidv4} from 'uuid';
 import {selectDebugMenu, toggleDebugMenu} from '../../appSlice';
 import strings from '../../features/localization';
 import {getLocalFiles} from '../../redux/entrySlice';
+import {useAppDispatch, useAppSelector} from '../../redux/hooks';
 
 function Debug() {
   interface notificationType {

@@ -1,6 +1,6 @@
 import { showNotification, updateNotification } from '@mantine/notifications';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Entry } from 'knex/types/tables';
+import { Entry } from '@prisma/client';
 import { RunWhisperResponse } from '../../../electron/handlers/runWhisper/runWhisper';
 
 // import { RunWhisperResponse } from '../../../electron/types/channels';

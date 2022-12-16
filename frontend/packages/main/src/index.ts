@@ -3,6 +3,35 @@ import './security-restrictions';
 import {restoreOrCreateWindow} from '/@/mainWindow';
 import {initializeApp} from './functions/initializeApp';
 import * as pc from 'picocolors';
+
+/**
+ * Add redux devtools extension support.
+ */
+
+app.on('ready', () => {
+  if (import.meta.env.DEV) {
+    const {
+      default: installExtension,
+      REDUX_DEVTOOLS,
+      REACT_DEVELOPER_TOOLS,
+    } = require('electron-devtools-installer');
+    installExtension([REDUX_DEVTOOLS, REACT_DEVELOPER_TOOLS])
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then((name: any) => console.log(`Added Extension:  ${name}`))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .catch((err: any) => console.log('An error occurred: ', err));
+  }
+});
+
+/**
+ * Add a handler for uncaught exceptions.
+ */
+process.on('uncaughtException', error => {
+  console.error(pc.red('Uncaught Exception:'), error);
+  app.quit();
+  process.exit(1);
+});
+
 /**
  * Prevent electron from running multiple instances.
  */

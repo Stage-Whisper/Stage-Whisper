@@ -1,5 +1,5 @@
 import { Global } from '@mantine/core';
-import React from 'react';
+import * as React from 'react';
 
 // Woff2 -- Should be all we need as electron supports it
 // electron/src/assets/fonts/asap/asap-v24-latin-ext_latin-500.woff2

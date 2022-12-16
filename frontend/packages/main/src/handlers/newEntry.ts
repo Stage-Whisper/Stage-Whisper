@@ -1,5 +1,5 @@
 // Database
-import db from '../database';
+import {prisma} from '../database';
 
 // Packages
 import {app, ipcMain} from 'electron';
@@ -9,7 +9,7 @@ import {v4 as uuidv4} from 'uuid';
 
 // Types
 import type {IpcMainInvokeEvent} from 'electron';
-import type {Entry} from 'knex/types/tables';
+import type {Entry} from '@prisma/client';
 import {Channels} from '../../../../types/channels';
 
 // Response type for the new-entry channel
@@ -42,7 +42,7 @@ export default ipcMain.handle(
       uuid: uuid,
       name: args.name,
       description: args.description,
-      created: Date.now(),
+      created: BigInt(Date.now()),
       inQueue: false,
       queueWeight: 0,
       activeTranscription: null,
@@ -50,11 +50,12 @@ export default ipcMain.handle(
       audio_path: join(audioPath, args.audio_name),
       audio_name: args.audio_name,
       audio_language: args.audio_language,
-      audio_fileLength: 0,
-      audio_addedOn: Date.now(),
+      audio_fileLength: BigInt(0),
+      audio_addedOn: BigInt(Date.now()),
     };
 
     // Copy audio file to ./store/audio/{file}
+    // TODO: Add a uuid to the file name to avoid collisions
     try {
       console.log('NewEntry: Copying audio file to store...');
       copyFileSync(args.filePath, entry.audio_path);
@@ -64,22 +65,14 @@ export default ipcMain.handle(
       throw new Error('Error moving audio file to data folder!');
     }
 
-    const response = await db
-      .insert(entry)
-      .into('entries')
-      .then(() => {
-        console.log('NewEntry: Entry added to database!');
-        return {success: true, entry: entry} as {success: boolean; entry: Entry};
-      })
-      .catch(error => {
-        console.error('NewEntry: Error adding entry to database: ' + error + '!');
-        throw new Error('Error adding entry to database!');
-      });
+    const response = await prisma.entry.create({
+      data: entry,
+    });
 
     if (response === null) {
       throw new Error('Error adding entry to database!');
     } else {
-      return {entry: response.entry};
+      return {entry};
     }
   },
 );

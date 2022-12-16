@@ -1,7 +1,7 @@
 import {Card, Group, Stack, Text} from '@mantine/core';
 import {Dropzone} from '@mantine/dropzone';
 import {IconCheckbox, IconUpload, IconX} from '@tabler/icons';
-import type {Entry} from 'knex/types/tables';
+import type {Entry} from '@prisma/client';
 
 import {useAppDispatch, useAppSelector} from '../../../../redux/hooks';
 import {selectAudio, setAudioValid, setSimpleAudioInput} from '../../../../redux/inputSlice';

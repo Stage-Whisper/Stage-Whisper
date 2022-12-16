@@ -1,12 +1,12 @@
-import { showNotification, updateNotification } from '@mantine/notifications';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import type { Entry } from 'knex/types/tables';
-import type { RunWhisperResponse } from '../../../electron/handlers/runWhisper/runWhisper';
+// Packages
+import {showNotification, updateNotification} from '@mantine/notifications';
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
-// import { RunWhisperResponse } from '../../../electron/types/channels';
-
-import type { WhisperArgs } from '../../../electron/types/whisperTypes';
-import type { RootState } from './store';
+// Types
+import type {Entry} from '@prisma/client';
+import type {WhisperArgs} from '../../../../types/whisper';
+import type {RunWhisperResponse} from '../../../main/src/handlers/runWhisper';
+import type {RootState} from './store';
 
 // WhisperSlice
 // Slice for managing requests to whisper and the queue of requests
@@ -27,7 +27,7 @@ const initialState: WhisperState = {
 export const passToWhisper = createAsyncThunk(
   // A promise that will be resolved when the transcription is complete
   'whisper/passToWhisper',
-  async ({ entry, args }: { entry: Entry; args?: WhisperArgs }): Promise<RunWhisperResponse> => {
+  async ({entry, args}: {entry: Entry; args?: WhisperArgs}): Promise<RunWhisperResponse> => {
     // If no arguments are passed, use the audio path as the input
     // Other arguments will be set to default values in the electron handler
     if (!args) {
@@ -44,7 +44,7 @@ export const passToWhisper = createAsyncThunk(
     if (result) {
       return result;
     } else {
-      throw { error: 'Error running whisper' };
+      throw {error: 'Error running whisper'};
     }
   },
 );
@@ -53,14 +53,14 @@ export const whisperSlice = createSlice({
   name: 'whisper',
   initialState,
   reducers: {
-    resetWhisper: (state) => {
+    resetWhisper: state => {
       // Reset the state of the whisper
       state.transcription_uuid = undefined;
       state.entry = undefined;
       state.status = 'idle';
     },
   },
-  extraReducers: (builder) => {
+  extraReducers: builder => {
     // Thunk for running the whisper transcribe
     builder.addCase(passToWhisper.pending, (state, action) => {
       // Set the status to loading
@@ -78,7 +78,7 @@ export const whisperSlice = createSlice({
       state.entry = action.meta.arg.entry;
     });
 
-    builder.addCase(passToWhisper.fulfilled, (state) => {
+    builder.addCase(passToWhisper.fulfilled, state => {
       // Whisper has finished running the transcription for the active entry
 
       // Clear notification
@@ -106,6 +106,6 @@ export const selectTranscribingStatus = (state: RootState) => {
   };
 };
 
-export const { resetWhisper } = whisperSlice.actions;
+export const {resetWhisper} = whisperSlice.actions;
 
 export default whisperSlice.reducer;

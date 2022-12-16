@@ -1,9 +1,9 @@
-import type {WhisperArgs} from './../../../electron/types/whisperTypes';
+// Redux
 import {createSlice} from '@reduxjs/toolkit';
-import type {RootState} from './store';
 
-// Settings Slice
-// This slice is used to store the state of the settings
+// Types
+import type {WhisperArgs} from '../../../../types/whisper';
+import type {RootState} from './store';
 
 export interface settingsState {
   // currentView: SettingsView;

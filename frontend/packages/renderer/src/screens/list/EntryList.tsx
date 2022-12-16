@@ -1,5 +1,6 @@
 import {Stack} from '@mantine/core';
-import React, {useState} from 'react';
+import * as React from 'react';
+import {useState} from 'react';
 
 // Redux
 import {useAppSelector} from '../../redux/hooks';

@@ -1,6 +1,6 @@
 import { Card, FileInput, Stack, Title } from '@mantine/core';
 import { IconUpload } from '@tabler/icons';
-import React from 'react';
+import * as React from 'react';
 
 // Redux
 import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
@@ -8,7 +8,7 @@ import { selectAudio, selectHighlightInvalid, setAudio, setAudioValid } from '..
 
 // Localization
 import strings from '../../../../localization';
-import { Entry } from 'knex/types/tables';
+import { Entry } from '@prisma/client';
 
 // Types
 

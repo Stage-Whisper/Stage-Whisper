@@ -1,7 +1,7 @@
 import { Button, Card, Center, Divider, Grid, Group, Loader, Stack, Text } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { IconFileCheck, IconFileDescription } from '@tabler/icons';
-import React from 'react';
+import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Redux
@@ -12,7 +12,7 @@ import strings from '../../../localization';
 
 import { passToWhisper, selectTranscribingStatus } from '../../whisper/whisperSlice';
 import { getLocalFiles, ReduxEntry } from '../entrySlice';
-import { Entry } from 'knex/types/tables';
+import { Entry } from '@prisma/client';
 
 function TranscriptionCard({ entry }: { entry: ReduxEntry }) {
   const dispatch = useAppDispatch();

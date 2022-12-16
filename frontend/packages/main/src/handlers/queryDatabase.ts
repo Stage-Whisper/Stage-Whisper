@@ -1,9 +1,9 @@
 // Database
-import db from '../database';
+import type {Entry, Line, Transcription} from '@prisma/client';
+import {prisma} from '../database';
 
 // Types
 import type {IpcMainInvokeEvent as invoke, IpcMainInvokeEvent} from 'electron';
-import type {Entry, Line, Transcription} from 'knex/types/tables';
 import type {QueryArgs, QueryReturn} from '../../../../types/queries';
 import {QUERY} from '../../../../types/queries';
 
@@ -32,8 +32,8 @@ ipcMain.handle(
     args: QueryArgs[QUERY.ADD_ENTRY],
   ): QueryReturn[QUERY.ADD_ENTRY] => {
     const {entry} = args;
-    const insertedEntry = (await db('entries').insert(entry).returning('*')) as Entry[];
-    return insertedEntry[0];
+    const insertedEntry = (await prisma.entry.create({data: entry})) as Entry;
+    return insertedEntry;
   },
 );
 
@@ -42,8 +42,8 @@ ipcMain.handle(
   QUERY.ADD_LINE,
   async (_event: invoke, args: QueryArgs[QUERY.ADD_LINE]): QueryReturn[QUERY.ADD_LINE] => {
     const {line} = args;
-    const insertedLine = (await db('lines').insert(line).returning('*')) as Line[];
-    return insertedLine[0];
+    const insertedLine = (await prisma.line.create({data: line})) as Line;
+    return insertedLine;
   },
 );
 
@@ -52,7 +52,10 @@ ipcMain.handle(
   QUERY.ADD_LINES,
   async (_event: invoke, args: QueryArgs[QUERY.ADD_LINES]): QueryReturn[QUERY.ADD_LINES] => {
     const {lines} = args;
-    const insertedLines = (await db('lines').insert(lines).returning('*')) as Line[];
+    const insertedLines = (await prisma.$transaction(
+      lines.map(line => prisma.line.create({data: line})),
+    )) as Line[];
+
     return insertedLines;
   },
 );
@@ -66,10 +69,10 @@ ipcMain.handle(
     args: QueryArgs[QUERY.ADD_TRANSCRIPTION],
   ): QueryReturn[QUERY.ADD_TRANSCRIPTION] => {
     const {transcription} = args;
-    const insertedTranscription = (await db('transcriptions')
-      .insert(transcription)
-      .returning('*')) as Transcription[];
-    return insertedTranscription[0];
+    const insertedTranscription = (await prisma.transcription.create({
+      data: transcription,
+    })) as Transcription;
+    return insertedTranscription;
   },
 );
 
@@ -79,18 +82,17 @@ ipcMain.handle(
   QUERY.GET_ENTRY,
   async (_event: invoke, args: QueryArgs[QUERY.GET_ENTRY]): QueryReturn[QUERY.GET_ENTRY] => {
     const {entryUUID} = args;
-    const entry = (await db('entries').where({uuid: entryUUID}).first()) as Entry;
+    const entry = (await prisma.entry.findUnique({
+      where: {uuid: entryUUID},
+    })) as Entry;
     return entry;
   },
 );
 
 // Get Entry Count
 ipcMain.handle(QUERY.GET_ENTRY_COUNT, async (): QueryReturn[QUERY.GET_ENTRY_COUNT] => {
-  const entryCount = await db('entries').count('*');
-  if (typeof entryCount[0].count === 'string') {
-    return parseInt(entryCount[0].count, 10);
-  }
-  return entryCount[0].count;
+  const entryCount = await prisma.entry.count();
+  return entryCount;
 });
 
 // Get Line
@@ -98,10 +100,11 @@ ipcMain.handle(
   QUERY.GET_LINE,
   async (_event: invoke, args: QueryArgs[QUERY.GET_LINE]): QueryReturn[QUERY.GET_LINE] => {
     const {index, transcriptionUUID} = args;
-    const line = (await db('lines').where({index, transcription: transcriptionUUID})) as Line[];
-
-    // Return the line with the highest version number
-    return line.reduce((prev, curr) => (prev.version > curr.version ? prev : curr));
+    const line = (await prisma.line.findFirst({
+      where: {index, transcription: {uuid: transcriptionUUID}},
+      orderBy: {version: 'desc'},
+    })) as Line;
+    return line;
   },
 );
 
@@ -113,11 +116,10 @@ ipcMain.handle(
     args: QueryArgs[QUERY.GET_LINE_COUNT],
   ): QueryReturn[QUERY.GET_LINE_COUNT] => {
     const {transcriptionUUID} = args;
-    const lineCount = await db('lines').where({transcription: transcriptionUUID}).count('*');
-    if (typeof lineCount[0].count === 'string') {
-      return parseInt(lineCount[0].count, 10);
-    }
-    return lineCount[0].count;
+    const lineCount = await prisma.line.count({
+      where: {transcription: {uuid: transcriptionUUID}},
+    });
+    return lineCount;
   },
 );
 
@@ -129,9 +131,9 @@ ipcMain.handle(
     args: QueryArgs[QUERY.GET_TRANSCRIPTION],
   ): QueryReturn[QUERY.GET_TRANSCRIPTION] => {
     const {transcriptionUUID} = args;
-    const transcription = (await db('transcriptions')
-      .where({uuid: transcriptionUUID})
-      .first()) as Transcription;
+    const transcription = (await prisma.transcription.findUnique({
+      where: {uuid: transcriptionUUID},
+    })) as Transcription;
     return transcription;
   },
 );
@@ -140,11 +142,8 @@ ipcMain.handle(
 ipcMain.handle(
   QUERY.GET_TRANSCRIPTION_COUNT,
   async (): QueryReturn[QUERY.GET_TRANSCRIPTION_COUNT] => {
-    const transcription = await db('transcriptions').count('*');
-    if (typeof transcription[0].count === 'string') {
-      return parseInt(transcription[0].count, 10);
-    }
-    return transcription[0].count;
+    const transcriptionCount = await prisma.transcription.count();
+    return transcriptionCount;
   },
 );
 
@@ -156,23 +155,22 @@ ipcMain.handle(
     args: QueryArgs[QUERY.GET_TRANSCRIPTION_COUNT_FOR_ENTRY],
   ): QueryReturn[QUERY.GET_TRANSCRIPTION_COUNT_FOR_ENTRY] => {
     const {entryUUID} = args;
-    const transcription = await db('transcriptions').where({entry_id: entryUUID}).count('*');
-    if (typeof transcription[0].count === 'string') {
-      return parseInt(transcription[0].count, 10);
-    }
-    return transcription[0].count;
+    const transcriptionCount = await prisma.transcription.count({
+      where: {entry: {uuid: entryUUID}},
+    });
+    return transcriptionCount;
   },
 );
 
 // Get All Entries
 ipcMain.handle(QUERY.GET_ALL_ENTRIES, async (): QueryReturn[QUERY.GET_ALL_ENTRIES] => {
-  const entries = (await db('entries')) as Entry[];
+  const entries = (await prisma.entry.findMany()) as Entry[];
   return entries;
 });
 
 // Get All Lines
 ipcMain.handle(QUERY.GET_ALL_LINES, async (): QueryReturn[QUERY.GET_ALL_LINES] => {
-  const lines = (await db('lines')) as Line[];
+  const lines = (await prisma.line.findMany()) as Line[];
   return lines;
 });
 
@@ -185,13 +183,46 @@ ipcMain.handle(
   ): QueryReturn[QUERY.GET_LATEST_LINES] => {
     const {transcriptionUUID} = args;
 
-    // Get the lines for a transcription, ordered by index, with only the highest version of each line
-    const lines = (await db('lines')
-      .where({transcription: transcriptionUUID})
-      .orderBy('index', 'asc')
-      .orderBy('version', 'desc')) as Line[];
+    // // Get the lines for a transcription, ordered by index, with only the highest version of each line
+    // const lines = (await db('lines')
+    //   .where({transcription: transcriptionUUID})
+    //   .orderBy('index', 'asc')
+    //   .orderBy('version', 'desc')) as Line[];
 
-    // Get the line at each index which has the highest version
+    // // Get the line at each index which has the highest version
+    // const latestLines = lines.reduce((acc: Line[], line: Line) => {
+    //   if (acc.length === 0) {
+    //     acc.push(line);
+    //   } else {
+    //     const lastLine = acc[acc.length - 1];
+    //     if (lastLine.index === line.index) {
+    //       if (lastLine.version < line.version) {
+    //         acc.pop();
+    //         acc.push(line);
+    //       }
+    //     } else {
+    //       acc.push(line);
+    //     }
+    //   }
+    //   return acc;
+    // }, []);
+
+    // // Remove lines that have been deleted
+    // const filteredLinesWithoutDeleted = latestLines.filter(line => {
+    //   if (line.deleted) {
+    //     return false;
+    //   } else {
+    //     return true;
+    //   }
+    // });
+
+    // return filteredLinesWithoutDeleted;
+
+    const lines = (await prisma.line.findMany({
+      where: {transcription: {uuid: transcriptionUUID}},
+      orderBy: {index: 'asc', version: 'desc'},
+    })) as Line[];
+
     const latestLines = lines.reduce((acc: Line[], line: Line) => {
       if (acc.length === 0) {
         acc.push(line);
@@ -209,7 +240,6 @@ ipcMain.handle(
       return acc;
     }, []);
 
-    // Remove lines that have been deleted
     const filteredLinesWithoutDeleted = latestLines.filter(line => {
       if (line.deleted) {
         return false;
@@ -226,7 +256,7 @@ ipcMain.handle(
 ipcMain.handle(
   QUERY.GET_ALL_TRANSCRIPTIONS,
   async (): QueryReturn[QUERY.GET_ALL_TRANSCRIPTIONS] => {
-    const transcriptions = (await db('transcriptions')) as Transcription[];
+    const transcriptions = (await prisma.transcription.findMany()) as Transcription[];
     return transcriptions;
   },
 );
@@ -239,10 +269,9 @@ ipcMain.handle(
     args: QueryArgs[QUERY.GET_ALL_TRANSCRIPTIONS_FOR_ENTRY],
   ): QueryReturn[QUERY.GET_ALL_TRANSCRIPTIONS_FOR_ENTRY] => {
     const {entryUUID} = args;
-    const transcriptions = (await db('transcriptions').where({
-      entry: entryUUID,
+    const transcriptions = (await prisma.transcription.findMany({
+      where: {entry: {uuid: entryUUID}},
     })) as Transcription[];
-
     return transcriptions;
   },
 );
@@ -253,11 +282,17 @@ ipcMain.handle(
   QUERY.UPDATE_ENTRY,
   async (_event: invoke, args: QueryArgs[QUERY.UPDATE_ENTRY]): QueryReturn[QUERY.UPDATE_ENTRY] => {
     const {entry} = args;
-    const updatedEntry = (await db('entries')
-      .where({uuid: entry.uuid})
-      .update(entry)
-      .returning('*')
-      .first()) as Entry;
+    // const updatedEntry = (await db('entries')
+    //   .where({uuid: entry.uuid})
+    //   .update(entry)
+    //   .returning('*')
+    //   .first()) as Entry;
+    // return updatedEntry;
+
+    const updatedEntry = (await prisma.entry.update({
+      where: {uuid: entry.uuid},
+      data: entry,
+    })) as Entry;
     return updatedEntry;
   },
 );
@@ -268,13 +303,28 @@ ipcMain.handle(
   async (_event: invoke, args: QueryArgs[QUERY.UPDATE_LINE]): QueryReturn[QUERY.UPDATE_LINE] => {
     const {line} = args;
 
-    // Get the line from the database
-    const dbLine = (await db('lines')
-      .where({transcription: line.transcription})
-      .where({index: line.index})
-      .first()) as Line;
+    // // Get the line from the database
+    // const dbLine = (await db('lines')
+    //   .where({transcription: line.transcription})
+    //   .where({index: line.index})
+    //   .first()) as Line;
 
-    // Create a new line object with the updated values and a higher version number
+    // // Create a new line object with the updated values and a higher version number
+    // const updatedLine = {
+    //   ...dbLine,
+    //   ...line,
+    //   uuid: uuidv4(),
+    //   version: dbLine.version + 1,
+    // };
+
+    // // Add the new line to the database and return it
+    // const newLine = (await db('lines').insert(updatedLine).returning('*')) as Line[];
+    // return newLine[0];
+
+    const dbLine = (await prisma.line.findFirst({
+      where: {transcription: {uuid: line.transcriptionId}, index: line.index},
+    })) as Line;
+
     const updatedLine = {
       ...dbLine,
       ...line,
@@ -282,9 +332,8 @@ ipcMain.handle(
       version: dbLine.version + 1,
     };
 
-    // Add the new line to the database and return it
-    const newLine = (await db('lines').insert(updatedLine).returning('*')) as Line[];
-    return newLine[0];
+    const newLine = (await prisma.line.create({data: updatedLine})) as Line;
+    return newLine;
   },
 );
 
@@ -293,10 +342,53 @@ ipcMain.handle(
   QUERY.RESTORE_LINE,
   async (_event: invoke, args: QueryArgs[QUERY.RESTORE_LINE]): QueryReturn[QUERY.RESTORE_LINE] => {
     const {line} = args;
-    // Get the lines from the database
-    const dbLines = (await db('lines')
-      .where({transcription: line.transcription})
-      .where({index: line.index})) as Line[];
+    // // Get the lines from the database
+    // const dbLines = (await db('lines')
+    //   .where({transcription: line.transcription})
+    //   .where({index: line.index})) as Line[];
+
+    // // Get the line with the lowest version number
+    // const lowestVersionLine = dbLines.reduce((acc: Line, line: Line) => {
+    //   if (acc.version > line.version) {
+    //     return line;
+    //   } else {
+    //     return acc;
+    //   }
+    // }, dbLines[0]);
+
+    // // Remove lines with version number higher than the lowest version number
+    // const linesToDelete = dbLines.filter(line => {
+    //   if (line.version > lowestVersionLine.version) {
+    //     return true;
+    //   } else {
+    //     return false;
+    //   }
+    // });
+
+    // // Delete the lines
+    // await db('lines')
+    //   .whereIn(
+    //     'uuid',
+    //     linesToDelete.map(line => line.uuid),
+    //   )
+    //   .del();
+
+    // // Set the deleted flag to false
+    // const updatedLine = {
+    //   ...lowestVersionLine,
+    //   deleted: false,
+    // };
+
+    // // Update the line in the database and return it
+    // const newLine = (await db('lines')
+    //   .where({uuid: updatedLine.uuid})
+    //   .update(updatedLine)
+    //   .returning('*')) as Line[];
+    // return newLine[0];
+
+    const dbLines = (await prisma.line.findMany({
+      where: {transcription: {uuid: line.transcriptionId}, index: line.index},
+    })) as Line[];
 
     // Get the line with the lowest version number
     const lowestVersionLine = dbLines.reduce((acc: Line, line: Line) => {
@@ -316,13 +408,14 @@ ipcMain.handle(
       }
     });
 
-    // Delete the lines
-    await db('lines')
-      .whereIn(
-        'uuid',
-        linesToDelete.map(line => line.uuid),
-      )
-      .del();
+    // Delete the non-original lines
+    await prisma.line.deleteMany({
+      where: {
+        uuid: {
+          in: linesToDelete.map(line => line.uuid),
+        },
+      },
+    });
 
     // Set the deleted flag to false
     const updatedLine = {
@@ -331,11 +424,11 @@ ipcMain.handle(
     };
 
     // Update the line in the database and return it
-    const newLine = (await db('lines')
-      .where({uuid: updatedLine.uuid})
-      .update(updatedLine)
-      .returning('*')) as Line[];
-    return newLine[0];
+    const newLine = (await prisma.line.update({
+      where: {uuid: updatedLine.uuid},
+      data: updatedLine,
+    })) as Line;
+    return newLine;
   },
 );
 
@@ -347,11 +440,10 @@ ipcMain.handle(
     args: QueryArgs[QUERY.UPDATE_TRANSCRIPTION],
   ): QueryReturn[QUERY.UPDATE_TRANSCRIPTION] => {
     const {transcription} = args;
-    const updatedTranscription = (await db('transcriptions')
-      .where({uuid: transcription.uuid})
-      .update(transcription)
-      .returning('*')
-      .first()) as Transcription;
+    const updatedTranscription = (await prisma.transcription.update({
+      where: {uuid: transcription.uuid},
+      data: transcription,
+    })) as Transcription;
     return updatedTranscription;
   },
 );
@@ -362,7 +454,7 @@ ipcMain.handle(
   QUERY.REMOVE_ENTRY,
   async (_event: invoke, args: QueryArgs[QUERY.REMOVE_ENTRY]): QueryReturn[QUERY.REMOVE_ENTRY] => {
     const {entryUUID} = args;
-    await db('entries').where({uuid: entryUUID}).del();
+    await prisma.entry.delete({where: {uuid: entryUUID}});
     return true;
   },
 );
@@ -374,11 +466,10 @@ ipcMain.handle(
     const {index, transcriptionUUID} = args;
 
     // Set deleted flag on all lines with the given index in the given transcription
-    await db('lines')
-      .where({index})
-      .where({transcription: transcriptionUUID})
-      .update({deleted: true});
-
+    await prisma.line.updateMany({
+      where: {index, transcription: {uuid: transcriptionUUID}},
+      data: {deleted: true},
+    });
     return true;
   },
 );

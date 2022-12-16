@@ -1,5 +1,6 @@
 // Database
-import db, {transcriptionStatus} from '../database';
+import type {Entry, Transcription} from '@prisma/client';
+import {prisma, transcriptionStatus} from '../database';
 
 // Packages
 import {app, ipcMain} from 'electron';
@@ -12,7 +13,6 @@ import {v4 as uuidv4} from 'uuid';
 
 // Types
 import type {IpcMainInvokeEvent} from 'electron';
-import type {Entry, Line, Transcription} from 'knex/types/tables';
 import type {NodeCue} from 'subtitle';
 import {Channels} from '../../../../types/channels';
 import type {WhisperArgs} from '../../../../types/whisper';
@@ -184,67 +184,52 @@ export default ipcMain.handle(
           const cues = lines.filter(line => line.type === 'cue') as NodeCue[];
 
           // Add to the database
-          console.log('RunWhisper: Building transcription object...');
-          const transcription: Transcription = {
-            uuid,
-            entry: entry.uuid,
-            transcribedOn,
-            path: outputDir,
-            model,
-            language,
-            status: transcriptionStatus.COMPLETE,
-            progress: 100,
-            completedOn: new Date().getTime(),
-            error: undefined,
-            translated: task === 'translate', // TODO: Detect if the transcription is translated or not, doesn't work for auto detect
-          };
-
-          // Add the transcription to the database
-
-          // invoke the main process to add the transcription to the database
-          console.log('RunWhisper: Adding transcription to database...');
-          console;
-          const newTranscription = (
-            (await db('transcriptions').insert(transcription).returning('*')) as Transcription[]
-          )[0];
-
-          if (newTranscription.error) {
-            console.log(
-              'RunWhisper: Error adding transcription to database!',
-              newTranscription.error,
-            );
-            throw new Error('Error adding transcription to database!');
-          }
-
-          // Convert cues to Lines objects
-          console.log('RunWhisper: Converting cues to lines...');
-          const formattedLines: Line[] = cues.map((cue, index) => {
-            const line: Line = {
-              uuid: uuidv4(),
-              entry: entry.uuid,
-              transcription: newTranscription.uuid,
-              start: cue.data.start,
-              end: cue.data.end,
-              text: cue.data.text || '',
-              index, // Note! This assumes that the cues are in order from whisper
-              deleted: false,
-              version: 0,
-            };
-            return line;
+          console.log('RunWhisper: Adding transcription and lines to database...');
+          const write_operation = await prisma.transcription.create({
+            data: {
+              uuid,
+              entry: {
+                connect: {
+                  uuid: entry.uuid,
+                },
+              },
+              transcribedOn: BigInt(transcribedOn),
+              path: outputDir,
+              model: model || 'base',
+              language: language || 'unknown', //TODO Add language detection output from whisper script
+              status: transcriptionStatus.COMPLETE,
+              progress: 100,
+              completedOn: BigInt(new Date().getTime()),
+              error: null,
+              translated: task === 'translate', // TODO: Detect if the transcription is translated or not, doesn't work for auto detect
+              lines: {
+                create: cues.map((cue, index) => {
+                  return {
+                    uuid: uuidv4(),
+                    transcription: {
+                      connect: {
+                        uuid: transcription.uuid,
+                      },
+                    },
+                    start: cue.data.start,
+                    end: cue.data.end,
+                    text: cue.data.text || '',
+                    index, // Note! This assumes that the cues are in order from whisper
+                    deleted: false,
+                    version: 0,
+                  };
+                }),
+              },
+            },
           });
 
-          // Add the lines to the database
-          console.log('RunWhisper: Adding lines to database...');
-          const newLines = (await db('lines').insert(formattedLines).returning('*')) as Line[];
-
-          if (newLines.length !== formattedLines.length) {
-            console.warn(
-              'RunWhisper: Mismatch between number of lines added to database and number of lines generated!',
+          // Check if the transcription was added to the database
+          if (write_operation.error) {
+            console.log(
+              'RunWhisper: Error adding transcription to database!',
+              write_operation.error,
             );
-            console.log('RunWhisper: Error adding lines to database!', newLines);
-            throw new Error('Error adding lines to database!');
-          } else {
-            console.log('RunWhisper: Lines added to database successfully!');
+            throw new Error('Error adding transcription to database!');
           }
 
           // ------------------  Delete the VTT file ------------------ //

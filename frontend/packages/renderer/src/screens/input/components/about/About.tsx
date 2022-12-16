@@ -1,6 +1,6 @@
 import {Card, Stack, TextInput, Title} from '@mantine/core';
-import type {Entry} from 'knex/types/tables';
-import React from 'react';
+import type {Entry} from '@prisma/client';
+import * as React from 'react';
 import strings from '../../../../features/localization';
 import {useAppDispatch, useAppSelector} from '../../../../redux/hooks';
 import {selectAbout, selectHighlightInvalid, setAbout} from '../../../../redux/inputSlice';
@@ -38,7 +38,7 @@ function About() {
           placeholder={strings.input?.about?.name.placeholder}
           label={strings.input?.about?.name.prompt}
           value={name}
-          onChange={e => {
+          onChange={(e: {currentTarget: {value: React.SetStateAction<string>}}) => {
             setName(e.currentTarget.value);
           }}
           onBlur={() => {
@@ -51,7 +51,7 @@ function About() {
           placeholder={strings.input?.about?.description.placeholder}
           label={strings.input?.about?.description.prompt}
           value={description}
-          onChange={e => {
+          onChange={(e: {currentTarget: {value: React.SetStateAction<string>}}) => {
             setDescription(e.currentTarget.value);
           }}
           onBlur={() => {

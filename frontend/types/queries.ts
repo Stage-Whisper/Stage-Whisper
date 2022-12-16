@@ -1,4 +1,4 @@
-import type {Entry, Line, Transcription} from 'knex/types/tables';
+import type {Entry, Line, Transcription} from '@prisma/client';
 
 // Query Channel Enums
 export enum QUERY {

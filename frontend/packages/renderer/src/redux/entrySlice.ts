@@ -1,14 +1,14 @@
+// Redux
 import type {RootState} from './store';
 
-// Transcription Slice
-// This holds the state of the transcriptions and will be updated by electron/node processes
-
-import type {PayloadAction} from '@reduxjs/toolkit';
+// Packages
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
-import type {Entry, Line, Transcription} from 'knex/types/tables';
-import type {RunWhisperResponse} from '../../../../types/handlers';
+// Types
+import type {PayloadAction} from '@reduxjs/toolkit';
+import type {Entry, Line, Transcription} from '@prisma/client';
 import type {WhisperArgs} from '../../../../types/whisper';
+import type {RunWhisperResponse} from '../../../main/src/handlers/runWhisper';
 
 export interface ReduxEntry extends Entry {
   transcriptions: Transcription[];
@@ -41,7 +41,7 @@ export const getLocalFiles = createAsyncThunk(
     // Attach transcriptions to entries
     const entries = entryResult.map((entry): ReduxEntry => {
       const transcriptions = transResult.filter(
-        transcription => transcription.entry === entry.uuid,
+        transcription => transcription.entryId === entry.uuid,
       );
       return {...entry, transcriptions};
     });
@@ -60,7 +60,7 @@ export const fetchLineAsync = createAsyncThunk(
     const {line} = args;
     const lineResult = (await window.Main.GET_LINE({
       index: line.index,
-      transcriptionUUID: line.transcription,
+      transcriptionUUID: line.transcriptionId,
     })) as Line;
     if (lineResult) {
       return {line: lineResult};

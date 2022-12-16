@@ -1,6 +1,7 @@
 import {Button, Chip, Group, Select, TextInput} from '@mantine/core';
 import {IconSearch, IconSortAscending, IconSortDescending} from '@tabler/icons';
-import React, {useEffect, useState} from 'react';
+import * as React from 'react';
+import {useEffect, useState} from 'react';
 import type {ReduxEntry} from '../../../redux/entrySlice';
 
 function FilterSettings({
@@ -59,7 +60,7 @@ function FilterSettings({
     if (filter.sortBy === 'time') {
       // console.log('sort by time');
       filteredEntries = filteredEntries.sort((a, b) => {
-        return filter.asc ? a.created - b.created : b.created - a.created;
+        return filter.asc ? Number(a.created - b.created) : Number(b.created - a.created);
       });
     } else {
       //Sort alphabetically

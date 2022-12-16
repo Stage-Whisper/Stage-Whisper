@@ -11,7 +11,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import React from 'react';
+import * as React from 'react';
 
 // Components
 
@@ -109,7 +109,7 @@ function Settings() {
               checked={largeModels}
               onLabel={strings.util?.on}
               offLabel={strings.util?.off}
-              onChange={event => {
+              onChange={(event: {target: {checked: any}}) => {
                 console.log(event.target.checked);
                 dispatch(setAllowLargeModel(event.target.checked));
               }}
@@ -133,8 +133,8 @@ function Settings() {
               <NumberInput
                 hideControls
                 value={audioPadding}
-                onChange={val => val && handleAudioPaddingSet(val)}
-                onInput={event => {
+                onChange={(val: number) => val && handleAudioPaddingSet(val)}
+                onInput={(event: {currentTarget: {value: string}}) => {
                   const val = parseInt(event.currentTarget.value);
                   handleAudioPaddingSet(val);
                 }}

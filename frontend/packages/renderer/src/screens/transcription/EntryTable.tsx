@@ -20,7 +20,7 @@ import {selectActiveLines, setLines} from '../../redux/entrySlice';
 
 // Types
 import type {Howl} from 'howler';
-import type {Line} from 'knex/types/tables';
+import type {Line} from '@prisma/client';
 
 function EntryTable({audioPlayer}: {audioPlayer: Howl}) {
   // Data Table States

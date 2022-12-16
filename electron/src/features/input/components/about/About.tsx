@@ -1,6 +1,6 @@
 import { Card, Stack, TextInput, Title } from '@mantine/core';
-import { Entry } from 'knex/types/tables';
-import React from 'react';
+import { Entry } from '@prisma/client';
+import * as React from 'react';
 import strings from '../../../../localization';
 import { useAppDispatch, useAppSelector } from '../../../../redux/hooks';
 import { selectAbout, selectHighlightInvalid, setAbout } from '../../inputSlice';
