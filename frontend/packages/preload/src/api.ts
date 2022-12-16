@@ -735,6 +735,7 @@ export const getAllEntries = async (): Promise<{entries: Entry[]} | null> => {
           result.length === 0 ||
             (result[0] instanceof Object && Object.hasOwn(result[0], 'createdOn')),
           pc.yellow('API: getAllEntries: result is not an array of Entries'),
+          result[0],
         );
 
         if (result === null) resolve(null);
