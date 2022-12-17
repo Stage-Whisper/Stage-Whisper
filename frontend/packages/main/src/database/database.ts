@@ -1,12 +1,14 @@
-import {PrismaClient} from '@prisma/client';
-// import {app} from 'electron';
-// import {existsSync} from 'fs';
-// import {join} from 'path';
+import {PrismaClient} from './generated';
+import {app} from 'electron';
+import {existsSync} from 'fs';
+import {join} from 'path';
 
 // Set up Prisma/SQLite
 console.log('Initializing Database');
 
-export const prisma = new PrismaClient();
+export const prisma = new PrismaClient({
+  errorFormat: 'pretty',
+});
 
 // Add prisma middleware
 prisma.$use(async (params, next) => {
@@ -19,11 +21,13 @@ prisma.$use(async (params, next) => {
 prisma.$connect();
 
 // Check if the database exists
-// if (!existsSync(join(app.getPath('userData'), 'store', 'database.sqlite'))) {
-// console.log('Database does not exist, creating...');
-
-// const rootPath = app.getPath('userData'); // Path to the top level of the data folder
-// const storePath = join(rootPath, 'store'); // Path to the store folder
+if (!existsSync(join(app.getPath('userData'), 'store', 'database.sqlite'))) {
+  console.log('Database does not exist, creating...');
+}
+const rootPath = app.getPath('userData'); // Path to the top level of the data folder
+const storePath = join(rootPath, 'store'); // Path to the store folder
+console.log('Root Path: ' + rootPath);
+console.log('Store Path: ' + storePath);
 
 /// ---------------------- Types ---------------------- ///
 

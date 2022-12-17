@@ -3,8 +3,8 @@ import type {
   exportTranscriptionReturn,
 } from './../../../preload/src/index';
 // Database
-import type {Line} from '@prisma/client';
-import {prisma} from '../database';
+import type {Line} from '../database/generated';
+import {prisma} from '../database/database';
 
 // Packages
 import {app, ipcMain} from 'electron';

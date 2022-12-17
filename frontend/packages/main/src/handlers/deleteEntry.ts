@@ -1,5 +1,5 @@
 // Database
-import {prisma} from '../database';
+import {prisma} from '../database/database';
 
 // Packages
 import {ipcMain} from 'electron';

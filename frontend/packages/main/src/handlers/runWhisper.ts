@@ -1,6 +1,6 @@
 // Database
-import type {Transcription} from '@prisma/client';
-import {prisma, transcriptionStatus} from '../database';
+import type {Transcription} from '../database/generated';
+import {prisma, transcriptionStatus} from '../database/database';
 
 // Packages
 import {spawn} from 'child_process';

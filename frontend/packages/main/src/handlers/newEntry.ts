@@ -1,7 +1,7 @@
 import type {newEntryParams, newEntryReturn} from './../../../preload/src/index';
 import * as pc from 'picocolors';
 // Database
-import {prisma} from '../database';
+import {prisma} from '../database/database';
 
 // Packages
 import {app, ipcMain} from 'electron';
@@ -11,7 +11,7 @@ import {v4 as uuidv4} from 'uuid';
 
 // Types
 import type {IpcMainInvokeEvent} from 'electron';
-import type {Entry} from '@prisma/client';
+import type {Entry} from '../database/generated';
 import {Channels} from '../../../../types/channels';
 
 export default ipcMain.handle(

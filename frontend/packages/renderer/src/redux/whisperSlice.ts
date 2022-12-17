@@ -3,9 +3,11 @@ import {showNotification, updateNotification} from '@mantine/notifications';
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit';
 
 // Types
-import type {Entry} from '@prisma/client';
+import type {Entry} from './../../../main/src/database/generated';
 import type {WhisperArgs} from '../../../../types/whisper';
-import type {RunWhisperResponse} from '../../../main/src/handlers/runWhisper';
+import {runWhisper} from '#preload';
+import type {runWhisperReturn} from '#preload';
+
 import type {RootState} from './store';
 
 // WhisperSlice
@@ -27,7 +29,7 @@ const initialState: WhisperState = {
 export const passToWhisper = createAsyncThunk(
   // A promise that will be resolved when the transcription is complete
   'whisper/passToWhisper',
-  async ({entry, args}: {entry: Entry; args?: WhisperArgs}): Promise<RunWhisperResponse> => {
+  async ({entry, args}: {entry: Entry; args?: WhisperArgs}): Promise<runWhisperReturn> => {
     // If no arguments are passed, use the audio path as the input
     // Other arguments will be set to default values in the electron handler
     if (!args) {
@@ -37,7 +39,11 @@ export const passToWhisper = createAsyncThunk(
     }
 
     // Send the request to the electron handler
-    const result = await window.Main.runWhisper(args, entry); // Resolves when the transcription is complete
+    const result = await runWhisper({
+      whisperArgs: args,
+      entryUUID: entry.uuid,
+    }); // Resolves when the transcription is complete
+    // const result = await window.Main.runWhisper(args, entry);
     // Result of the transcription
 
     console.log('passToWhisper result', result);

@@ -1,6 +1,6 @@
 // Database
-import type {Line} from '@prisma/client';
-import {prisma} from '../database';
+import type {Line} from '../database/generated';
+import {prisma} from '../database/database';
 
 // Types
 import type {IpcMainInvokeEvent as invoke, IpcMainInvokeEvent} from 'electron';

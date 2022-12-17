@@ -1,7 +1,7 @@
 import {Button, Card, Center, Divider, Grid, Group, Loader, Stack, Text} from '@mantine/core';
 import {useMediaQuery} from '@mantine/hooks';
 import {IconFileCheck, IconFileDescription} from '@tabler/icons';
-import * as React from 'react';
+// import * as React from 'react';
 import {useNavigate} from 'react-router-dom';
 
 // Redux
@@ -13,7 +13,7 @@ import strings from '../../localization';
 import {passToWhisper, selectTranscribingStatus} from '../../../redux/whisperSlice';
 import type {ReduxEntry} from '../../../redux/entrySlice';
 import {getLocalFiles} from '../../../redux/entrySlice';
-import type {Entry} from '@prisma/client';
+import {deleteEntry, exportTranscription, getEntry} from '#preload';
 
 function TranscriptionCard({entry}: {entry: ReduxEntry}) {
   const dispatch = useAppDispatch();
@@ -34,7 +34,16 @@ function TranscriptionCard({entry}: {entry: ReduxEntry}) {
           onClick={() => {
             // Get the latest transcription
             const transcription = entry.transcriptions[entry.transcriptions.length - 1];
-            window.Main.exportTranscription(transcription.uuid, entry);
+            // window.Main.exportTranscription(transcription.uuid, entry);
+            exportTranscription({
+              transcriptionUUID: transcription.uuid,
+            })
+              .then(res => {
+                console.log(res);
+              })
+              .catch(err => {
+                console.log(err);
+              });
           }}
           color="green.6"
           variant="outline"
@@ -56,11 +65,11 @@ function TranscriptionCard({entry}: {entry: ReduxEntry}) {
         <Button
           onClick={async () => {
             try {
-              const normalizedEntry = (await window.Main.GET_ENTRY({
-                entryUUID: entry.uuid,
-              })) as Entry;
+              const normalizedEntry = await getEntry({entryUUID: entry.uuid});
               if (!normalizedEntry) throw new Error('Entry not found');
-              await window.Main.deleteEntry(normalizedEntry).then(() => {
+              deleteEntry({
+                entryUUID: entry.uuid,
+              }).then(() => {
                 console.log('Deleted: Reloading local files');
                 dispatch(getLocalFiles());
               });
@@ -106,11 +115,12 @@ function TranscriptionCard({entry}: {entry: ReduxEntry}) {
           <Button
             onClick={async () => {
               try {
-                const normalizedEntry = (await window.Main.GET_ENTRY({
-                  entryUUID: entry.uuid,
-                })) as Entry;
+                const normalizedEntry = await getEntry({entryUUID: entry.uuid});
+
                 if (!normalizedEntry) throw new Error('Entry not found');
-                await window.Main.deleteEntry(normalizedEntry).then(() => {
+                deleteEntry({
+                  entryUUID: entry.uuid,
+                }).then(() => {
                   console.log('Deleted: Reloading local files');
                   dispatch(getLocalFiles());
                 });
