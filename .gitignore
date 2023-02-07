@@ -1,2 +1,7 @@
 electron/database.db
 electron/reports
+node_modules
+.eslintcache
+.DS_Store
+dev.db
+frontend/prisma/dev.db
