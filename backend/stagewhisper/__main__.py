@@ -5,13 +5,14 @@ import os
 import warnings
 from whisper.utils import write_vtt
 
+
 @click.command()
 @click.option(
     "--input",
     "-i",
     type=click.Path(),
     required=True,
-    help="Audio file to transcribe."
+    help="Audio file to transcribe.",
 )
 @click.option(
     "--model",
@@ -19,7 +20,7 @@ from whisper.utils import write_vtt
     default="base",
     type=click.Choice(whisper.available_models(), case_sensitive=True),
     show_default=True,
-    help="Model to use. Smaller models are more efficient, but are less accurate. Models that end in '.en' are English-only models."
+    help="Model to use. Smaller models are more efficient, but are less accurate. Models that end in '.en' are English-only models.",
 )
 @click.option(
     "--device",
@@ -27,7 +28,7 @@ from whisper.utils import write_vtt
     default="cuda" if torch.cuda.is_available() else "cpu",
     type=click.Choice(['cuda', 'cpu'], case_sensitive=False),
     show_default=True,
-    help="What device to use for PyTorch inference"
+    help="What device to use for PyTorch inference",
 )
 @click.option(
     "--output_dir",
@@ -36,7 +37,7 @@ from whisper.utils import write_vtt
     default=".",
     show_default=True,
     type=click.Path(),
-    help="Where to save output text files"
+    help="Where to save output text files",
 )
 @click.option(
     "--verbose",
@@ -45,7 +46,7 @@ from whisper.utils import write_vtt
     required=False,
     default=True,
     show_default=True,
-    help="Whether to print out the progress and debug messages"
+    help="Whether to print out the progress and debug messages",
 )
 @click.option(
     "--task",
@@ -54,7 +55,7 @@ from whisper.utils import write_vtt
     default="transcribe",
     type=click.Choice(['translate', 'transcribe'], case_sensitive=False),
     show_default=True,
-    help="Whether to perform X->X speech recognition ('transcribe') or X->English translation ('translate')"
+    help="Whether to perform X->X speech recognition ('transcribe') or X->English translation ('translate')",
 )
 @click.option(
     "--language",
@@ -62,7 +63,7 @@ from whisper.utils import write_vtt
     default=None,
     show_default=True,
     type=str,
-    help="Language spoken in the audio, specify 'None' to perform language detection"
+    help="Language spoken in the audio, specify 'None' to perform language detection",
 )
 def cli(input, model, device, output_dir, verbose, task, language):
     """
@@ -74,21 +75,25 @@ def cli(input, model, device, output_dir, verbose, task, language):
     """
     os.makedirs(output_dir, exist_ok=True)
     if model.endswith(".en") and language != "en":
-        warnings.warn(f"{model} is an English-only model but '{language}' was selected; using English instead.")
+        warnings.warn(
+            f"{model} is an English-only model but '{language}' was selected; using English instead."
+        )
         language = "en"
-    
+
     loaded_model = whisper.load_model(model, device=device)
     result = loaded_model.transcribe(input)
-    
+
     audio_basename = os.path.basename(input)
     # # save TXT
     # with open(os.path.join(output_dir, audio_basename + ".txt"), "w", encoding="utf-8") as txt:
     #     print(result["text"], file=txt)
 
     # save VTT
-    with open(os.path.join(output_dir, audio_basename + ".vtt"), "w", encoding="utf-8") as vtt:
+    with open(
+        os.path.join(output_dir, audio_basename + ".vtt"), "w", encoding="utf-8"
+    ) as vtt:
         write_vtt(result["segments"], file=vtt)
-    
+
     print(result["text"])
 
 
