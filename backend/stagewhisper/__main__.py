@@ -46,10 +46,7 @@ from whisper.utils import write_vtt
 @click.option(
     "--verbose",
     "-v",
-    type=bool,
-    required=False,
-    default=True,
-    show_default=True,
+    is_flag=True,
     help="Whether to print out the progress and debug messages",
 )
 @click.option(
