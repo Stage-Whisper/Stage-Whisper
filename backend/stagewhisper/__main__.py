@@ -1,8 +1,9 @@
+import os
+import warnings
+
 import rich_click as click
 import torch
 import whisper
-import os
-import warnings
 from whisper.utils import write_vtt
 
 
