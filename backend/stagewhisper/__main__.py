@@ -69,7 +69,7 @@ from whisper.utils import write_vtt
     type=str,
     help="Language spoken in the audio, specify 'None' to perform language detection",
 )
-def cli(input, model, device, output_dir, verbose, task, language):
+def cli(in_file, model, device, output_dir, verbose, task, language):
     """
     Command line interface for Stage Whisper Python component.
     Uses the whisper package to transcribe and translate audio files,
@@ -87,9 +87,9 @@ def cli(input, model, device, output_dir, verbose, task, language):
         language = "en"
 
     loaded_model = whisper.load_model(model, device=device)
-    result = loaded_model.transcribe(input, language=language, verbose=verbose)
+    result = loaded_model.transcribe(in_file, language=language, verbose=verbose)
 
-    audio_basename = os.path.basename(input)
+    audio_basename = os.path.basename(in_file)
     # # save TXT
     # with open(os.path.join(output_dir, audio_basename + ".txt"), "w", encoding="utf-8") as txt:
     #     print(result["text"], file=txt)
