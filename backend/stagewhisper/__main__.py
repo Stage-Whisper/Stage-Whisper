@@ -20,7 +20,10 @@ from whisper.utils import write_vtt
     default="base",
     type=click.Choice(whisper.available_models(), case_sensitive=True),
     show_default=True,
-    help="Model to use. Smaller models are more efficient, but are less accurate. Models that end in '.en' are English-only models.",
+    help=(
+        "Model to use. Smaller models are more efficient, but are less accurate."
+        " Models that end in '.en' are English-only models."
+    ),
 )
 @click.option(
     "--device",
@@ -55,7 +58,10 @@ from whisper.utils import write_vtt
     default="transcribe",
     type=click.Choice(['translate', 'transcribe'], case_sensitive=False),
     show_default=True,
-    help="Whether to perform X->X speech recognition ('transcribe') or X->English translation ('translate')",
+    help=(
+        "Whether to perform X->X speech recognition ('transcribe')"
+        " or X->English translation ('translate')"
+    ),
 )
 @click.option(
     "--language",
@@ -68,7 +74,8 @@ from whisper.utils import write_vtt
 def cli(input, model, device, output_dir, verbose, task, language):
     """
     Command line interface for Stage Whisper Python component.
-    Uses the whisper package to transcribe and translate audio files, as well as format the output text.
+    Uses the whisper package to transcribe and translate audio files,
+    as well as format the output text.
     This function is copied and modified from the original whisper CLI
     function at
     https://github.com/openai/whisper/blob/c85eaaa/whisper/transcribe.py#L227
@@ -76,7 +83,8 @@ def cli(input, model, device, output_dir, verbose, task, language):
     os.makedirs(output_dir, exist_ok=True)
     if model.endswith(".en") and language != "en":
         warnings.warn(
-            f"{model} is an English-only model but '{language}' was selected; using English instead."
+            f"{model} is an English-only model but '{language}' was selected;"
+            f" using English instead."
         )
         language = "en"
 
