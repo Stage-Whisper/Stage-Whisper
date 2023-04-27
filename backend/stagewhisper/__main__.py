@@ -87,7 +87,7 @@ def cli(input, model, device, output_dir, verbose, task, language):
         language = "en"
 
     loaded_model = whisper.load_model(model, device=device)
-    result = loaded_model.transcribe(input)
+    result = loaded_model.transcribe(input, language=language, verbose=verbose)
 
     audio_basename = os.path.basename(input)
     # # save TXT
